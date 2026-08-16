@@ -19,7 +19,7 @@ export default function Header() {
       <nav className="mx-auto flex max-w-[1180px] items-center justify-between px-7 py-3">
         <Link href="/" className="flex items-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/logo-horizontal.jpeg" alt="GiftGrid" className="h-9 w-auto object-contain" />
+          <img src="/images/logo-horizontal.png" alt="GiftGrid" className="h-9 w-auto object-contain" />
         </Link>
 
         <ul className="hidden gap-8 text-[14.5px] text-textSecondary md:flex">
@@ -37,7 +37,7 @@ export default function Header() {
             Sign In
           </Link>
           <Link
-            href="/merchant/application"
+            href="/auth/sign-up"
             className="rounded-full px-5 py-2.5 text-[14px] font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5"
             style={{ background: "linear-gradient(90deg, #4F46E5, #F97316)" }}
           >
@@ -73,7 +73,7 @@ export default function Header() {
               Sign In
             </Link>
             <Link
-              href="/merchant/application"
+              href="/auth/sign-up"
               className="rounded-full px-5 py-3 text-center text-[14px] font-semibold text-white"
               style={{ background: "linear-gradient(90deg, #4F46E5, #F97316)" }}
             >

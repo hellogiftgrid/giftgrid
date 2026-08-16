@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { siteConfig } from "@/config/branding";
+import VideoBackground from "@/components/shared/VideoBackground";
 
-// Hero background.
-// Once the Veo-generated clip exists, drop it at /public/videos/hero.mp4
-// and /public/images/hero-poster.jpg, then uncomment the <video> block below.
-// A dark scrim keeps the headline legible over footage specifically in this
-// section, independent of the site's light theme elsewhere.
+// Drop an 8s looping clip at /public/videos/hero.mp4 (+ poster at
+// /public/images/hero-poster.jpg) to enable — VideoBackground no-ops
+// gracefully with the blob/gradient backdrop underneath until then.
 export default function Hero() {
   return (
     <section className="relative overflow-hidden border-b border-borderCustom">
@@ -13,19 +12,7 @@ export default function Hero() {
       <div className="absolute left-[8%] top-16 h-64 w-64 animate-blobDrift rounded-full bg-accent/10 blur-3xl" />
       <div className="absolute right-[10%] top-32 h-56 w-56 animate-blobDrift rounded-full bg-accentAlt/10 blur-3xl" style={{ animationDelay: "2s" }} />
 
-      {/*
-      <video
-        className="absolute inset-0 h-full w-full object-cover"
-        autoPlay
-        muted
-        loop
-        playsInline
-        poster="/images/hero-poster.jpg"
-      >
-        <source src="/videos/hero.mp4" type="video/mp4" />
-      </video>
-      <div className="absolute inset-0 bg-black/40" />
-      */}
+      <VideoBackground src="/videos/hero.mp4" poster="/images/hero-poster.jpg" overlayClassName="bg-black/40" />
 
       <div className="relative z-10 mx-auto grid max-w-[1180px] items-center gap-14 px-7 py-24 lg:grid-cols-[1.05fr_0.95fr] lg:py-32">
         <div>
@@ -41,7 +28,7 @@ export default function Hero() {
 
           <div className="mt-9 flex flex-wrap items-center gap-4">
             <Link
-              href="/merchant/application"
+              href="/auth/sign-up"
               className="rounded-full px-7 py-3.5 text-[14.5px] font-semibold text-white shadow-md transition-transform hover:-translate-y-0.5"
               style={{ background: "linear-gradient(90deg, #4F46E5, #F97316)" }}
             >
@@ -64,7 +51,8 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Illustrative category collage — abstract gradient tiles, not real product photography */}
+        {/* Illustrative category collage — abstract gradient tiles, not real product photography.
+            Each tile jumps to its full write-up in the Opportunity Network section below. */}
         <div className="grid grid-cols-2 gap-4">
           {[
             { label: "Corporate Gifting", from: "#4F46E5", to: "#818CF8" },
@@ -72,13 +60,27 @@ export default function Hero() {
             { label: "Bulk Buyers", from: "#0EA5E9", to: "#38BDF8" },
             { label: "Employee Rewards", from: "#EC4899", to: "#F472B6" },
           ].map((tile, i) => (
-            <div
+            <Link
               key={tile.label}
-              className={`flex aspect-square flex-col justify-end rounded-2xl p-5 text-white shadow-lg ${i === 1 ? "translate-y-6" : ""}`}
+              href="/#network"
+              className={`group flex aspect-square flex-col justify-end rounded-2xl p-5 text-white shadow-lg outline-none transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl focus-visible:-translate-y-2 focus-visible:ring-2 focus-visible:ring-white ${i === 1 ? "translate-y-6" : ""}`}
               style={{ background: `linear-gradient(135deg, ${tile.from}, ${tile.to})` }}
             >
-              <span className="text-[13.5px] font-semibold">{tile.label}</span>
-            </div>
+              <span className="flex items-center gap-1.5 text-[13.5px] font-semibold">
+                {tile.label}
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  className="-translate-x-1 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </span>
+            </Link>
           ))}
         </div>
       </div>

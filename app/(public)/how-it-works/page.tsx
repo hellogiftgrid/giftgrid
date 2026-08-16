@@ -95,7 +95,7 @@ export default function HowItWorksPage() {
             </h2>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
-                href="/merchant/application"
+                href="/auth/sign-up"
                 className="rounded-[3px] bg-accent px-6 py-3 text-[14.5px] font-semibold text-primary transition-transform hover:-translate-y-0.5"
               >
                 Apply as a Merchant

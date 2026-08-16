@@ -36,13 +36,8 @@ export default function Footer() {
       <div className="mx-auto max-w-[1180px] px-7 pb-8 pt-16">
         <div className="mb-14 grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            {/* The source file has a white background, not transparent — the white
-                pill keeps it looking intentional on the dark footer instead of a
-                broken box. Swap for a transparent PNG when you have one. */}
-            <div className="inline-block rounded-lg bg-white px-3 py-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/logo-horizontal.jpeg" alt="GiftGrid" className="h-7 w-auto object-contain" />
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/logo-horizontal.png" alt="GiftGrid" className="h-8 w-auto object-contain" />
             <p className="mt-3.5 max-w-[280px] text-[14px] leading-relaxed text-footerTextSecondary">
               {siteConfig.tagline} {siteConfig.description}
             </p>

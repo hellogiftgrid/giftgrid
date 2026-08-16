@@ -58,6 +58,18 @@ export const opportunityCategories = [
   "Events",
 ] as const;
 
+export const opportunityCategoryDescriptions: Record<(typeof opportunityCategories)[number], string> = {
+  "Corporate Gifting": "Curated holiday and milestone gifting programs for companies buying at scale.",
+  "Bulk Buyers": "Buyers looking to purchase large quantities direct from your store.",
+  Wholesale: "Wholesale accounts that stock and resell your products.",
+  Retail: "Retail partners looking to carry your brand in-store or online.",
+  "Corporate Procurement": "Procurement teams sourcing vendors for recurring business needs.",
+  Distributors: "Distribution partners to help your products reach new regions and channels.",
+  "Employee Reward Platforms": "Rewards and recognition platforms that feature merchandise for employees.",
+  Hospitality: "Hotels, airlines, and hospitality brands sourcing amenities and guest gifts.",
+  Events: "Conference, trade show, and event organizers sourcing branded merchandise.",
+};
+
 // Real, factual capability claim — GiftGrid can review stores on these
 // platforms. Not a claim of partnership or endorsement.
 export const supportedPlatforms = [

@@ -118,7 +118,7 @@ export default function StoreReviewPage() {
               See what your store's review would look like.
             </h2>
             <Link
-              href="/merchant/application"
+              href="/auth/sign-up"
               className="mt-8 inline-flex rounded-[3px] bg-accent px-6 py-3 text-[14.5px] font-semibold text-primary transition-transform hover:-translate-y-0.5"
             >
               Apply as a Merchant

@@ -35,7 +35,7 @@ export default function HomePage() {
             </h2>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
-                href="/merchant/application"
+                href="/auth/sign-up"
                 className="rounded-full px-7 py-3.5 text-[14.5px] font-semibold text-white shadow-md transition-transform hover:-translate-y-0.5"
                 style={{ background: "linear-gradient(90deg, #4F46E5, #F97316)" }}
               >

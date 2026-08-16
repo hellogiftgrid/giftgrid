@@ -16,7 +16,7 @@ export default function AuthShell({
       <div className="w-full max-w-[400px]">
         <Link href="/" className="mb-10 flex items-center justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/logo-horizontal.jpeg" alt="GiftGrid" className="h-10 w-auto object-contain" />
+          <img src="/images/logo-horizontal.png" alt="GiftGrid" className="h-10 w-auto object-contain" />
         </Link>
 
         <div className="rounded-md border border-borderCustom bg-secondary p-8">
