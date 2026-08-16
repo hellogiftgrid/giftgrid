@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter, IBM_Plex_Mono } from "next/font/google";
+import { Sora, Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/config/branding";
 
-const fraunces = Fraunces({
+const sora = Sora({
   subsets: ["latin"],
   variable: "--font-display",
-  weight: "variable",
+  weight: ["400", "600", "700", "800"],
 });
 
 const inter = Inter({
@@ -32,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${inter.variable} ${plexMono.variable}`}>
+    <html lang="en" className={`${sora.variable} ${inter.variable} ${plexMono.variable}`}>
       <body>{children}</body>
     </html>
   );
