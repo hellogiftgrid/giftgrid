@@ -6,7 +6,7 @@ import { siteConfig } from "@/config/branding";
 const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-display",
-  weight: ["300", "450", "560", "650"],
+  weight: "variable",
 });
 
 const inter = Inter({
