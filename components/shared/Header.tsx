@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { siteConfig } from "@/config/branding";
 
 const navLinks = [
   { href: "/how-it-works", label: "How It Works" },
@@ -16,11 +15,11 @@ export default function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-borderCustom bg-primary/80 backdrop-blur-md">
-      <nav className="mx-auto flex max-w-[1180px] items-center justify-between px-7 py-4">
-        <Link href="/" className="flex items-center gap-2 font-display text-[21px] font-semibold">
-          <span className="h-[7px] w-[7px] rounded-full bg-accent shadow-[0_0_10px_theme(colors.accent)]" />
-          {siteConfig.name}
+    <header className="sticky top-0 z-50 border-b border-borderCustom bg-primary/85 backdrop-blur-md">
+      <nav className="mx-auto flex max-w-[1180px] items-center justify-between px-7 py-3">
+        <Link href="/" className="flex items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/logo-horizontal.jpeg" alt="GiftGrid" className="h-9 w-auto object-contain" />
         </Link>
 
         <ul className="hidden gap-8 text-[14.5px] text-textSecondary md:flex">
@@ -39,7 +38,8 @@ export default function Header() {
           </Link>
           <Link
             href="/merchant/application"
-            className="rounded-[3px] bg-accent px-5 py-2.5 text-[14px] font-semibold text-primary transition-transform hover:-translate-y-0.5"
+            className="rounded-full px-5 py-2.5 text-[14px] font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5"
+            style={{ background: "linear-gradient(90deg, #4F46E5, #F97316)" }}
           >
             Apply as Merchant
           </Link>
@@ -74,7 +74,8 @@ export default function Header() {
             </Link>
             <Link
               href="/merchant/application"
-              className="rounded-[3px] bg-accent px-5 py-3 text-center text-[14px] font-semibold text-primary"
+              className="rounded-full px-5 py-3 text-center text-[14px] font-semibold text-white"
+              style={{ background: "linear-gradient(90deg, #4F46E5, #F97316)" }}
             >
               Apply as Merchant
             </Link>

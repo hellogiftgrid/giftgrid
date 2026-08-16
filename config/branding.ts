@@ -1,22 +1,39 @@
 // GiftGrid design tokens — single source of truth.
 // Referenced by tailwind.config.ts. Change values here, not in components.
+// Light, colorful marketplace identity (v2) — replaces the dark/gold v1 palette.
 
 export const colors = {
-  primary: "#0B0F19",       // deep charcoal blue — base background
-  secondary: "#1E293B",     // deep navy slate — card/section surface
-  secondarySoft: "#161F30", // slightly lighter than primary, for banded sections
-  accent: "#D4AF37",        // brushed gold — restrained accent only
-  accentDim: "#8A7326",
-  textPrimary: "#F8FAFC",
-  textSecondary: "#94A3B8",
-  borderCustom: "#334155",
-  success: "#22C55E",
+  // Page + surfaces
+  primary: "#F8FAFC",        // page background — soft off-white
+  secondary: "#FFFFFF",      // card / surface
+  secondarySoft: "#F1F5F9",  // banded section background
+
+  // Text
+  textPrimary: "#0F172A",    // deep navy, near-black
+  textSecondary: "#64748B",  // slate gray
+
+  // Borders
+  borderCustom: "#E2E8F0",
+
+  // Brand accents — gradient duo used across CTAs, icons, the logomark
+  accent: "#4F46E5",         // indigo — primary accent
+  accentAlt: "#F97316",      // orange — secondary accent, used sparingly
+  accentDim: "#4338CA",
+
+  // Status
+  success: "#16A34A",
   warning: "#F59E0B",
   danger: "#EF4444",
+
+  // Footer intentionally inverts for contrast, like most marketplace sites
+  footerBg: "#0F172A",
+  footerText: "#F8FAFC",
+  footerTextSecondary: "#94A3B8",
+  footerBorder: "#1E293B",
 } as const;
 
 export const fonts = {
-  display: ["Fraunces", "serif"],
+  display: ["Sora", "sans-serif"],
   body: ["Inter", "system-ui", "sans-serif"],
   mono: ['"IBM Plex Mono"', "monospace"],
 } as const;
@@ -39,4 +56,14 @@ export const opportunityCategories = [
   "Employee Reward Platforms",
   "Hospitality",
   "Events",
+] as const;
+
+// Real, factual capability claim — GiftGrid can review stores on these
+// platforms. Not a claim of partnership or endorsement.
+export const supportedPlatforms = [
+  "Shopify",
+  "WooCommerce",
+  "BigCommerce",
+  "Magento",
+  "Wix",
 ] as const;
