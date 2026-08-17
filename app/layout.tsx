@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Sora, Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/config/branding";
+import ChatWidget from "@/components/shared/ChatWidget";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -33,7 +34,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${sora.variable} ${inter.variable} ${plexMono.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <ChatWidget />
+      </body>
     </html>
   );
 }

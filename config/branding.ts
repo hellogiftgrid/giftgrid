@@ -71,11 +71,25 @@ export const opportunityCategoryDescriptions: Record<(typeof opportunityCategori
 };
 
 // Real, factual capability claim — GiftGrid can review stores on these
-// platforms. Not a claim of partnership or endorsement.
+// platforms. Not a claim of partnership or endorsement. `slug` maps to
+// /public/images/platforms/<slug>.png — falls back to text if not present.
 export const supportedPlatforms = [
-  "Shopify",
-  "WooCommerce",
-  "BigCommerce",
-  "Magento",
-  "Wix",
+  { name: "Shopify", slug: "shopify" },
+  { name: "WooCommerce", slug: "woocommerce" },
+  { name: "BigCommerce", slug: "bigcommerce" },
+  { name: "Magento", slug: "magento" },
+  { name: "Wix", slug: "wix" },
+] as const;
+
+// Corporate gifting / rewards platforms GiftGrid routes merchant opportunities
+// through. `slug` maps to the logo filename in /public/images/partners/<slug>.png.
+// `chip: "dark"` is for logos that are white-on-color by design (no transparent
+// background possible) — those render inside a small dark card instead of bare.
+export const partnerNetwork = [
+  { name: "Goody", slug: "goody" },
+  { name: "Sendoso", slug: "sendoso" },
+  { name: "Snappy", slug: "snappy", chip: "dark" },
+  { name: "Guusto", slug: "guusto" },
+  { name: "Stadium", slug: "stadium" },
+  { name: "Gifted.co", slug: "gifted" },
 ] as const;
