@@ -1,31 +1,30 @@
 // GiftGrid design tokens — single source of truth.
-// Referenced by tailwind.config.ts. Change values here, not in components.
-// Light, colorful marketplace identity (v2) — replaces the dark/gold v1 palette.
+// Light, bright marketplace identity with high-contrast text and crisp actions.
 
 export const colors = {
   // Page + surfaces
-  primary: "#F8FAFC",        // page background — soft off-white
-  secondary: "#FFFFFF",      // card / surface
-  secondarySoft: "#F1F5F9",  // banded section background
+  primary: "#FFFFFF",        // Clean bright white page base
+  secondary: "#F8FAFC",      // Soft light gray for card surfaces
+  secondarySoft: "#F1F5F9",  // Subtle slate panel backgrounds
 
   // Text
-  textPrimary: "#0F172A",    // deep navy, near-black
-  textSecondary: "#64748B",  // slate gray
+  textPrimary: "#0F172A",    // Deep obsidian navy for headers
+  textSecondary: "#475569",  // Dark slate for paragraphs
 
   // Borders
-  borderCustom: "#E2E8F0",
+  borderCustom: "#CBD5E1",   
 
-  // Brand accents — gradient duo used across CTAs, icons, the logomark
-  accent: "#4F46E5",         // indigo — primary accent
-  accentAlt: "#F97316",      // orange — secondary accent, used sparingly
-  accentDim: "#4338CA",
+  // Brand accents
+  accent: "#4F46E5",         
+  accentAlt: "#EA580C",      
+  accentDim: "#3730A3",      
 
   // Status
   success: "#16A34A",
-  warning: "#F59E0B",
-  danger: "#EF4444",
+  warning: "#D97706",
+  danger: "#DC2626",
 
-  // Footer intentionally inverts for contrast, like most marketplace sites
+  // Footer
   footerBg: "#0F172A",
   footerText: "#F8FAFC",
   footerTextSecondary: "#94A3B8",
@@ -56,7 +55,20 @@ export const opportunityCategories = [
   "Employee Reward Platforms",
   "Hospitality",
   "Events",
-] as const;
+ ] as const;
+
+// Verified mapping file matching your exact folder system setup
+export const opportunityImages: Record<string, string> = {
+  "Corporate Gifting": "/images/coporate gifting.jfif",
+  "Bulk Buyers": "/images/bulk buyers.jfif", 
+  "Wholesale": "/images/whosale.jfif",
+  "Retail": "/images/retail.jfif",
+  "Corporate Procurement": "/images/coporate procurement.jfif",
+  "Distributors": "/images/distributors.jfif",
+  "Employee Reward Platforms": "/images/employee reward platform.jfif",
+  "Hospitality": "/images/hosppitality.jfif", 
+  "Events": "/images/events.jfif",
+};
 
 export const opportunityCategoryDescriptions: Record<(typeof opportunityCategories)[number], string> = {
   "Corporate Gifting": "Curated holiday and milestone gifting programs for companies buying at scale.",
@@ -70,21 +82,15 @@ export const opportunityCategoryDescriptions: Record<(typeof opportunityCategori
   Events: "Conference, trade show, and event organizers sourcing branded merchandise.",
 };
 
-// Real, factual capability claim — GiftGrid can review stores on these
-// platforms. Not a claim of partnership or endorsement. `slug` maps to
-// /public/images/platforms/<slug>.png — falls back to text if not present.
+// Fixed to ensure paths don't use raw blank spaces that encode into broken %20 links!
 export const supportedPlatforms = [
-  { name: "Shopify", slug: "shopify" },
-  { name: "WooCommerce", slug: "woocommerce" },
-  { name: "BigCommerce", slug: "bigcommerce" },
-  { name: "Magento", slug: "magento" },
-  { name: "Wix", slug: "wix" },
+  { name: "Shopify", slug: "shopify.png" },
+  { name: "WooCommerce", slug: "woocommerce.png" },
+  { name: "BigCommerce", slug: "big_commerce.jfif" }, // Linked to snake_case format
+  { name: "Magento", slug: "magento.jfif" },
+  { name: "Wix", slug: "wix.png" },
 ] as const;
 
-// Corporate gifting / rewards platforms GiftGrid routes merchant opportunities
-// through. `slug` maps to the logo filename in /public/images/partners/<slug>.png.
-// `chip: "dark"` is for logos that are white-on-color by design (no transparent
-// background possible) — those render inside a small dark card instead of bare.
 export const partnerNetwork = [
   { name: "Goody", slug: "goody" },
   { name: "Sendoso", slug: "sendoso" },

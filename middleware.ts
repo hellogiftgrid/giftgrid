@@ -9,23 +9,24 @@ export async function middleware(request: NextRequest) {
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
+       {
       cookies: {
         get(name: string) {
           return request.cookies.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
+          // Updates request headers for downstream components
           request.cookies.set({ name, value, ...options });
-          response = NextResponse.next({ request: { headers: request.headers } });
+          // Updates response cookies for the browser client without reinstantiating the response
           response.cookies.set({ name, value, ...options });
         },
         remove(name: string, options: CookieOptions) {
           request.cookies.set({ name, value: "", ...options });
-          response = NextResponse.next({ request: { headers: request.headers } });
           response.cookies.set({ name, value: "", ...options });
         },
       },
     }
+
   );
 
   // Refreshing the session here keeps server components' cookies current —
@@ -39,4 +40,4 @@ export const config = {
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|images/|api/).*)",
   ],
-};
+}; // <--- Make sure this closing bracket and semicolon are here!

@@ -1,87 +1,64 @@
 import Link from "next/link";
 import { siteConfig } from "@/config/branding";
-import VideoBackground from "@/components/shared/VideoBackground";
 
-// Drop an 8s looping clip at /public/videos/hero.mp4 (+ poster at
-// /public/images/hero-poster.jpg) to enable — VideoBackground no-ops
-// gracefully with the blob/gradient backdrop underneath until then.
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden border-b border-borderCustom">
-      <div className="hero-blob-bg absolute inset-0" />
-      <div className="absolute left-[8%] top-16 h-64 w-64 animate-blobDrift rounded-full bg-accent/10 blur-3xl" />
-      <div className="absolute right-[10%] top-32 h-56 w-56 animate-blobDrift rounded-full bg-accentAlt/10 blur-3xl" style={{ animationDelay: "2s" }} />
+    <section className="relative flex min-h-[86vh] items-center overflow-hidden border-b border-slate-200 bg-white">
+      {/* Background video layer - Opacity set to 100% for full clarity */}
+      <video
+        className="absolute inset-0 h-full w-full object-cover opacity-100"
+        autoPlay
+        muted
+        loop
+        playsInline
+        poster="/images/hero-poster.jpg"
+      >
+        <source src="/videos/hero.mp4" type="video/mp4" />
+      </video>
 
-      <VideoBackground src="/videos/hero.mp4" poster="/images/hero-poster.jpg" overlayClassName="bg-black/40" />
+      {/* 
+        This is the secret sauce: A smart white gradient overlay. 
+        It fades to transparent on the right so your video stays 100% visible, 
+        but adds a clean white fade behind the text so it stays perfectly legible!
+      */}
+      <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-white/10 md:to-transparent" />
+      <div className="hero-grid-bg absolute inset-0 animate-driftGrid opacity-5" />
 
-      <div className="relative z-10 mx-auto grid max-w-[1180px] items-center gap-14 px-7 py-24 lg:grid-cols-[1.05fr_0.95fr] lg:py-32">
-        <div>
-          <span className="inline-block rounded-full border border-borderCustom bg-secondary px-4 py-1.5 font-mono text-[12px] uppercase tracking-[0.1em] text-accent">
-            B2B Merchant Opportunity Platform
-          </span>
-          <h1 className="mt-6 max-w-[600px] font-display text-[clamp(36px,5vw,58px)] font-bold leading-[1.08] tracking-tight text-textPrimary">
-            Position your brand for corporate gifting opportunities.
-          </h1>
-          <p className="mt-5 max-w-[480px] text-[clamp(15px,1.5vw,18px)] leading-relaxed text-textSecondary">
-            {siteConfig.description}
-          </p>
+      <div className="relative z-10 mx-auto w-full max-w-[1180px] px-7 py-28">
+        <span className="font-mono text-[12px] uppercase tracking-[0.14em] text-indigo-700 font-bold drop-shadow-sm">
+          B2B Merchant Opportunity Platform
+        </span>
+        
+        {/* Text styling with a small shadow filter to pop over the video background element */}
+        <h1 className="mt-5 max-w-[820px] font-display text-[clamp(38px,5.6vw,68px)] font-bold leading-[1.06] tracking-tight text-slate-900 drop-shadow-sm">
+          Position Your Brand for Corporate Gifting Opportunities.
+        </h1>
+        <p className="mt-5 max-w-[560px] text-[clamp(15px,1.6vw,18px)] leading-relaxed text-slate-700 font-semibold drop-shadow-sm">
+          {siteConfig.description}
+        </p>
 
-          <div className="mt-9 flex flex-wrap items-center gap-4">
-            <Link
-              href="/auth/sign-up"
-              className="rounded-full px-7 py-3.5 text-[14.5px] font-semibold text-white shadow-md transition-transform hover:-translate-y-0.5"
-              style={{ background: "linear-gradient(90deg, #4F46E5, #F97316)" }}
-            >
-              Apply as a Merchant
-            </Link>
-            <Link
-              href="/how-it-works"
-              className="rounded-full border border-borderCustom bg-secondary px-7 py-3.5 text-[14.5px] font-semibold text-textPrimary hover:border-accent hover:text-accent"
-            >
-              See How It Works
-            </Link>
-          </div>
-
-          <div className="mt-8 flex items-center gap-2.5 text-[13.5px] text-textSecondary">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 text-accent">
-              <rect x="4" y="11" width="16" height="9" rx="1.5" />
-              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-            </svg>
-            Reviewed securely — your store data is never shared without authorization.
-          </div>
+        {/* Action buttons */}
+        <div className="mt-9 flex flex-wrap items-center gap-4">
+          <Link
+            href="/merchant/application"
+            className="rounded-[6px] bg-slate-900 text-white hover:bg-black px-6 py-3.5 text-[14.5px] font-bold shadow-md transition-all hover:-translate-y-0.5"
+          >
+            Apply as a Merchant
+          </Link>
+          <Link
+            href="/how-it-works"
+            className="rounded-[6px] border-2 border-slate-900 bg-white text-slate-900 hover:bg-slate-50 px-6 py-3.5 text-[14.5px] font-bold shadow-sm transition-all hover:-translate-y-0.5"
+          >
+            See How It Works
+          </Link>
         </div>
 
-        {/* Illustrative category collage — abstract gradient tiles, not real product photography.
-            Each tile jumps to its full write-up in the Opportunity Network section below. */}
-        <div className="grid grid-cols-2 gap-4">
-          {[
-            { label: "Corporate Gifting", from: "#4F46E5", to: "#818CF8" },
-            { label: "Wholesale", from: "#F97316", to: "#FBBF24" },
-            { label: "Bulk Buyers", from: "#0EA5E9", to: "#38BDF8" },
-            { label: "Employee Rewards", from: "#EC4899", to: "#F472B6" },
-          ].map((tile, i) => (
-            <Link
-              key={tile.label}
-              href="/#network"
-              className={`group flex aspect-square flex-col justify-end rounded-2xl p-5 text-white shadow-lg outline-none transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl focus-visible:-translate-y-2 focus-visible:ring-2 focus-visible:ring-white ${i === 1 ? "translate-y-6" : ""}`}
-              style={{ background: `linear-gradient(135deg, ${tile.from}, ${tile.to})` }}
-            >
-              <span className="flex items-center gap-1.5 text-[13.5px] font-semibold">
-                {tile.label}
-                <svg
-                  width="13"
-                  height="13"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.4"
-                  className="-translate-x-1 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
-                >
-                  <path d="M5 12h14M13 6l6 6-6 6" />
-                </svg>
-              </span>
-            </Link>
-          ))}
+        <div className="mt-7 flex items-center gap-2.5 text-[13.5px] text-slate-600 font-bold drop-shadow-sm">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="flex-shrink-0 text-indigo-600">
+            <rect x="4" y="11" width="16" height="9" rx="1.5" />
+            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+          </svg>
+          Reviewed securely — your store data is never shared without authorization.
         </div>
       </div>
     </section>

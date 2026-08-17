@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { siteConfig } from "@/config/branding";
 
-// Hero background.
-// Once the Veo-generated clip exists, drop it at /public/videos/hero.mp4
-// and /public/images/hero-poster.jpg, then uncomment the <video> block below.
-// Until then, the animated gold grid (.hero-grid-bg, defined in globals.css)
-// stands in as the motion layer so the hero isn't static.
+// Hero background configured with external direct streaming links
+// Replace the placeholder URLs below with your actual uploaded Imgur/Supabase links.
+const HERO_POSTER_URL = "https://xxkodcatazrbjhwddqxg.supabase.co/storage/v1/object/public/hero-assets/frame_004.jpg";
+const HERO_VIDEO_URL = "https://xxkodcatazrbjhwddqxg.supabase.co/storage/v1/object/public/hero-assets/Black_gift_box_opening_202608171521.mp4";
+
 export default function Hero() {
   return (
     <section className="relative flex min-h-[86vh] items-center overflow-hidden border-b border-borderCustom">
@@ -19,19 +19,18 @@ export default function Hero() {
         />
       </div>
 
-      {/*
+      {/* Video layer is now active and uses cloud link inputs */}
       <video
         className="absolute inset-0 h-full w-full object-cover"
         autoPlay
         muted
         loop
         playsInline
-        poster="/images/hero-poster.jpg"
+        poster={HERO_POSTER_URL}
       >
-        <source src="/videos/hero.mp4" type="video/mp4" />
+        <source src={HERO_VIDEO_URL} type="video/mp4" />
       </video>
       <div className="absolute inset-0 bg-primary/55" />
-      */}
 
       <div className="hero-grid-bg absolute inset-0 animate-driftGrid" />
       <div

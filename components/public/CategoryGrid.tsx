@@ -1,25 +1,11 @@
 import Link from "next/link";
-import { opportunityCategories, opportunityCategoryDescriptions } from "@/config/branding";
+import Image from "next/image";
+import { opportunityCategories, opportunityCategoryDescriptions, opportunityImages } from "@/config/branding";
 import VideoBackground from "@/components/shared/VideoBackground";
-
-const gradients = [
-  ["#4F46E5", "#818CF8"],
-  ["#F97316", "#FBBF24"],
-  ["#0EA5E9", "#38BDF8"],
-  ["#EC4899", "#F472B6"],
-  ["#16A34A", "#4ADE80"],
-  ["#8B5CF6", "#C4B5FD"],
-  ["#F43F5E", "#FB7185"],
-  ["#0D9488", "#5EEAD4"],
-  ["#EA580C", "#FDBA74"],
-];
 
 export default function CategoryGrid() {
   return (
     <section id="network" className="relative overflow-hidden py-24">
-      {/* Drop an 8s looping clip at /public/videos/opportunity-network.mp4
-          (+ poster at /public/images/opportunity-network-poster.jpg) to enable —
-          VideoBackground no-ops gracefully until then. */}
       <VideoBackground
         src="/videos/opportunity-network.mp4"
         poster="/images/opportunity-network-poster.jpg"
@@ -39,23 +25,40 @@ export default function CategoryGrid() {
         </div>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3">
-          {opportunityCategories.map((category, i) => {
-            const [from, to] = gradients[i % gradients.length];
+          {opportunityCategories.map((category) => {
+            const imageSrc = opportunityImages[category];
+
             return (
               <Link
                 key={category}
                 href="/contact"
-                className="group relative flex aspect-[4/3] flex-col justify-end overflow-hidden rounded-2xl p-6 text-white shadow-sm outline-none transition-transform duration-300 hover:-translate-y-1.5 hover:shadow-xl focus-visible:-translate-y-1.5 focus-visible:ring-2 focus-visible:ring-white"
-                style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}
+                className="group relative flex aspect-[4/3] flex-col justify-end overflow-hidden rounded-2xl p-6 text-white shadow-sm outline-none transition-transform duration-300 hover:-translate-y-1.5 hover:shadow-xl focus-visible:-translate-y-1.5 focus-visible:ring-2 focus-visible:ring-white border border-borderCustom"
               >
-                {/* Description panel — slides up on hover/focus, tap-friendly on mobile via :active */}
-                <span className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-black/35 p-6 opacity-0 backdrop-blur-[1px] transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 group-active:opacity-100">
+                {/* Full-bleed background image replacing the color gradient */}
+                {imageSrc && (
+                  <div className="absolute inset-0 w-full h-full z-0 transition-transform duration-300 group-hover:scale-105">
+                    <Image
+                      src={imageSrc}
+                      alt={category}
+                      fill
+                      sizes="(max-width: 640px) 50vw, 33vw"
+                      className="object-cover"
+                      priority
+                    />
+                    {/* Semi-transparent dark overlay so white text stays readable over any image */}
+                    <div className="absolute inset-0 bg-black/40 transition-colors duration-300 group-hover:bg-black/50" />
+                  </div>
+                )}
+
+                {/* Description panel sliding up on hover */}
+                <span className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-black/60 p-6 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 group-active:opacity-100 z-20">
                   <span className="text-[12.5px] leading-snug text-white/90">
                     {opportunityCategoryDescriptions[category]}
                   </span>
                 </span>
 
-                <span className="relative flex items-center justify-between text-[15px] font-semibold transition-transform duration-300 group-hover:-translate-y-1">
+                {/* Card Title Header */}
+                <span className="relative z-10 flex items-center justify-between text-[15px] font-semibold transition-transform duration-300 group-hover:-translate-y-1 w-full drop-shadow-md">
                   {category}
                   <svg
                     width="15"

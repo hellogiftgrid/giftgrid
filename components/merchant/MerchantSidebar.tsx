@@ -123,12 +123,13 @@ export default function MerchantSidebar() {
         </div>
       </aside>
 
+      {/* Tailwind and layout alignment values mapped safely */}
       <style jsx>{`
         .sidebar {
-          width: 230px;
+          width: 240px;
           min-height: 100vh;
-          background: var(--bg-secondary-soft);
-          border-right: 1px solid var(--border);
+          background: #F8FAFC;
+          border-right: 1px solid #E2E8F0;
           display: flex;
           flex-direction: column;
           padding: 0;
@@ -140,53 +141,54 @@ export default function MerchantSidebar() {
         .sidebar-logo {
           display: flex;
           align-items: center;
-          gap: 9px;
-          padding: 22px 22px 20px;
-          border-bottom: 1px solid var(--border);
-          font-family: var(--display);
-          font-weight: 560;
-          font-size: 19px;
+          gap: 10px;
+          padding: 24px;
+          border-bottom: 1px solid #E2E8F0;
+          font-weight: 700;
+          font-size: 20px;
+          color: #0F172A;
         }
         .logo-dot {
-          width: 7px;
-          height: 7px;
+          width: 8px;
+          height: 8px;
           border-radius: 50%;
-          background: var(--accent);
-          box-shadow: 0 0 8px var(--accent);
+          background: #4F46E5;
+          box-shadow: 0 0 8px rgba(79, 70, 229, 0.4);
           flex-shrink: 0;
         }
         .sidebar-nav {
           flex: 1;
-          padding: 20px 14px;
+          padding: 24px 16px;
           overflow-y: auto;
         }
         .sidebar-section-label {
-          font-family: var(--mono);
           font-size: 10px;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.15em;
           text-transform: uppercase;
-          color: var(--text-secondary);
+          color: #64748B;
           padding: 0 8px;
-          margin-bottom: 10px;
+          margin-bottom: 12px;
+          font-weight: 700;
         }
         .sidebar-link {
           display: flex;
           align-items: center;
-          gap: 11px;
-          padding: 9px 10px;
-          border-radius: 5px;
+          gap: 12px;
+          padding: 10px 12px;
+          border-radius: 8px;
           font-size: 14px;
-          color: var(--text-secondary);
-          transition: color 0.15s, background 0.15s;
-          margin-bottom: 2px;
+          color: #475569;
+          font-weight: 600;
+          transition: all 0.2s ease;
+          margin-bottom: 4px;
         }
         .sidebar-link:hover {
-          color: var(--text-primary);
-          background: rgba(255, 255, 255, 0.04);
+          color: #0F172A;
+          background: #F1F5F9;
         }
         .sidebar-link.active {
-          color: var(--accent);
-          background: rgba(212, 175, 55, 0.08);
+          color: #4F46E5;
+          background: #EEF2FF;
         }
         .sidebar-icon {
           flex-shrink: 0;
@@ -194,27 +196,27 @@ export default function MerchantSidebar() {
           align-items: center;
         }
         .sidebar-footer {
-          padding: 16px 14px;
-          border-top: 1px solid var(--border);
+          padding: 16px;
+          border-top: 1px solid #E2E8F0;
         }
         .sign-out-btn {
           display: flex;
           align-items: center;
-          gap: 9px;
+          gap: 10px;
           width: 100%;
-          padding: 9px 10px;
+          padding: 10px 12px;
           border: none;
           background: none;
-          color: var(--text-secondary);
-          font-size: 13.5px;
-          font-family: var(--body);
+          color: #64748B;
+          font-size: 14px;
+          font-weight: 600;
           cursor: pointer;
-          border-radius: 5px;
-          transition: color 0.15s, background 0.15s;
+          border-radius: 8px;
+          transition: all 0.2s ease;
         }
         .sign-out-btn:hover {
-          color: var(--text-primary);
-          background: rgba(255, 255, 255, 0.04);
+          color: #DC2626;
+          background: #FEF2F2;
         }
       `}</style>
     </>

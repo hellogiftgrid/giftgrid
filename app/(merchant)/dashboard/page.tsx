@@ -1,399 +1,181 @@
-import { createServerClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import Link from 'next/link'
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
+import Link from 'next/link';
 
-export const metadata = { title: 'Dashboard — GiftGrid' }
+export const metadata = {
+  title: 'Merchant Dashboard — GiftGrid',
+};
 
-async function getMerchantData(userId: string) {
-  const supabase = createServerClient()
+export default async function MerchantDashboardPage() {
+  const supabase = createClient();
+  
+  // 1. Get the authenticated user session context
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/auth/sign-in');
 
-  const [{ data: merchant }, { data: profile }] = await Promise.all([
-    supabase
-      .from('merchant_profiles')
-      .select('id, store_url, business_name, application_status, onboarding_stage')
-      .eq('user_id', userId)
-      .single(),
-    supabase
-      .from('profiles')
-      .select('full_name')
-      .eq('id', userId)
-      .single(),
-  ])
+  // 2. Fetch the profile and merchant records simultaneously
+  const [profileRes, merchantRes] = await Promise.all([
+    supabase.from('profiles').select('full_name, role').eq('id', user.id).single(),
+    supabase.from('merchant_profiles').select('id, business_name').eq('profile_id', user.id).single()
+  ]);
 
-  if (!merchant) return null
+  const profile = profileRes.data;
+  const merchant = merchantRes.data;
 
-  const [{ data: latestAudit }, { data: openRecs }, { data: unreadMsgs }, { data: submissions }] =
-    await Promise.all([
-      supabase
-        .from('store_audits')
-        .select('id, overall_score, status, created_at')
-        .eq('merchant_id', merchant.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single(),
-      supabase
-        .from('audit_recommendations')
-        .select('id, status')
-        .eq('merchant_id', merchant.id)
-        .eq('status', 'open'),
-      supabase
-        .from('merchant_communications')
-        .select('id')
-        .eq('merchant_id', merchant.id)
-        .eq('is_read', false)
-        .eq('direction', 'inbound'),
-      supabase
-        .from('opportunity_submissions')
-        .select('id, status, submitted_at')
-        .eq('merchant_id', merchant.id)
-        .order('submitted_at', { ascending: false })
-        .limit(5),
-    ])
+  // Inline Server Action to create the workspace profile right on this page!
+  async function activateWorkspace(formData: FormData) {
+    'use server';
+    const serverSupabase = createClient();
+    const businessName = formData.get('businessName') as string;
+    
+    // Fetch user object to guarantee contextual tracking visibility
+    const { data: { user: sessionUser } } = await serverSupabase.auth.getUser();
+    if (!sessionUser) return;
 
-  return {
-    merchant,
-    profile,
-    latestAudit,
-    openRecsCount: openRecs?.length ?? 0,
-    unreadCount: unreadMsgs?.length ?? 0,
-    submissions: submissions ?? [],
+    await serverSupabase.from('merchant_profiles').insert({
+      profile_id: sessionUser.id,
+      business_name: businessName || 'My Business Entity',
+      contact_email: sessionUser.email
+    });
+    
+    // Instantly refreshes the view layers to reveal the dashboard metrics below
+    revalidatePath('/dashboard');
   }
-}
 
-const STATUS_LABEL: Record<string, string> = {
-  pending: 'Pending Review',
-  in_review: 'Under Review',
-  reviewed: 'Review Complete',
-  submitted: 'Submitted',
-  rejected: 'Not Approved',
-}
+  // Interactive Fallback view if no unique business entry row is present yet
+  if (!merchant) {
+    return (
+      <div className="max-w-[600px] mx-auto mt-16 p-8 border border-amber-200 bg-amber-50/60 rounded-2xl shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">!</div>
+          <h2 className="text-amber-900 font-bold text-lg">Account Initialization Required</h2>
+        </div>
+        <p className="text-amber-700 text-sm mt-3 leading-relaxed">
+          Your authorization credentials are valid, but a unique merchant workspace hasn't been instantiated for your user ID yet. Enter your business name below to activate your account layout.
+        </p>
 
-const SUBMISSION_BADGE: Record<string, { label: string; color: string }> = {
-  pending: { label: 'Pending', color: 'var(--text-secondary)' },
-  submitted: { label: 'Submitted', color: 'var(--accent)' },
-  accepted: { label: 'Accepted', color: 'var(--success)' },
-  declined: { label: 'Declined', color: '#F87171' },
-  no_response: { label: 'No Response', color: 'var(--text-secondary)' },
-}
+        <form action={activateWorkspace} className="mt-6 space-y-4 bg-white p-6 rounded-xl border border-amber-200 shadow-sm">
+          <div>
+            <label className="block text-xs font-mono font-bold text-slate-500 uppercase mb-2">
+              Your Company Name
+            </label>
+            <input 
+              type="text" 
+              name="businessName" 
+              required 
+              placeholder="e.g. Acme Gifting Labs"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-indigo-600 transition-colors"
+            />
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button 
+              type="submit" 
+              className="text-xs bg-slate-900 hover:bg-black text-white font-bold rounded-lg px-5 py-2.5 shadow-sm transition-colors"
+            >
+              Activate Workspace
+            </button>
+            <Link 
+              href="/auth/sign-out" 
+              className="text-xs border border-slate-200 text-slate-700 bg-white font-semibold rounded-lg px-4 py-2.5 hover:bg-slate-50 transition-colors"
+            >
+              Sign Out
+            </Link>
+          </div>
+        </form>
+      </div>
+    );
+  }
 
-export default async function DashboardPage() {
-  const supabase = createServerClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/auth/sign-in')
+  // 3. Collect active context metrics once the profile is confirmed
+  const [auditsRes, submissionsRes] = await Promise.all([
+    supabase.from('audits').select('id, status, overall_score').eq('store_id', merchant.id),
+    supabase.from('opportunity_submissions').select('*', { count: 'exact', head: true }).eq('merchant_id', merchant.id).eq('status', 'submitted')
+  ]);
 
-  const data = await getMerchantData(user.id)
-  if (!data) redirect('/auth/sign-in')
-
-  const { merchant, profile, latestAudit, openRecsCount, unreadCount, submissions } = data
-
-  const firstName = profile?.full_name?.split(' ')[0] ?? 'there'
+  const audits = auditsRes.data;
+  const pendingSubmissions = submissionsRes.count;
 
   return (
-    <>
-      <div className="page-header">
-        <h1 className="page-title">Hello, {firstName}.</h1>
-        <p className="page-sub">Here's where your store stands with GiftGrid.</p>
-      </div>
-
-      {/* STATUS RIBBON */}
-      <div className="status-ribbon">
-        <span className="ribbon-label">Application status</span>
-        <span className="ribbon-value">
-          {STATUS_LABEL[merchant.application_status] ?? merchant.application_status}
+    <div className="space-y-8 p-4 max-w-[1140px] mx-auto">
+      
+      {/* Welcome Header Banner */}
+      <div className="border border-slate-200 rounded-2xl bg-white p-8 shadow-sm">
+        <span className="text-xs font-mono uppercase tracking-[0.1em] text-indigo-600 font-bold">
+          Workspace Hub
         </span>
-        {merchant.store_url && (
-          <a
-            href={merchant.store_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ribbon-store"
-          >
-            {merchant.store_url.replace(/^https?:\/\//, '')}
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-              <polyline points="15,3 21,3 21,9" />
-              <line x1="10" y1="14" x2="21" y2="3" />
-            </svg>
-          </a>
-        )}
+        <h1 className="text-3xl font-bold text-slate-900 mt-1">
+          Welcome back, {profile?.full_name || 'Merchant'}
+        </h1>
+        <p className="text-sm text-slate-500 mt-2">
+          Connected Company: <span className="font-semibold text-slate-800">{merchant.business_name}</span>
+        </p>
       </div>
 
-      {/* STAT CARDS */}
-      <div className="stat-grid">
-        <Link href="/dashboard/audit" className="stat-card">
-          <div className="stat-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M9 12l2 2 4-4" />
-              <circle cx="12" cy="12" r="9" />
-            </svg>
-          </div>
-          <div className="stat-body">
-            <p className="stat-label">Audit Score</p>
-            <p className="stat-value">
-              {latestAudit ? `${latestAudit.overall_score ?? '—'} / 100` : 'Not yet audited'}
-            </p>
-            <p className="stat-sub">
-              {latestAudit ? `Status: ${latestAudit.status}` : 'Your store has not been reviewed yet'}
+      {/* Metric Cards Grid Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        {/* Audit Metric Card */}
+        <div className="border border-slate-200 bg-white p-6 rounded-xl shadow-sm hover:border-slate-300 transition-all flex flex-col justify-between min-h-[160px]">
+          <div>
+            <h3 className="text-xs font-mono text-slate-400 uppercase tracking-wider">Latest Store Audit</h3>
+            <p className="text-3xl font-bold text-slate-900 mt-3">
+              {audits && audits.length > 0 && audits[0].overall_score !== null ? `${audits[0].overall_score}/100` : 'Pending'}
             </p>
           </div>
-          <span className="stat-arrow">→</span>
-        </Link>
+          <Link href="/dashboard/audit" className="text-xs text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1 mt-4">
+            View comprehensive metrics <span>→</span>
+          </Link>
+        </div>
 
-        <Link href="/dashboard/recommendations" className="stat-card">
-          <div className="stat-icon accent">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" />
-            </svg>
+        {/* Pipeline Metric Card */}
+        <div className="border border-slate-200 bg-white p-6 rounded-xl shadow-sm hover:border-slate-300 transition-all flex flex-col justify-between min-h-[160px]">
+          <div>
+            <h3 className="text-xs font-mono text-slate-400 uppercase tracking-wider">Active Submissions</h3>
+            <p className="text-3xl font-bold text-slate-900 mt-3">
+              {pendingSubmissions || 0}
+            </p>
           </div>
-          <div className="stat-body">
-            <p className="stat-label">Open Recommendations</p>
-            <p className="stat-value">{openRecsCount}</p>
-            <p className="stat-sub">{openRecsCount === 0 ? 'No open items' : 'Action may be needed'}</p>
-          </div>
-          <span className="stat-arrow">→</span>
-        </Link>
+          <Link href="/dashboard/opportunities" className="text-xs text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1 mt-4">
+            Track matching pipeline <span>→</span>
+          </Link>
+        </div>
 
-        <Link href="/dashboard/comms" className="stat-card">
-          <div className="stat-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
+        {/* Inbox Communications Card */}
+        <div className="border border-slate-200 bg-white p-6 rounded-xl shadow-sm hover:border-slate-300 transition-all flex flex-col justify-between min-h-[160px]">
+          <div>
+            <h3 className="text-xs font-mono text-slate-400 uppercase tracking-wider">Support Comms Inbox</h3>
+            <p className="text-3xl font-bold text-slate-900 mt-3">Connected</p>
           </div>
-          <div className="stat-body">
-            <p className="stat-label">Messages</p>
-            <p className="stat-value">{unreadCount > 0 ? `${unreadCount} unread` : 'All caught up'}</p>
-            <p className="stat-sub">From the GiftGrid team</p>
-          </div>
-          <span className="stat-arrow">→</span>
-        </Link>
-
-        <Link href="/dashboard/opportunities" className="stat-card">
-          <div className="stat-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <circle cx="12" cy="12" r="9" />
-              <path d="M12 8v4l3 3" />
-            </svg>
-          </div>
-          <div className="stat-body">
-            <p className="stat-label">Opportunity Submissions</p>
-            <p className="stat-value">{submissions.length}</p>
-            <p className="stat-sub">Tracked from submission to response</p>
-          </div>
-          <span className="stat-arrow">→</span>
-        </Link>
+          <Link href="/dashboard/comms" className="text-xs text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1 mt-4">
+            Open help desk channel <span>→</span>
+          </Link>
+        </div>
       </div>
 
-      {/* RECENT SUBMISSIONS TABLE */}
-      {submissions.length > 0 && (
-        <section className="section">
-          <div className="section-head">
-            <h2 className="section-title">Recent Submissions</h2>
-            <Link href="/dashboard/opportunities" className="section-link">View all →</Link>
+      {/* Onboarding Tasks Timeline Section */}
+      <div className="border border-slate-200 rounded-xl bg-white p-6 shadow-sm">
+        <h2 className="text-lg font-bold text-slate-900">Your Onboarding Workflow Checklist</h2>
+        <p className="text-xs text-slate-400 mt-0.5">Complete your configuration pipeline items to qualify for corporate matching pools.</p>
+        
+        <div className="mt-6 space-y-4">
+          <div className="flex items-start gap-4 p-5 rounded-xl bg-slate-50 border border-slate-100">
+            <div className="w-6 h-6 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center font-bold text-xs mt-0.5 shadow-sm">
+              ✓
+            </div>
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold text-slate-900">Step 1: Complete Corporate Profile Metadata</h4>
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                Ensure your verified distributions capacities, e-commerce store platform targets, and primary phone settings match up perfectly.
+              </p>
+              <Link href="/dashboard/profile" className="inline-block mt-3 text-xs bg-slate-900 text-white font-bold rounded-lg px-4 py-2 hover:bg-black transition-colors shadow-sm">
+                Update Business Details
+              </Link>
+            </div>
           </div>
-          <div className="table-wrap">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Submission ID</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {submissions.map((s) => {
-                  const badge = SUBMISSION_BADGE[s.status] ?? { label: s.status, color: 'var(--text-secondary)' }
-                  return (
-                    <tr key={s.id}>
-                      <td className="mono">{s.id.slice(0, 8).toUpperCase()}</td>
-                      <td>{s.submitted_at ? new Date(s.submitted_at).toLocaleDateString() : '—'}</td>
-                      <td>
-                        <span className="badge" style={{ color: badge.color }}>
-                          {badge.label}
-                        </span>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
-
-      <style jsx>{`
-        .page-header {
-          margin-bottom: 28px;
-        }
-        .page-title {
-          font-family: var(--display);
-          font-weight: 560;
-          font-size: 28px;
-          margin-bottom: 6px;
-        }
-        .page-sub {
-          color: var(--text-secondary);
-          font-size: 14.5px;
-        }
-        .status-ribbon {
-          display: flex;
-          align-items: center;
-          gap: 14px;
-          padding: 13px 20px;
-          background: var(--bg-secondary);
-          border: 1px solid var(--border);
-          border-radius: 6px;
-          margin-bottom: 28px;
-          font-size: 13.5px;
-        }
-        .ribbon-label {
-          color: var(--text-secondary);
-          font-family: var(--mono);
-          font-size: 11px;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-        }
-        .ribbon-value {
-          color: var(--accent);
-          font-weight: 600;
-        }
-        .ribbon-store {
-          margin-left: auto;
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          color: var(--text-secondary);
-          font-family: var(--mono);
-          font-size: 12px;
-          transition: color 0.15s;
-        }
-        .ribbon-store:hover {
-          color: var(--text-primary);
-        }
-        .stat-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 16px;
-          margin-bottom: 36px;
-        }
-        @media (max-width: 700px) {
-          .stat-grid { grid-template-columns: 1fr; }
-        }
-        .stat-card {
-          display: flex;
-          align-items: flex-start;
-          gap: 16px;
-          padding: 22px 20px;
-          background: var(--bg-secondary);
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          transition: border-color 0.15s;
-          position: relative;
-        }
-        .stat-card:hover {
-          border-color: var(--accent-dim);
-        }
-        .stat-icon {
-          width: 40px;
-          height: 40px;
-          border-radius: 8px;
-          background: rgba(255,255,255,0.05);
-          border: 1px solid var(--border);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: var(--text-secondary);
-          flex-shrink: 0;
-        }
-        .stat-icon.accent {
-          color: var(--accent);
-          background: rgba(212,175,55,0.08);
-          border-color: rgba(212,175,55,0.2);
-        }
-        .stat-body {
-          flex: 1;
-          min-width: 0;
-        }
-        .stat-label {
-          font-size: 12px;
-          color: var(--text-secondary);
-          font-family: var(--mono);
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          margin-bottom: 5px;
-        }
-        .stat-value {
-          font-size: 19px;
-          font-weight: 600;
-          margin-bottom: 4px;
-        }
-        .stat-sub {
-          font-size: 12.5px;
-          color: var(--text-secondary);
-        }
-        .stat-arrow {
-          font-size: 14px;
-          color: var(--text-secondary);
-          align-self: center;
-        }
-        .section {
-          margin-top: 10px;
-        }
-        .section-head {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 16px;
-        }
-        .section-title {
-          font-size: 16px;
-          font-weight: 600;
-        }
-        .section-link {
-          font-size: 13px;
-          color: var(--accent);
-        }
-        .table-wrap {
-          background: var(--bg-secondary);
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          overflow: hidden;
-        }
-        .data-table {
-          width: 100%;
-          border-collapse: collapse;
-          font-size: 13.5px;
-        }
-        .data-table th {
-          text-align: left;
-          padding: 12px 18px;
-          font-family: var(--mono);
-          font-size: 10.5px;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          color: var(--text-secondary);
-          border-bottom: 1px solid var(--border);
-        }
-        .data-table td {
-          padding: 13px 18px;
-          border-bottom: 1px solid var(--border);
-          color: var(--text-primary);
-        }
-        .data-table tr:last-child td {
-          border-bottom: none;
-        }
-        .mono {
-          font-family: var(--mono);
-          font-size: 12px;
-        }
-        .badge {
-          font-family: var(--mono);
-          font-size: 11px;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-        }
-      `}</style>
-    </>
-  )
+        </div>
+      </div>
+      
+    </div>
+  );
 }

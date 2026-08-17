@@ -29,7 +29,7 @@ export default function SignInPage() {
       setError(error.message);
       return;
     }
-    router.push("/merchant/dashboard");
+    router.push("/dashboard");
     router.refresh();
   }
 

@@ -1,39 +1,34 @@
-"use client";
-
-import { useState } from "react";
+import Image from "next/image";
 import { supportedPlatforms } from "@/config/branding";
-
-// Drop each platform's official logo at /public/images/platforms/<slug>.png.
-// Until a file exists, that entry falls back to a clean text wordmark
-// instead of a broken image — states a real capability (which store
-// platforms GiftGrid can audit), not a claim of partnership.
-function PlatformLogo({ name, slug }: { name: string; slug: string }) {
-  const [failed, setFailed] = useState(false);
-
-  if (failed) {
-    return <span className="text-[15px] font-semibold text-textPrimary">{name}</span>;
-  }
-
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={`/images/platforms/${slug}.png`}
-      alt={name}
-      className="h-6 w-auto object-contain"
-      onError={() => setFailed(true)}
-    />
-  );
-}
 
 export default function PlatformBadges() {
   return (
-    <div className="border-b border-borderCustom bg-secondary py-8">
-      <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-center gap-x-10 gap-y-4 px-7">
-        <span className="text-[13px] font-medium text-textSecondary">Reviews stores built on</span>
-        {supportedPlatforms.map((platform) => (
-          <PlatformLogo key={platform.slug} name={platform.name} slug={platform.slug} />
-        ))}
+    <section className="bg-slate-50 border-y border-slate-200 py-12">
+      <div className="mx-auto max-w-[1180px] px-7">
+        <p className="text-center font-mono text-[11px] uppercase tracking-[0.15em] text-slate-500 mb-8">
+          Supported E-Commerce Platforms for Review
+        </p>
+        
+        <div className="flex flex-wrap items-center justify-center gap-10 md:gap-16">
+          {supportedPlatforms.map((platform) => (
+            <div 
+              key={platform.name} 
+              className="group relative flex items-center justify-center grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300 h-10 w-32"
+            >
+              <Image
+                src={`/images/platforms/${platform.slug}`}
+                alt={`${platform.name} logo`}
+                fill
+                sizes="(max-width: 768px) 120px, 150px"
+                className="object-contain"
+                unoptimized // Prevents Next.js optimization errors for custom .jfif extension files
+              />
+              {/* Screen-reader backup text descriptor */}
+              <span className="sr-only">{platform.name}</span>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

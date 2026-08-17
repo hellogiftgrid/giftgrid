@@ -1,209 +1,139 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { createBrowserClient } from '@/lib/supabase/client'
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
-interface Props {
-  profile: { full_name: string | null; email: string; phone: string | null }
-  merchant: {
-    id: string
-    business_name: string | null
-    store_url: string | null
-    country: string | null
-    business_category: string | null
-    product_category: string | null
-    business_description: string | null
-  }
-  userId: string
+interface MerchantProfile {
+  id: string;
+  business_name: string;
+  contact_email: string;
+  website_url?: string;
+  support_phone?: string;
+  estimated_monthly_orders?: string;
 }
 
-export default function ProfileForm({ profile, merchant, userId }: Props) {
-  const supabase = createBrowserClient()
+export default function ProfileForm({ initialData }: { initialData: MerchantProfile }) {
+  const supabase = createClient();
+  const router = useRouter();
+  
+  const [businessName, setBusinessName] = useState(initialData.business_name || '');
+  const [websiteUrl, setWebsiteUrl] = useState(initialData.website_url || '');
+  const [supportPhone, setSupportPhone] = useState(initialData.support_phone || '');
+  const [orders, setOrders] = useState(initialData.estimated_monthly_orders || '0-100');
+  
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  const [form, setForm] = useState({
-    full_name: profile.full_name ?? '',
-    phone: profile.phone ?? '',
-    business_name: merchant.business_name ?? '',
-    store_url: merchant.store_url ?? '',
-    country: merchant.country ?? '',
-    business_category: merchant.business_category ?? '',
-    product_category: merchant.product_category ?? '',
-    business_description: merchant.business_description ?? '',
-  })
-  const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  async function handleProfileSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setMessage(null);
 
-  const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    setForm((f) => ({ ...f, [field]: e.target.value }))
+    const { error } = await supabase
+      .from('merchant_profiles')
+      .update({
+        business_name: businessName,
+        website_url: websiteUrl,
+        support_phone: supportPhone,
+        estimated_monthly_orders: orders,
+      })
+      .eq('id', initialData.id);
 
-  const handleSave = async () => {
-    setSaving(true)
-    setError(null)
-    setSaved(false)
+    setLoading(false);
 
-    const [profileUpdate, merchantUpdate] = await Promise.all([
-      supabase
-        .from('profiles')
-        .update({ full_name: form.full_name, phone: form.phone })
-        .eq('id', userId),
-      supabase
-        .from('merchant_profiles')
-        .update({
-          business_name: form.business_name,
-          store_url: form.store_url,
-          country: form.country,
-          business_category: form.business_category,
-          product_category: form.product_category,
-          business_description: form.business_description,
-        })
-        .eq('id', merchant.id),
-    ])
-
-    setSaving(false)
-    if (profileUpdate.error || merchantUpdate.error) {
-      setError(profileUpdate.error?.message ?? merchantUpdate.error?.message ?? 'Save failed.')
+    if (error) {
+      setMessage({ type: 'error', text: `Configuration failed: ${error.message}` });
     } else {
-      setSaved(true)
-      setTimeout(() => setSaved(false), 3000)
+      setMessage({ type: 'success', text: 'Corporate metadata sync completed successfully!' });
+      router.refresh();
     }
   }
 
   return (
-    <>
-      <div className="form-wrap">
-        <section className="form-section">
-          <h2 className="section-title">Personal Details</h2>
-          <div className="field-grid">
-            <div className="field">
-              <label>Full Name</label>
-              <input value={form.full_name} onChange={set('full_name')} placeholder="Your full name" />
-            </div>
-            <div className="field">
-              <label>Email</label>
-              <input value={profile.email} disabled className="disabled" />
-              <p className="field-hint">Email cannot be changed here. Contact support if needed.</p>
-            </div>
-            <div className="field">
-              <label>Phone</label>
-              <input value={form.phone} onChange={set('phone')} placeholder="+44 7000 000000" />
-            </div>
-          </div>
-        </section>
+    <form onSubmit={handleProfileSubmit} className="space-y-6 max-w-[680px]">
+      
+      {/* Toast Alert Feedback Overlay */}
+      {message && (
+        <div className={`p-4 rounded-xl border text-sm font-semibold shadow-sm transition-all ${
+          message.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'
+        }`}>
+          {message.text}
+        </div>
+      )}
 
-        <section className="form-section">
-          <h2 className="section-title">Business Information</h2>
-          <div className="field-grid">
-            <div className="field">
-              <label>Business Name</label>
-              <input value={form.business_name} onChange={set('business_name')} placeholder="Your business name" />
-            </div>
-            <div className="field">
-              <label>Store URL</label>
-              <input value={form.store_url} onChange={set('store_url')} placeholder="https://yourstore.com" type="url" />
-            </div>
-            <div className="field">
-              <label>Country</label>
-              <input value={form.country} onChange={set('country')} placeholder="e.g. United Kingdom" />
-            </div>
-            <div className="field">
-              <label>Business Category</label>
-              <input value={form.business_category} onChange={set('business_category')} placeholder="e.g. Lifestyle, Food & Drink" />
-            </div>
-            <div className="field">
-              <label>Product Category</label>
-              <input value={form.product_category} onChange={set('product_category')} placeholder="e.g. Gifts, Homewares" />
-            </div>
-          </div>
-          <div className="field full-width">
-            <label>Business Description</label>
-            <textarea
-              value={form.business_description}
-              onChange={set('business_description')}
-              placeholder="Briefly describe your business and what makes your products suitable for corporate gifting or bulk opportunities."
-              rows={5}
+      {/* Grid Inputs Display */}
+      <div className="grid grid-cols-1 gap-6 bg-white p-6 border border-slate-200 rounded-2xl shadow-sm">
+        
+        <div>
+          <label className="block text-xs font-mono uppercase tracking-wider text-slate-500 font-bold mb-2">
+            Registered Enterprise Name
+          </label>
+          <input
+            type="text"
+            required
+            value={businessName}
+            onChange={(e) => setBusinessName(e.target.value)}
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-indigo-600 transition-colors"
+            placeholder="e.g. GiftGrid Inc."
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-mono uppercase tracking-wider text-slate-500 font-bold mb-2">
+            E-Commerce Store Website URL
+          </label>
+          <input
+            type="url"
+            value={websiteUrl}
+            onChange={(e) => setWebsiteUrl(e.target.value)}
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-indigo-600 transition-colors"
+            placeholder="https://yourstore.com"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-mono uppercase tracking-wider text-slate-500 font-bold mb-2">
+              Primary Support Hotline Phone
+            </label>
+            <input
+              type="tel"
+              value={supportPhone}
+              onChange={(e) => setSupportPhone(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-indigo-600 transition-colors"
+              placeholder="+1 (555) 000-0000"
             />
           </div>
-        </section>
 
-        <div className="form-footer">
-          {error && <p className="error-msg">{error}</p>}
-          {saved && <p className="success-msg">Changes saved.</p>}
-          <button onClick={handleSave} disabled={saving} className="save-btn">
-            {saving ? 'Saving…' : 'Save Changes'}
-          </button>
+          <div>
+            <label className="block text-xs font-mono uppercase tracking-wider text-slate-500 font-bold mb-2">
+              Estimated Monthly Orders Volume
+            </label>
+            <select
+              value={orders}
+              onChange={(e) => setOrders(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-indigo-600 transition-colors"
+            >
+              <option value="0-100">0 - 100 orders / mo</option>
+              <option value="101-500">101 - 500 orders / mo</option>
+              <option value="501-2000">501 - 2,000 orders / mo</option>
+              <option value="2001+">2,000+ orders / mo</option>
+            </select>
+          </div>
         </div>
+
       </div>
 
-      <style jsx>{`
-        .form-wrap { max-width: 680px; }
-        .form-section {
-          background: var(--bg-secondary);
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          padding: 24px 26px;
-          margin-bottom: 16px;
-        }
-        .section-title {
-          font-size: 15px;
-          font-weight: 600;
-          margin-bottom: 20px;
-          padding-bottom: 14px;
-          border-bottom: 1px solid var(--border);
-        }
-        .field-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 16px;
-        }
-        @media (max-width: 580px) {
-          .field-grid { grid-template-columns: 1fr; }
-        }
-        .field { display: flex; flex-direction: column; gap: 6px; }
-        .full-width { margin-top: 16px; }
-        label {
-          font-family: var(--mono);
-          font-size: 10.5px;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          color: var(--text-secondary);
-        }
-        input, textarea, select {
-          background: var(--bg-primary);
-          border: 1px solid var(--border);
-          border-radius: 5px;
-          padding: 10px 13px;
-          color: var(--text-primary);
-          font-family: var(--body);
-          font-size: 14px;
-          transition: border-color 0.15s;
-          width: 100%;
-        }
-        input:focus, textarea:focus { outline: none; border-color: var(--accent-dim); }
-        input.disabled { opacity: 0.5; cursor: not-allowed; }
-        .field-hint { font-size: 12px; color: var(--text-secondary); }
-        textarea { resize: vertical; }
-        .form-footer {
-          display: flex;
-          align-items: center;
-          justify-content: flex-end;
-          gap: 16px;
-        }
-        .error-msg { color: #F87171; font-size: 13.5px; }
-        .success-msg { color: var(--success); font-size: 13.5px; }
-        .save-btn {
-          padding: 11px 24px;
-          background: var(--accent);
-          color: #0B0F19;
-          border: none;
-          border-radius: 4px;
-          font-size: 14px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: opacity 0.15s;
-        }
-        .save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-      `}</style>
-    </>
-  )
+      {/* High Contrast Light Theme Submission Button */}
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full md:w-auto bg-slate-900 text-white font-bold text-sm px-6 py-3 rounded-xl hover:bg-black transition-colors shadow-md disabled:opacity-50"
+      >
+        {loading ? 'Synchronizing Data...' : 'Save Profile Settings'}
+      </button>
+
+    </form>
+  );
 }

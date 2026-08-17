@@ -3,9 +3,8 @@ import { siteConfig, opportunityCategories, supportedPlatforms, partnerNetwork }
 
 // Server-only — GROQ_API_KEY never reaches the browser. Uses Groq's
 // OpenAI-compatible chat completions endpoint.
-// Model list / availability can change — check https://console.groq.com/docs/models
-// and swap GROQ_MODEL below if this one is retired.
-const GROQ_MODEL = "llama-3.3-70b-versatile";
+// Swapped to an active, production-ready system model.
+const GROQ_MODEL = "groq/compound";
 
 const SYSTEM_PROMPT = `You are the support assistant on ${siteConfig.name}'s website.
 
