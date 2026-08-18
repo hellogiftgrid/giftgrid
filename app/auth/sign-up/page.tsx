@@ -27,24 +27,18 @@ export default function SignUpPage() {
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName } },
+      options: {
+        data: {
+          full_name: fullName,
+          business_name: businessName,
+        },
+      },
     });
 
     if (signUpError) {
       setError(signUpError.message);
       setLoading(false);
       return;
-    }
-
-    // profiles row is expected to be created by a DB trigger on auth.users insert
-    // (see docs/database.md — "handle_new_user" trigger, to be added in a later migration).
-    // Once that trigger exists, insert the merchant_profiles row here:
-    if (data.user) {
-      await supabase.from("merchant_profiles").insert({
-        profile_id: data.user.id,
-        business_name: businessName,
-        contact_email: email,
-      });
     }
 
     setLoading(false);
