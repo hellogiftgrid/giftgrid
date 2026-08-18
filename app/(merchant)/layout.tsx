@@ -3,10 +3,6 @@
 import React from "react";
 import MerchantSidebar from "@/components/merchant/MerchantSidebar";
 
-export const metadata = {
-  title: "Merchant Portal — GiftGrid",
-};
-
 export default function MerchantLayout({
   children,
 }: {
