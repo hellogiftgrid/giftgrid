@@ -6,18 +6,21 @@ export async function middleware(request: NextRequest) {
     request: { headers: request.headers },
   });
 
+  // Guard clause: Prevents crashes if environment variables aren't injected into Vercel yet
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return response;
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-       {
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
       cookies: {
         get(name: string) {
           return request.cookies.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
-          // Updates request headers for downstream components
           request.cookies.set({ name, value, ...options });
-          // Updates response cookies for the browser client without reinstantiating the response
           response.cookies.set({ name, value, ...options });
         },
         remove(name: string, options: CookieOptions) {
@@ -26,11 +29,9 @@ export async function middleware(request: NextRequest) {
         },
       },
     }
-
   );
 
-  // Refreshing the session here keeps server components' cookies current —
-  // without this, sign-in state can silently go stale.
+  // Refreshing the session here keeps server components' cookies current
   await supabase.auth.getUser();
 
   return response;
@@ -40,4 +41,4 @@ export const config = {
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|images/|api/).*)",
   ],
-}; // <--- Make sure this closing bracket and semicolon are here!
+};

@@ -59,15 +59,15 @@ export const opportunityCategories = [
 
 // Verified mapping file matching your exact folder system setup
 export const opportunityImages: Record<string, string> = {
-  "Corporate Gifting": "/images/coporate gifting.jfif",
-  "Bulk Buyers": "/images/bulk buyers.jfif", 
-  "Wholesale": "/images/whosale.jfif",
-  "Retail": "/images/retail.jfif",
-  "Corporate Procurement": "/images/coporate procurement.jfif",
-  "Distributors": "/images/distributors.jfif",
-  "Employee Reward Platforms": "/images/employee reward platform.jfif",
-  "Hospitality": "/images/hosppitality.jfif", 
-  "Events": "/images/events.jfif",
+  "Corporate Gifting": "/images/coporate gifting.png",
+  "Bulk Buyers": "/images/bulk buyers.png", 
+  "Wholesale": "/images/whosale.png",
+  "Retail": "/images/retail.png",
+  "Corporate Procurement": "/images/coporate procurement.png",
+  "Distributors": "/images/distributors.png",
+  "Employee Reward Platforms": "/images/employee reward platform.png",
+  "Hospitality": "/images/hospittality.png", 
+  "Events": "/images/events.png",
 };
 
 export const opportunityCategoryDescriptions: Record<(typeof opportunityCategories)[number], string> = {
@@ -86,8 +86,8 @@ export const opportunityCategoryDescriptions: Record<(typeof opportunityCategori
 export const supportedPlatforms = [
   { name: "Shopify", slug: "shopify.png" },
   { name: "WooCommerce", slug: "woocommerce.png" },
-  { name: "BigCommerce", slug: "big_commerce.jfif" }, // Linked to snake_case format
-  { name: "Magento", slug: "magento.jfif" },
+  { name: "BigCommerce", slug: "big commerce.png" }, // Linked to snake_case format
+  { name: "Magento", slug: "magneto.png" },
   { name: "Wix", slug: "wix.png" },
 ] as const;
 

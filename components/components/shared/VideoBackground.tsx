@@ -2,14 +2,7 @@
 
 import { useState } from "react";
 
-/**
- * Drop-in looping video background for a section.
- *
- * Usage: point `src` / `poster` at files that don't exist yet in /public,
- * and this renders nothing extra until they do — no broken video icon, no
- * layout shift. Once you add the real files at those paths, the video
- * fades in automatically. No code changes needed on either end.
- */
+
 export default function VideoBackground({
   src,
   poster,

@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
     "@netlify/plugin-nextjs": "^5.15.13",
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.112.3",

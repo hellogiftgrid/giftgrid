@@ -27,8 +27,7 @@ function PartnerLogo({ name, slug, chip }: { name: string; slug: string; chip?: 
     />
   );
 
-  // Logos that are white-on-color by design (no transparent background
-  // possible) get a small matching dark card instead of floating bare.
+
   if (chip === "dark") {
     return <div className="flex items-center rounded-lg bg-footerBg px-4 py-2.5">{img}</div>;
   }
