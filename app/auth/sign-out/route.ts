@@ -1,8 +1,12 @@
-import { createServerClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
-export async function POST() {
-  const supabase = createServerClient()
+export async function POST(request: Request) {
+  const supabase = createClient()
+
   await supabase.auth.signOut()
-  return NextResponse.redirect(new URL('/auth/sign-in', process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'))
+
+  return NextResponse.redirect(
+    new URL('/auth/sign-in', request.url)
+  )
 }

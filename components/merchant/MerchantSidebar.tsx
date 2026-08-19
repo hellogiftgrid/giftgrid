@@ -123,16 +123,26 @@ export default function MerchantSidebar() {
   return (
     <aside className="sticky top-0 flex h-screen w-[250px] shrink-0 flex-col border-r border-slate-200 bg-white">
 
-      <div className="flex h-[88px] items-center border-b border-slate-200 px-6">
-        <Link href="/dashboard" className="block">
-          <Image
-            src="/images/logo-full.png"
-            alt="GiftGrid"
-            width={150}
-            height={42}
-            priority
-            className="h-auto w-[150px] object-contain object-left"
-          />
+      <div className="flex h-[88px] items-center border-b border-slate-200 px-5">
+        <Link
+          href="/dashboard"
+          aria-label="GiftGrid dashboard"
+          className="flex items-center gap-3"
+        >
+          <span className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-indigo-100 bg-white shadow-sm">
+            <Image
+              src="/images/logo-full.png"
+              alt="GiftGrid"
+              fill
+              priority
+              sizes="48px"
+              className="object-contain p-1.5"
+            />
+          </span>
+
+          <span className="text-[18px] font-bold tracking-tight text-slate-900">
+            GiftGrid
+          </span>
         </Link>
       </div>
 
