@@ -1,157 +1,254 @@
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import Link from 'next/link'
 
 export const metadata = {
-  title: 'Store Performance Audit — GiftGrid',
-};
+  title: 'Store Audit — GiftGrid',
+}
 
-export default async function MerchantAuditPage() {
-  const supabase = createClient();
+export default async function AuditPage() {
+  const supabase = createClient()
 
-  // 1. Authenticate user context session
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/auth/sign-in');
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  // 2. Fetch the linked merchant account identifier
+  if (!user) redirect('/auth/sign-in')
+
   const { data: merchant } = await supabase
     .from('merchant_profiles')
-    .select('id, business_name')
-    .eq('profile_id', user.id)
-    .single();
+    .select('id, business_name, store_url')
+    .eq('user_id', user.id)
+    .single()
 
-  if (!merchant) redirect('/dashboard');
+  if (!merchant) redirect('/dashboard')
 
-  // 3. Fetch comprehensive audit analytics rows assigned to this specific merchant store
   const { data: audits } = await supabase
     .from('audits')
-    .select('*')
-    .eq('store_id', merchant.id)
-    .order('created_at', { ascending: false });
+    .select(`
+      id,
+      status,
+      overall_score,
+      executive_summary,
+      published_at,
+      created_at
+    `)
+    .eq('merchant_id', merchant.id)
+    .order('created_at', { ascending: false })
 
-  const activeAudit = audits && audits.length > 0 ? audits[0] : null;
+  const audit = audits?.find(
+    (item) => item.status === 'approved' || item.published_at
+  ) || audits?.[0]
 
-  return (
-    <div className="space-y-8 p-4 max-w-[1140px] mx-auto bg-slate-50/30 min-h-screen">
-      
-      {/* Structural Header Banner Section */}
-      <div className="border border-slate-200 rounded-2xl bg-white p-8 shadow-sm relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-32 h-32 bg-indigo-50/50 rounded-bl-full pointer-events-none" />
-        <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-indigo-700 font-bold bg-indigo-50 px-2.5 py-1 rounded">
-          Evaluation Analytics
-        </span>
-        <h1 className="text-3xl font-display font-bold text-slate-900 mt-4">
-          Store Optimization Audit
-        </h1>
-        <p className="text-sm text-slate-500 mt-2 leading-relaxed">
-          Review automated parameters, loading benchmarks, and performance profiles gathered for <span className="font-semibold text-slate-800">{merchant.business_name}</span>.
-        </p>
-      </div>
-
-      {/* Conditional Branching Layout Based on Audit Discovery */}
-      {!activeAudit ? (
-        /* State A: No Audit Generated Yet */
-        <div className="border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center bg-white shadow-sm">
-          <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center mx-auto text-xl font-bold mb-4">
-            ?
+  if (!audit) {
+    return (
+      <div className="min-h-full bg-[#F7F9FC] -m-10 p-6 lg:p-10">
+        <div className="mx-auto max-w-5xl space-y-7">
+          <div>
+            <p className="text-xs font-mono font-bold uppercase tracking-[0.15em] text-[#4F46E5]">
+              Store Audit
+            </p>
+            <h1 className="mt-2 text-3xl font-bold text-slate-900">
+              Your GiftGrid audit
+            </h1>
           </div>
-          <h3 className="text-base font-bold text-slate-900">No Active Audit Data Found</h3>
-          <p className="text-sm text-slate-500 mt-2 max-w-[420px] mx-auto leading-relaxed">
-            Your e-commerce parameters haven't been processed by the automated analyzer grid yet. Connect your store API variables in your profile layout panel to initiate a scoring evaluation run.
-          </p>
-          <div className="mt-6">
-            <Link href="/dashboard/profile" className="inline-block text-xs bg-slate-900 text-white font-bold rounded-lg px-5 py-2.5 hover:bg-black transition-colors shadow-sm">
-              Complete Core Profile Configuration
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-indigo-50 text-[#4F46E5]">
+              ✓
+            </div>
+
+            <h2 className="mt-4 text-lg font-bold text-slate-900">
+              Audit not available yet
+            </h2>
+
+            <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-500">
+              GiftGrid has not published an audit for your business yet.
+              Complete your business information while you wait.
+            </p>
+
+            <Link
+              href="/dashboard/profile"
+              className="mt-5 inline-flex rounded-xl bg-[#4F46E5] px-5 py-3 text-sm font-bold text-white"
+            >
+              Complete profile →
             </Link>
           </div>
         </div>
-      ) : (
-        /* State B: Active Core Metrics Discovered */
-        <div className="space-y-8">
-          
-          {/* Top Score Matrix Metrics Panels */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            <div className="border border-slate-200 bg-white p-6 rounded-xl shadow-sm flex flex-col justify-between">
-              <div>
-                <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider block">Overall Grid Grade</span>
-                <p className="text-4xl font-display font-bold text-indigo-600 mt-3">
-                  {activeAudit.overall_score || 0}<span className="text-sm text-slate-400 font-normal">/100</span>
-                </p>
-              </div>
-              <span className="text-[11px] text-slate-500 mt-4 font-medium block">
-                Status: <span className="capitalize font-bold text-slate-700">{activeAudit.status || 'Complete'}</span>
-              </span>
-            </div>
+      </div>
+    )
+  }
 
-            <div className="border border-slate-200 bg-white p-6 rounded-xl shadow-sm flex flex-col justify-between">
-              <div>
-                <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider block">Fulfillment Readiness</span>
-                <p className="text-4xl font-display font-bold text-slate-900 mt-3">
-                  {activeAudit.overall_score && activeAudit.overall_score >= 80 ? 'High' : 'Medium'}
-                </p>
-              </div>
-              <span className="text-[11px] text-slate-500 mt-4 font-medium block">Based on inventory capacity maps</span>
-            </div>
+  const { data: sections } = await supabase
+    .from('audit_sections')
+    .select('id, title, description, score, sort_order')
+    .eq('audit_id', audit.id)
+    .eq('is_visible', true)
+    .order('sort_order')
 
-            <div className="border border-slate-200 bg-white p-6 rounded-xl shadow-sm flex flex-col justify-between">
-              <div>
-                <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider block">Last Scanner Run</span>
-                <p className="text-sm font-semibold text-slate-800 mt-4">
-                  {activeAudit.created_at ? new Date(activeAudit.created_at).toLocaleDateString() : 'N/A'}
-                </p>
-              </div>
-              <span className="text-[11px] text-slate-500 mt-4 font-medium block">Data pipeline remains active</span>
-            </div>
+  const sectionIds = (sections || []).map((section) => section.id)
 
-          </div>
+  const { data: findings } = sectionIds.length
+    ? await supabase
+        .from('audit_findings')
+        .select(`
+          id,
+          section_id,
+          title,
+          description,
+          status,
+          severity,
+          what_was_checked,
+          why_it_matters,
+          recommendation,
+          evidence,
+          screenshot_url,
+          sort_order
+        `)
+        .in('section_id', sectionIds)
+        .order('sort_order')
+    : { data: [] }
 
-          {/* Breakdown Analytics Details Layout Card */}
-          <div className="border border-slate-200 rounded-xl bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-slate-900">Optimization Parameter Logs</h2>
-            <p className="text-xs text-slate-400 mt-0.5">Granular performance benchmarks mapped by your application scanning layer.</p>
-            
-            <div className="mt-6 space-y-4">
-              
-              {/* Check Item A */}
-              <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-100">
-                <div>
-                  <h4 className="text-sm font-semibold text-slate-900">Mobile Fluid Response Framework</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">Validates layouts across viewport nodes.</p>
-                </div>
-                <span className="text-xs font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded px-2.5 py-1">
-                  PASS
-                </span>
-              </div>
+  return (
+    <div className="min-h-full bg-[#F7F9FC] -m-10 p-6 lg:p-10">
+      <div className="mx-auto max-w-6xl space-y-7">
 
-              {/* Check Item B */}
-              <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-100">
-                <div>
-                  <h4 className="text-sm font-semibold text-slate-900">SSL Certificate & Metadata Verification</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">Encrypts transactional customer token configurations securely.</p>
-                </div>
-                <span className="text-xs font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded px-2.5 py-1">
-                  SECURE
-                </span>
-              </div>
-
-              {/* Check Item C */}
-              <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-100">
-                <div>
-                  <h4 className="text-sm font-semibold text-slate-900">Cart Checkout Flow Hook Hydration</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">Analyzes checkout speed performance for high volume corporate loads.</p>
-                </div>
-                <span className="text-xs font-mono font-bold bg-amber-50 text-amber-700 border border-amber-200 rounded px-2.5 py-1">
-                  OPTIMIZE
-                </span>
-              </div>
-
-            </div>
-          </div>
-
+        <div>
+          <p className="text-xs font-mono font-bold uppercase tracking-[0.15em] text-[#4F46E5]">
+            Store Audit
+          </p>
+          <h1 className="mt-2 text-3xl font-bold text-slate-900">
+            Store Performance Audit
+          </h1>
+          <p className="mt-2 text-sm text-slate-500">
+            {merchant.business_name}
+          </p>
         </div>
-      )}
-      
+
+        <div className="grid gap-5 md:grid-cols-3">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <p className="text-xs font-mono uppercase tracking-wider text-slate-400">
+              Overall score
+            </p>
+            <p className="mt-3 text-4xl font-bold text-[#4F46E5]">
+              {audit.overall_score ?? '—'}
+              <span className="text-sm font-normal text-slate-400">/100</span>
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <p className="text-xs font-mono uppercase tracking-wider text-slate-400">
+              Status
+            </p>
+            <p className="mt-3 text-2xl font-bold capitalize text-slate-900">
+              {audit.status}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <p className="text-xs font-mono uppercase tracking-wider text-slate-400">
+              Published
+            </p>
+            <p className="mt-3 text-lg font-bold text-slate-900">
+              {audit.published_at
+                ? new Date(audit.published_at).toLocaleDateString()
+                : 'Pending'}
+            </p>
+          </div>
+        </div>
+
+        {audit.executive_summary && (
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <p className="text-xs font-mono uppercase tracking-wider text-slate-400">
+              Executive summary
+            </p>
+            <p className="mt-3 text-sm leading-7 text-slate-600">
+              {audit.executive_summary}
+            </p>
+          </div>
+        )}
+
+        <div className="space-y-5">
+          {(sections || []).map((section) => {
+            const sectionFindings = (findings || []).filter(
+              (item) => item.section_id === section.id
+            )
+
+            return (
+              <section
+                key={section.id}
+                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h2 className="text-lg font-bold text-slate-900">
+                      {section.title}
+                    </h2>
+                    {section.description && (
+                      <p className="mt-1 text-sm text-slate-500">
+                        {section.description}
+                      </p>
+                    )}
+                  </div>
+
+                  {section.score !== null && (
+                    <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-[#4F46E5]">
+                      {section.score}/100
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-5 space-y-3">
+                  {sectionFindings.length === 0 ? (
+                    <p className="text-sm text-slate-400">
+                      No findings published.
+                    </p>
+                  ) : (
+                    sectionFindings.map((finding) => (
+                      <article
+                        key={finding.id}
+                        className="rounded-xl border border-slate-100 bg-slate-50 p-4"
+                      >
+                        <div className="flex flex-col gap-3 md:flex-row md:justify-between">
+                          <div>
+                            <h3 className="text-sm font-bold text-slate-900">
+                              {finding.title}
+                            </h3>
+
+                            {finding.description && (
+                              <p className="mt-2 text-xs leading-6 text-slate-600">
+                                {finding.description}
+                              </p>
+                            )}
+
+                            {finding.why_it_matters && (
+                              <p className="mt-2 text-xs leading-6 text-slate-500">
+                                <strong>Why it matters:</strong>{' '}
+                                {finding.why_it_matters}
+                              </p>
+                            )}
+
+                            {finding.recommendation && (
+                              <p className="mt-2 text-xs leading-6 text-slate-600">
+                                <strong>Recommendation:</strong>{' '}
+                                {finding.recommendation}
+                              </p>
+                            )}
+                          </div>
+
+                          <span className="h-fit shrink-0 rounded-full bg-white px-3 py-1 text-[11px] font-bold capitalize text-slate-600 ring-1 ring-slate-200">
+                            {String(finding.status || 'not_tested').replaceAll('_', ' ')}
+                          </span>
+                        </div>
+                      </article>
+                    ))
+                  )}
+                </div>
+              </section>
+            )
+          })}
+        </div>
+      </div>
     </div>
-  );
+  )
 }
