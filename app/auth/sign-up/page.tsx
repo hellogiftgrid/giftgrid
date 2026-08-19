@@ -29,6 +29,7 @@ export default function SignUpPage() {
       password,
       options: {
         data: {
+          email,
           full_name: fullName,
           business_name: businessName,
         },
