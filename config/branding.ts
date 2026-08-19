@@ -16,7 +16,7 @@ export const colors = {
 
   // Brand accents
   accent: "#4F46E5",         
-  accentAlt: "#EA580C",      
+  accentAlt: "#2563EB",      
   accentDim: "#3730A3",      
 
   // Status

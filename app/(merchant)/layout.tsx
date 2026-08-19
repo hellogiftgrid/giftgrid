@@ -14,8 +14,8 @@ export default function MerchantLayout({
       <MerchantSidebar />
 
       {/* Main scrolling content frame panel */}
-      <main className="flex-1 h-screen overflow-y-auto bg-white">
-        <div className="p-10 max-w-[1200px] mx-auto">
+      <main className="flex-1 h-screen overflow-y-auto bg-[#F7F9FC]">
+        <div className="p-6 lg:p-10 max-w-[1280px] mx-auto">
           {children}
         </div>
       </main>

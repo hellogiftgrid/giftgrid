@@ -57,7 +57,7 @@ export default function ChatWidget() {
     <div className="fixed bottom-5 right-5 z-50">
       {open && (
         <div className="mb-3 flex h-[480px] w-[340px] flex-col overflow-hidden rounded-2xl border border-borderCustom bg-secondary shadow-2xl sm:w-[380px]">
-          <div className="flex items-center justify-between border-b border-borderCustom bg-textPrimary px-4 py-3.5">
+          <div className="flex items-center justify-between border-b border-borderCustom bg-[#4F46E5] px-4 py-3.5">
             <span className="text-[14px] font-semibold text-white">{siteConfig.name} Assistant</span>
             <button
               onClick={() => setOpen(false)}
@@ -112,7 +112,7 @@ export default function ChatWidget() {
               disabled={loading || !input.trim()}
               aria-label="Send message"
               className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-white shadow-sm transition-opacity disabled:opacity-40"
-              style={{ background: "linear-gradient(90deg, #4F46E5, #F97316)" }}
+              style={{ background: "#4F46E5" }}
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
                 <path d="M5 12h14M13 6l6 6-6 6" />
@@ -126,7 +126,7 @@ export default function ChatWidget() {
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Close chat" : "Open chat"}
         className="flex h-14 w-14 items-center justify-center rounded-full text-white shadow-xl transition-transform hover:-translate-y-0.5"
-        style={{ background: "linear-gradient(135deg, #4F46E5, #F97316)" }}
+        style={{ background: "#4F46E5" }}
       >
         {open ? (
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
