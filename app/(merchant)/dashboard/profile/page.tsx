@@ -182,6 +182,8 @@ export default function ProfilePage() {
       setMessage("Profile saved successfully.");
       router.push("/dashboard");
       router.refresh();
+      router.push("/dashboard");
+      router.refresh();
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Unable to save your profile."
