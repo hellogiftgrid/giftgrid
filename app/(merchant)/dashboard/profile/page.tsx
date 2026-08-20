@@ -3,33 +3,22 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-type MerchantProfile = {
-  id: string;
-  user_id: string;
-  business_name: string | null;
-  business_email: string | null;
-  phone: string | null;
-  country: string | null;
-  store_url: string | null;
-  business_category: string | null;
-  product_category: string | null;
-  business_description: string | null;
-};
-
-type Profile = {
-  full_name: string | null;
-  email: string | null;
-  phone: string | null;
-  country: string | null;
+type FormState = {
+  fullName: string;
+  businessName: string;
+  businessEmail: string;
+  phone: string;
+  country: string;
+  storeUrl: string;
+  businessCategory: string;
+  productCategory: string;
+  businessDescription: string;
 };
 
 export default function ProfilePage() {
   const supabase = createClient();
 
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [merchant, setMerchant] = useState<MerchantProfile | null>(null);
-
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormState>({
     fullName: "",
     businessName: "",
     businessEmail: "",
@@ -43,113 +32,115 @@ export default function ProfilePage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    async function loadProfile() {
-      setLoading(true);
-      setError(null);
+    async function load() {
+      try {
+        setLoading(true);
+        setError("");
 
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
 
-      if (userError || !user) {
-        setError(userError?.message || "You are not signed in.");
-        setLoading(false);
-        return;
-      }
+        if (authError) throw authError;
+        if (!user) throw new Error("You are not signed in.");
 
-      const [profileRes, merchantRes] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select("full_name, email, phone, country")
-          .eq("id", user.id)
-          .single(),
+        const [profileResult, merchantResult] = await Promise.all([
+          supabase
+            .from("profiles")
+            .select("full_name, email, phone, country")
+            .eq("id", user.id)
+            .limit(1),
 
-        supabase
-          .from("merchant_profiles")
-          .select(`
-            id,
-            user_id,
-            business_name,
-            business_email,
-            phone,
-            country,
-            store_url,
-            business_category,
-            product_category,
-            business_description
-          `)
-          .eq("user_id", user.id)
-          .single(),
-      ]);
+          supabase
+            .from("merchant_profiles")
+            .select(`
+              id,
+              user_id,
+              business_name,
+              business_email,
+              phone,
+              country,
+              store_url,
+              business_category,
+              product_category,
+              business_description
+            `)
+            .eq("user_id", user.id)
+            .limit(1),
+        ]);
 
-      if (profileRes.error) {
-        setError(`Profile could not be loaded: ${profileRes.error.message}`);
-        setLoading(false);
-        return;
-      }
+        if (profileResult.error) {
+          throw new Error(
+            `Profile could not be loaded: ${profileResult.error.message}`
+          );
+        }
 
-      if (merchantRes.error) {
+        if (merchantResult.error) {
+          throw new Error(
+            `Merchant profile could not be loaded: ${merchantResult.error.message}`
+          );
+        }
+
+        const profile = profileResult.data?.[0];
+        const merchant = merchantResult.data?.[0];
+
+        if (!profile) {
+          throw new Error("Your account profile record could not be found.");
+        }
+
+        if (!merchant) {
+          throw new Error("Your merchant workspace could not be found.");
+        }
+
+        setForm({
+          fullName: profile.full_name || "",
+          businessName: merchant.business_name || "",
+          businessEmail:
+            merchant.business_email || profile.email || user.email || "",
+          phone: merchant.phone || profile.phone || "",
+          country: merchant.country || profile.country || "",
+          storeUrl: merchant.store_url || "",
+          businessCategory: merchant.business_category || "",
+          productCategory: merchant.product_category || "",
+          businessDescription: merchant.business_description || "",
+        });
+      } catch (err) {
         setError(
-          `Merchant profile could not be loaded: ${merchantRes.error.message}`
+          err instanceof Error ? err.message : "Unable to load your profile."
         );
+      } finally {
         setLoading(false);
-        return;
       }
-
-      const nextProfile = profileRes.data as Profile;
-      const nextMerchant = merchantRes.data as MerchantProfile;
-
-      setProfile(nextProfile);
-      setMerchant(nextMerchant);
-
-      setForm({
-        fullName: nextProfile.full_name || "",
-        businessName: nextMerchant.business_name || "",
-        businessEmail:
-          nextMerchant.business_email || nextProfile.email || user.email || "",
-        phone: nextMerchant.phone || nextProfile.phone || "",
-        country: nextMerchant.country || nextProfile.country || "",
-        storeUrl: nextMerchant.store_url || "",
-        businessCategory: nextMerchant.business_category || "",
-        productCategory: nextMerchant.product_category || "",
-        businessDescription: nextMerchant.business_description || "",
-      });
-
-      setLoading(false);
     }
 
-    loadProfile();
+    load();
   }, [supabase]);
 
-  function updateField(
-    field: keyof typeof form,
-    value: string
-  ) {
+  function setField(field: keyof FormState, value: string) {
     setForm((current) => ({
       ...current,
       [field]: value,
     }));
   }
 
-  async function handleSave() {
-    setSaving(true);
-    setMessage(null);
-    setError(null);
-
+  async function saveProfile() {
     try {
+      setSaving(true);
+      setMessage("");
+      setError("");
+
       const {
         data: { user },
-        error: userError,
+        error: authError,
       } = await supabase.auth.getUser();
 
-      if (userError || !user) {
-        throw new Error(userError?.message || "You are not signed in.");
-      }
+      if (authError) throw authError;
+      if (!user) throw new Error("You are not signed in.");
 
       const { error: merchantError } = await supabase
         .from("merchant_profiles")
@@ -189,9 +180,7 @@ export default function ProfilePage() {
       setMessage("Profile saved successfully.");
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : "Something went wrong while saving."
+        err instanceof Error ? err.message : "Unable to save your profile."
       );
     } finally {
       setSaving(false);
@@ -201,29 +190,8 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="min-h-full bg-[#F7F9FC] -m-10 p-6 lg:p-10">
-        <div className="mx-auto max-w-5xl">
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-            <div className="animate-pulse space-y-4">
-              <div className="h-5 w-40 rounded bg-slate-200" />
-              <div className="h-10 w-2/3 rounded bg-slate-200" />
-              <div className="h-32 rounded bg-slate-100" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!profile || !merchant) {
-    return (
-      <div className="min-h-full bg-[#F7F9FC] -m-10 p-6 lg:p-10">
-        <div className="mx-auto max-w-4xl rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-          <h1 className="text-xl font-bold text-slate-900">
-            Profile unavailable
-          </h1>
-          <p className="mt-2 text-sm text-slate-500">
-            {error || "Your merchant workspace could not be loaded."}
-          </p>
+        <div className="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-8">
+          <p className="text-sm text-slate-500">Loading your profile…</p>
         </div>
       </div>
     );
@@ -242,8 +210,8 @@ export default function ProfilePage() {
           </h1>
 
           <p className="mt-2 text-sm text-slate-500">
-            Keep your business information current so GiftGrid can evaluate
-            your store and match you with opportunities.
+            Manage the business information GiftGrid uses for audits and
+            opportunity matching.
           </p>
         </div>
 
@@ -265,23 +233,23 @@ export default function ProfilePage() {
           </h2>
 
           <div className="mt-6 grid gap-5 md:grid-cols-2">
-            <label className="block">
+            <label>
               <span className="mb-2 block text-sm font-semibold text-slate-700">
                 Full name
               </span>
               <input
                 value={form.fullName}
-                onChange={(e) => updateField("fullName", e.target.value)}
+                onChange={(e) => setField("fullName", e.target.value)}
                 className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
               />
             </label>
 
-            <label className="block">
+            <label>
               <span className="mb-2 block text-sm font-semibold text-slate-700">
                 Account email
               </span>
               <input
-                value={profile.email || ""}
+                value={form.businessEmail}
                 disabled
                 className="w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-500"
               />
@@ -295,49 +263,47 @@ export default function ProfilePage() {
           </h2>
 
           <div className="mt-6 grid gap-5 md:grid-cols-2">
-            <label className="block">
+            <label>
               <span className="mb-2 block text-sm font-semibold text-slate-700">
                 Business name
               </span>
               <input
-                required
                 value={form.businessName}
-                onChange={(e) => updateField("businessName", e.target.value)}
+                onChange={(e) => setField("businessName", e.target.value)}
                 className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
               />
             </label>
 
-            <label className="block">
+            <label>
               <span className="mb-2 block text-sm font-semibold text-slate-700">
                 Business email
               </span>
               <input
                 type="email"
-                required
                 value={form.businessEmail}
-                onChange={(e) => updateField("businessEmail", e.target.value)}
+                onChange={(e) => setField("businessEmail", e.target.value)}
                 className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
               />
             </label>
 
-            <label className="block">
+            <label>
               <span className="mb-2 block text-sm font-semibold text-slate-700">
                 Phone
               </span>
               <input
                 value={form.phone}
-                onChange={(e) => updateField("phone", e.target.value)}
+                onChange={(e) => setField("phone", e.target.value)}
                 className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
               />
             </label>
 
-            <label className="block">
+            <label>
               <span className="mb-2 block text-sm font-semibold text-slate-700">
                 Country
               </span>
               <input
                 value={form.country}
-                onChange={(e) => updateField("country", e.target.value)}
+                onChange={(e) => setField("country", e.target.value)}
                 placeholder="Nigeria"
                 className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
               />
@@ -351,50 +317,48 @@ export default function ProfilePage() {
           </h2>
 
           <div className="mt-6 space-y-5">
-            <label className="block">
+            <label>
               <span className="mb-2 block text-sm font-semibold text-slate-700">
                 Store URL
               </span>
               <input
                 type="url"
                 value={form.storeUrl}
-                onChange={(e) => updateField("storeUrl", e.target.value)}
+                onChange={(e) => setField("storeUrl", e.target.value)}
                 placeholder="https://yourstore.com"
                 className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
               />
             </label>
 
             <div className="grid gap-5 md:grid-cols-2">
-              <label className="block">
+              <label>
                 <span className="mb-2 block text-sm font-semibold text-slate-700">
                   Business category
                 </span>
                 <input
                   value={form.businessCategory}
                   onChange={(e) =>
-                    updateField("businessCategory", e.target.value)
+                    setField("businessCategory", e.target.value)
                   }
-                  placeholder="Fashion, Gifts, Beauty..."
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
                 />
               </label>
 
-              <label className="block">
+              <label>
                 <span className="mb-2 block text-sm font-semibold text-slate-700">
                   Product category
                 </span>
                 <input
                   value={form.productCategory}
                   onChange={(e) =>
-                    updateField("productCategory", e.target.value)
+                    setField("productCategory", e.target.value)
                   }
-                  placeholder="Gift boxes, apparel, homeware..."
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
                 />
               </label>
             </div>
 
-            <label className="block">
+            <label>
               <span className="mb-2 block text-sm font-semibold text-slate-700">
                 Business description
               </span>
@@ -402,9 +366,8 @@ export default function ProfilePage() {
                 rows={6}
                 value={form.businessDescription}
                 onChange={(e) =>
-                  updateField("businessDescription", e.target.value)
+                  setField("businessDescription", e.target.value)
                 }
-                placeholder="Tell us about your business and products."
                 className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
               />
             </label>
@@ -414,18 +377,11 @@ export default function ProfilePage() {
         <div className="flex justify-end">
           <button
             type="button"
-            onClick={handleSave}
+            onClick={saveProfile}
             disabled={saving}
-            className="inline-flex min-w-[170px] items-center justify-center gap-2 rounded-xl bg-[#4F46E5] px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#4338CA] disabled:cursor-not-allowed disabled:opacity-60"
+            className="min-w-[170px] rounded-xl bg-[#4F46E5] px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#4338CA] disabled:opacity-60"
           >
-            {saving ? (
-              <>
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                Saving…
-              </>
-            ) : (
-              "Save profile"
-            )}
+            {saving ? "Saving…" : "Save profile"}
           </button>
         </div>
       </div>
