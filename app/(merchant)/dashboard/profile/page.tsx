@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type FormState = {
@@ -17,6 +18,7 @@ type FormState = {
 
 export default function ProfilePage() {
   const supabase = createClient();
+  const router = useRouter();
 
   const [form, setForm] = useState<FormState>({
     fullName: "",
@@ -178,6 +180,8 @@ export default function ProfilePage() {
       }
 
       setMessage("Profile saved successfully.");
+      router.push("/dashboard");
+      router.refresh();
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Unable to save your profile."

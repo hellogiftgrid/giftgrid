@@ -205,24 +205,13 @@ export default async function MerchantDashboardPage() {
     );
   }
 
-  // Fetch stores first because audits are connected to stores,
-  // not directly to merchant_profiles.
-  const { data: stores } = await supabase
-    .from('stores')
-    .select('id, store_url, platform, created_at')
-    .eq('merchant_id', merchant.id)
-    .order('created_at', { ascending: false });
-
-  const storeIds = (stores || []).map((store) => store.id);
-
+  // Live schema: audits belong directly to merchant_profiles.
   const [auditsRes, submissionsRes, documentsRes] = await Promise.all([
-    storeIds.length
-      ? supabase
-          .from('audits')
-          .select('id, status, overall_score, created_at')
-          .in('store_id', storeIds)
-          .order('created_at', { ascending: false })
-      : Promise.resolve({ data: [] }),
+    supabase
+      .from('audits')
+      .select('id, status, overall_score, created_at')
+      .eq('merchant_id', merchant.id)
+      .order('created_at', { ascending: false }),
 
     supabase
       .from('opportunity_submissions')
@@ -233,7 +222,7 @@ export default async function MerchantDashboardPage() {
       .from('documents')
       .select('id', { count: 'exact' })
       .eq('merchant_id', merchant.id)
-      .eq('visible_to_merchant', true),
+      .eq('is_visible_to_merchant', true),
   ]);
 
   const audits = auditsRes.data || [];
@@ -404,45 +393,61 @@ export default async function MerchantDashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-mono uppercase tracking-wider text-slate-400">
-                  Store connection
+                  Store setup
                 </p>
+
                 <h2 className="text-lg font-bold text-slate-900 mt-1">
-                  {stores?.length ? 'Store connected' : 'Store not connected'}
+                  {merchant.store_url ? 'Store connected' : 'Store setup required'}
                 </h2>
               </div>
 
-              <div className={`w-3 h-3 rounded-full ${
-                stores?.length ? 'bg-emerald-500' : 'bg-amber-400'
-              }`} />
+              <div
+                className={`w-3 h-3 rounded-full ${
+                  merchant.store_url ? 'bg-emerald-500' : 'bg-amber-400'
+                }`}
+              />
             </div>
 
-            {stores?.length ? (
-              <div className="mt-5 space-y-3">
-                {stores.slice(0, 2).map((store) => (
-                  <div
-                    key={store.id}
-                    className="rounded-xl border border-slate-100 bg-slate-50 p-4"
+            {merchant.store_url ? (
+              <div className="mt-5 rounded-xl border border-emerald-100 bg-emerald-50/60 p-5">
+                <p className="text-xs font-mono uppercase tracking-wider text-emerald-600">
+                  Connected store
+                </p>
+
+                <p className="mt-2 break-all text-sm font-semibold text-slate-900">
+                  {merchant.store_url}
+                </p>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <a
+                    href={merchant.store_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex rounded-lg bg-[#4F46E5] px-4 py-2 text-xs font-bold text-white hover:bg-[#4338CA]"
                   >
-                    <p className="text-sm font-semibold text-slate-900">
-                      {store.store_url}
-                    </p>
-                    <p className="text-xs text-slate-500 mt-1">
-                      {store.platform || 'Platform not specified'}
-                    </p>
-                  </div>
-                ))}
+                    Visit store ↗
+                  </a>
+
+                  <Link
+                    href="/dashboard/profile"
+                    className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
+                  >
+                    Manage store
+                  </Link>
+                </div>
               </div>
             ) : (
               <div className="mt-5 rounded-xl border border-dashed border-slate-200 p-5">
-                <p className="text-sm text-slate-600">
-                  Connect your store to unlock audit and opportunity workflows.
+                <p className="text-sm leading-6 text-slate-600">
+                  Add your store URL in your GiftGrid profile. Once saved, your
+                  dashboard will recognize the store as connected.
                 </p>
 
                 <Link
                   href="/dashboard/profile"
-                  className="inline-flex mt-4 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-700"
+                  className="inline-flex mt-4 rounded-lg bg-[#4F46E5] px-4 py-2 text-xs font-bold text-white hover:bg-[#4338CA]"
                 >
-                  Add store details
+                  Set up store →
                 </Link>
               </div>
             )}
@@ -476,10 +481,11 @@ export default async function MerchantDashboardPage() {
                     <div
                       className={`h-2 rounded-full ${
                         stepIndex <= currentIndex
-                          ? 'bg-indigo-600'
+                          ? 'bg-[#4F46E5]'
                           : 'bg-slate-100'
                       }`}
                     />
+
                     <p className="text-[10px] text-slate-400 mt-2 capitalize">
                       {step.replaceAll('_', ' ')}
                     </p>
@@ -493,7 +499,7 @@ export default async function MerchantDashboardPage() {
                 ? 'Your merchant application has been approved.'
                 : merchant.application_status === 'submitted'
                 ? 'Your application has been submitted for review.'
-                : 'Complete your profile and submit your application when ready.'}
+                : 'Complete your profile and store setup before submitting your application.'}
             </p>
           </div>
 
