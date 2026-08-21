@@ -5,6 +5,7 @@ const SITE_URL = "https://www.degiftgrid.com";
 const routes = [
   "/",
   "/about",
+  "/giftgrid",
   "/how-it-works",
   "/store-review",
   "/faq",

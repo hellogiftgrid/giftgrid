@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     template: "%s | GiftGrid",
   },
   description:
-    "GiftGrid helps e-commerce merchants audit their stores, improve buyer readiness, and connect with corporate gifting, wholesale, and commercial opportunities.",
+    "GiftGrid is an e-commerce merchant platform that helps brands audit their stores, improve buyer readiness, and prepare for corporate gifting, wholesale, and commercial opportunities.",
   icons: {
     icon: [
       { url: "/favicon.ico" },
