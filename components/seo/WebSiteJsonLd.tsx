@@ -6,7 +6,7 @@ export default function WebSiteJsonLd() {
     url: "https://www.degiftgrid.com/",
     name: "GiftGrid",
     description:
-      "GiftGrid helps e-commerce merchants improve store readiness and pursue corporate gifting and commercial opportunities.",
+      "GiftGrid helps e-commerce merchants improve store readiness and prepare for corporate gifting and commercial opportunities.",
     publisher: {
       "@id": "https://www.degiftgrid.com/#organization",
     },

@@ -4,18 +4,18 @@ export default function OrganizationJsonLd() {
     "@type": "Organization",
     "@id": "https://www.degiftgrid.com/#organization",
     name: "GiftGrid",
-    url: "https://www.degiftgrid.com",
+    url: "https://www.degiftgrid.com/",
     logo: {
       "@type": "ImageObject",
-      url: "https://www.degiftgrid.com/images/logo-horizontal.png",
+      url: "https://www.degiftgrid.com/images/logo-full.png",
     },
     email: "support@degiftgrid.com",
     description:
-      "GiftGrid helps e-commerce merchants prepare, review, and position their stores for corporate gifting, buyer, wholesale, and business opportunities.",
+      "GiftGrid helps e-commerce merchants audit their stores, improve buyer readiness, and prepare for corporate gifting, wholesale, and commercial opportunities.",
     contactPoint: {
       "@type": "ContactPoint",
-      email: "support@degiftgrid.com",
       contactType: "customer support",
+      email: "support@degiftgrid.com",
     },
   };
 
