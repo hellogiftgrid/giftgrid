@@ -1,30 +1,33 @@
-
 "use client";
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import AuthShell from "@/components/auth/AuthShell";
 import AuthField from "@/components/auth/AuthField";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SignUpPage() {
   const supabase = createClient();
+  const router = useRouter();
+
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
     setError(null);
     setLoading(true);
 
     const form = new FormData(e.currentTarget);
-    const email = form.get("email") as string;
-    const password = form.get("password") as string;
-    const businessName = form.get("businessName") as string;
-    const fullName = form.get("fullName") as string;
 
-    const { data, error: signUpError } = await supabase.auth.signUp({
+    const email = String(form.get("email") || "").trim();
+    const password = String(form.get("password") || "");
+    const businessName = String(form.get("businessName") || "").trim();
+    const fullName = String(form.get("fullName") || "").trim();
+
+    const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -36,24 +39,18 @@ export default function SignUpPage() {
       },
     });
 
+    setLoading(false);
+
     if (signUpError) {
       setError(signUpError.message);
-      setLoading(false);
       return;
     }
 
-    setLoading(false);
-    setSent(true);
-  }
+    const params = new URLSearchParams({
+      email,
+    });
 
-  if (sent) {
-    return (
-      <AuthShell title="Check your email" subtitle="We sent a confirmation link to finish setting up your account.">
-        <p className="text-[14px] text-textSecondary">
-          Once confirmed, you can sign in and start your merchant application.
-        </p>
-      </AuthShell>
-    );
+    router.push(`/auth/verify?${params.toString()}`);
   }
 
   return (
@@ -70,12 +67,40 @@ export default function SignUpPage() {
       }
     >
       <form onSubmit={handleSubmit} className="space-y-5">
-        <AuthField label="Full Name" name="fullName" required autoComplete="name" />
-        <AuthField label="Business Name" name="businessName" required />
-        <AuthField label="Email" name="email" type="email" required autoComplete="email" />
-        <AuthField label="Password" name="password" type="password" required autoComplete="new-password" />
+        <AuthField
+          label="Full Name"
+          name="fullName"
+          required
+          autoComplete="name"
+        />
 
-        {error && <p className="text-[13.5px] text-danger">{error}</p>}
+        <AuthField
+          label="Business Name"
+          name="businessName"
+          required
+        />
+
+        <AuthField
+          label="Email"
+          name="email"
+          type="email"
+          required
+          autoComplete="email"
+        />
+
+        <AuthField
+          label="Password"
+          name="password"
+          type="password"
+          required
+          autoComplete="new-password"
+        />
+
+        {error && (
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700">
+            {error}
+          </div>
+        )}
 
         <button
           type="submit"

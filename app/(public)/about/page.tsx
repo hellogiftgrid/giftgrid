@@ -72,7 +72,45 @@ export default function AboutPage() {
             </p>
           </div>
         </section>
-      </main>
+      
+        <section className="mx-auto max-w-5xl px-6 py-10">
+          <div className="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#4F46E5]">
+              About GiftGrid
+            </p>
+
+            <h2 className="mt-3 text-2xl font-bold text-slate-950">
+              GiftGrid is an e-commerce merchant platform.
+            </h2>
+
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              GiftGrid helps e-commerce merchants review their online stores,
+              improve buyer readiness, and prepare for corporate gifting,
+              wholesale, and commercial opportunities.
+            </p>
+
+            <p className="mt-3 text-sm leading-7 text-slate-600">
+              Official website:
+              <a
+                href="https://www.degiftgrid.com"
+                className="ml-1 font-semibold text-[#4F46E5]"
+              >
+                www.degiftgrid.com
+              </a>
+            </p>
+
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              Support:
+              <a
+                href="mailto:support@degiftgrid.com"
+                className="ml-1 font-semibold text-[#4F46E5]"
+              >
+                support@degiftgrid.com
+              </a>
+            </p>
+          </div>
+        </section>
+</main>
       <Footer />
     </>
   );

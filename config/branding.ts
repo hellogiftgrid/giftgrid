@@ -42,7 +42,7 @@ export const siteConfig = {
   tagline: "Prepare. Connect. Pursue.",
   description:
     "GiftGrid helps e-commerce brands prepare, review, and position their stores for opportunities within the corporate gifting ecosystem.",
-  supportEmail: "hellogiftgrid@gmail.com",
+  supportEmail: "support@degiftgrid.com",
 };
 
 export const opportunityCategories = [

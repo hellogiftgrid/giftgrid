@@ -1,3 +1,4 @@
+import HireExpertButton from "@/components/merchant/HireExpertButton";
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 

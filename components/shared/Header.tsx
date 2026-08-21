@@ -8,6 +8,7 @@ const navLinks = [
   { href: "/store-review", label: "Store Review" },
   { href: "/about", label: "About" },
   { href: "/faq", label: "FAQ" },
+  { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
 ];
 

@@ -43,8 +43,8 @@ export default async function CommsPage() {
         <p className="page-sub">
           Messages from the GiftGrid team about your account, audit, and opportunities.
           To reply, use the form below or email{' '}
-          <a href="mailto:hellogiftgrid@gmail.com" className="email-link">
-            hellogiftgrid@gmail.com
+          <a href="mailto:support@degiftgrid.com" className="email-link">
+            support@degiftgrid.com
           </a>
           .
         </p>
