@@ -1,7 +1,5 @@
 import type { MetadataRoute } from "next";
 
-const SITE_URL = "https://www.degiftgrid.com";
-
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
@@ -15,7 +13,7 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: `${SITE_URL}/sitemap.xml`,
-    host: SITE_URL,
+    sitemap: "https://www.degiftgrid.com/sitemap.xml",
+    host: "https://www.degiftgrid.com",
   };
 }

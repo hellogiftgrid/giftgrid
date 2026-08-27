@@ -3,6 +3,7 @@ import { Sora, Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/config/branding";
 import ChatWidget from "@/components/shared/ChatWidget";
+import SiteFooter from "@/components/shared/SiteFooter";
 import OrganizationJsonLd from "@/components/seo/OrganizationJsonLd";
 import WebSiteJsonLd from "@/components/seo/WebSiteJsonLd";
 
@@ -27,11 +28,14 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.degiftgrid.com"),
   title: {
-    default: "GiftGrid | Corporate Gifting & E-commerce Merchant Platform",
+    default: "GiftGrid | E-commerce Merchant Platform for Corporate Gifting",
     template: "%s | GiftGrid",
   },
   description:
     "GiftGrid is an e-commerce merchant platform that helps brands audit their stores, improve buyer readiness, and prepare for corporate gifting, wholesale, and commercial opportunities.",
+  alternates: {
+    canonical: "https://www.degiftgrid.com/",
+  },
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -40,9 +44,9 @@ export const metadata: Metadata = {
     apple: "/apple-icon.png",
   },
   openGraph: {
-    title: "GiftGrid | Corporate Gifting & E-commerce Merchant Platform",
+    title: "GiftGrid | E-commerce Merchant Platform for Corporate Gifting",
     description:
-      "Audit your store, improve your buyer readiness, and prepare for corporate gifting and commercial opportunities with GiftGrid.",
+      "GiftGrid helps e-commerce merchants audit their stores, improve buyer readiness, and prepare for corporate gifting, wholesale, and commercial opportunities.",
     url: "https://www.degiftgrid.com/",
     siteName: "GiftGrid",
     images: [
@@ -55,9 +59,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "GiftGrid | Corporate Gifting & E-commerce Merchant Platform",
+    title: "GiftGrid | E-commerce Merchant Platform for Corporate Gifting",
     description:
-      "GiftGrid helps e-commerce merchants improve store readiness and pursue business opportunities.",
+      "GiftGrid helps e-commerce merchants audit their stores, improve buyer readiness, and prepare for corporate gifting, wholesale, and commercial opportunities.",
     images: ["/images/logo-horizontal.png"],
   },
 };
@@ -86,6 +90,7 @@ export default function RootLayout({
         <OrganizationJsonLd />
         <WebSiteJsonLd />
         {children}
+        <SiteFooter />
         <ChatWidget />
       </body>
     </html>

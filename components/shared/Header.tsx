@@ -40,7 +40,7 @@ export default function Header() {
           <Link
             href="/auth/sign-up"
             className="rounded-full px-5 py-2.5 text-[14px] font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5"
-            style={{ background: "linear-gradient(90deg, #4F46E5, #F97316)" }}
+            style={{ background: "#4F46E5" }}
           >
             Apply as Merchant
           </Link>
@@ -76,7 +76,7 @@ export default function Header() {
             <Link
               href="/auth/sign-up"
               className="rounded-full px-5 py-3 text-center text-[14px] font-semibold text-white"
-              style={{ background: "linear-gradient(90deg, #4F46E5, #F97316)" }}
+              style={{ background: "#4F46E5" }}
             >
               Apply as Merchant
             </Link>
