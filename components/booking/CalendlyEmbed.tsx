@@ -20,11 +20,14 @@ export default function CalendlyEmbed({
   url: string;
 }) {
   useEffect(() => {
-    function initialize() {
-      const target =
-        document.getElementById("giftgrid-calendly");
+    const target = document.getElementById(
+      "giftgrid-calendly"
+    );
 
-      if (!target || !window.Calendly) return;
+    if (!target) return;
+
+    const initialise = () => {
+      if (!window.Calendly) return;
 
       target.innerHTML = "";
 
@@ -33,10 +36,10 @@ export default function CalendlyEmbed({
         parentElement: target,
         resize: true,
       });
-    }
+    };
 
     if (window.Calendly) {
-      initialize();
+      initialise();
       return;
     }
 
@@ -44,8 +47,7 @@ export default function CalendlyEmbed({
     script.src =
       "https://assets.calendly.com/assets/external/widget.js";
     script.async = true;
-
-    script.onload = initialize;
+    script.onload = initialise;
 
     document.body.appendChild(script);
 
@@ -60,7 +62,6 @@ export default function CalendlyEmbed({
       style={{
         minWidth: "320px",
         height: "760px",
-        overflow: "hidden",
       }}
     />
   );

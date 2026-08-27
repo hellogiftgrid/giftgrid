@@ -2,10 +2,10 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import CalendlyEmbed from "@/components/booking/CalendlyEmbed";
 
+export const dynamic = "force-dynamic";
+
 const CALENDLY_URL =
   process.env.NEXT_PUBLIC_CALENDLY_URL || "";
-
-export const dynamic = "force-dynamic";
 
 export default async function BookingPage({
   params,
@@ -28,22 +28,6 @@ export default async function BookingPage({
     notFound();
   }
 
-  if (!CALENDLY_URL) {
-    return (
-      <main className="min-h-screen bg-slate-50 px-5 py-16">
-        <div className="mx-auto max-w-xl rounded-2xl border border-red-200 bg-white p-8">
-          <h1 className="text-2xl font-bold text-slate-950">
-            Booking is being configured
-          </h1>
-
-          <p className="mt-3 text-sm text-slate-500">
-            Please check back shortly.
-          </p>
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main className="min-h-screen bg-slate-50 px-5 py-10">
       <div className="mx-auto max-w-6xl">
@@ -58,12 +42,24 @@ export default async function BookingPage({
 
           <p className="mt-2 text-sm text-slate-500">
             {admin.booking_title ||
-              "Choose a convenient time for your GiftGrid consultation."}
+              "Choose a convenient time to speak with the GiftGrid team."}
           </p>
         </div>
 
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-          <CalendlyEmbed url={CALENDLY_URL} />
+          {CALENDLY_URL ? (
+            <CalendlyEmbed url={CALENDLY_URL} />
+          ) : (
+            <div className="p-12 text-center">
+              <h2 className="text-xl font-bold text-slate-950">
+                Booking is being configured
+              </h2>
+
+              <p className="mt-2 text-sm text-slate-500">
+                Please check back shortly.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </main>

@@ -1,9 +1,9 @@
 import CalendlyEmbed from "@/components/booking/CalendlyEmbed";
 
+export const dynamic = "force-dynamic";
+
 const CALENDLY_URL =
   process.env.NEXT_PUBLIC_CALENDLY_URL || "";
-
-export const dynamic = "force-dynamic";
 
 export default function BookPage() {
   return (
@@ -15,11 +15,11 @@ export default function BookPage() {
           </div>
 
           <h1 className="mt-2 text-3xl font-bold text-slate-950">
-            Book a call
+            Book a Call
           </h1>
 
           <p className="mt-2 text-sm text-slate-500">
-            Choose a convenient time to speak with the GiftGrid team.
+            Choose a convenient time to speak with GiftGrid.
           </p>
         </div>
 
@@ -27,7 +27,7 @@ export default function BookPage() {
           {CALENDLY_URL ? (
             <CalendlyEmbed url={CALENDLY_URL} />
           ) : (
-            <div className="p-10 text-center text-sm text-slate-500">
+            <div className="p-12 text-center text-sm text-slate-500">
               Booking is currently being configured.
             </div>
           )}
