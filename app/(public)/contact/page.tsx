@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import Header from "@/components/shared/Header";
 import { siteConfig } from "@/config/branding";
 
 type Status = "idle" | "submitting" | "sent" | "error";
@@ -31,8 +30,7 @@ export default function ContactPage() {
 
   return (
     <>
-      <Header />
-      <main>
+<main>
         <section className="border-b border-borderCustom py-24">
           <div className="mx-auto max-w-[760px] px-7">
             <span className="font-mono text-[12px] uppercase tracking-[0.14em] text-accent">Contact</span>

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Header from "@/components/shared/Header";
 export const metadata: Metadata = {
   title: "About GiftGrid",
   description: "Why GiftGrid exists, and how it helps e-commerce brands reach real commercial opportunities.",
@@ -23,8 +22,7 @@ const pillars = [
 export default function AboutPage() {
   return (
     <>
-      <Header />
-      <main>
+<main>
         <section className="border-b border-borderCustom py-28">
           <div className="mx-auto max-w-[760px] px-7">
             <span className="font-mono text-[12px] uppercase tracking-[0.14em] text-accent">About GiftGrid</span>

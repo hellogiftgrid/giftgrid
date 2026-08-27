@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Header from "@/components/shared/Header";
 export const metadata: Metadata = {
   title: "How It Works — GiftGrid",
   description: "The path from application to opportunity, step by step.",
@@ -52,8 +51,7 @@ const steps = [
 export default function HowItWorksPage() {
   return (
     <>
-      <Header />
-      <main>
+<main>
         <section className="border-b border-borderCustom py-24">
           <div className="mx-auto max-w-[760px] px-7">
             <span className="font-mono text-[12px] uppercase tracking-[0.14em] text-accent">The Process</span>

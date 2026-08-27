@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import Header from "@/components/shared/Header";
 import Hero from "@/components/public/Hero";
 import PartnerNetwork from "@/components/public/PartnerNetwork";
 import PlatformBadges from "@/components/public/PlatformBadges";
@@ -18,8 +17,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
-      <Header />
-      <main>
+<main>
         <Hero />
         <PartnerNetwork />
         <PlatformBadges />

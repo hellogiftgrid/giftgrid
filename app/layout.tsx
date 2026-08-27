@@ -3,7 +3,6 @@ import { Sora, Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/config/branding";
 import ChatWidget from "@/components/shared/ChatWidget";
-import SiteFooter from "@/components/shared/SiteFooter";
 import OrganizationJsonLd from "@/components/seo/OrganizationJsonLd";
 import WebSiteJsonLd from "@/components/seo/WebSiteJsonLd";
 
@@ -91,7 +90,6 @@ export default function RootLayout({
         <WebSiteJsonLd />
         {children}
         <ChatWidget />
-              <SiteFooter />
 </body>
     </html>
   );
