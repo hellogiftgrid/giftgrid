@@ -1,67 +1,134 @@
-
 "use client";
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import AuthShell from "@/components/auth/AuthShell";
-import AuthField from "@/components/auth/AuthField";
 import { createClient } from "@/lib/supabase/client";
 
 export default function ForgotPasswordPage() {
   const supabase = createClient();
-  const [error, setError] = useState<string | null>(null);
+
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-    const form = new FormData(e.currentTarget);
-    const email = form.get("email") as string;
+    setError("");
+    setSent(false);
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password`,
-    });
+    const cleanEmail = email.trim().toLowerCase();
 
-    setLoading(false);
-    if (error) {
-      setError(error.message);
+    if (!cleanEmail) {
+      setError("Enter your email address.");
       return;
     }
-    setSent(true);
-  }
 
-  if (sent) {
-    return (
-      <AuthShell title="Check your email" subtitle="If an account exists for that address, we've sent a reset link." />
-    );
+    setLoading(true);
+
+    try {
+      const { error: resetError } =
+        await supabase.auth.resetPasswordForEmail(cleanEmail, {
+          redirectTo:
+            `${window.location.origin}/auth/reset-password`,
+        });
+
+      if (resetError) {
+        setError(resetError.message);
+        return;
+      }
+
+      setSent(true);
+    } catch (err) {
+      console.error("Password reset error:", err);
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to send the password reset email."
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <AuthShell
       title="Reset your password"
-      subtitle="Enter your email and we'll send you a reset link."
+      subtitle="Enter your email and we'll send you a secure password reset link."
       footer={
-        <Link href="/auth/sign-in" className="text-accent">
-          Back to sign in
-        </Link>
+        <>
+          Remember your password?{" "}
+          <Link
+            href="/auth/sign-in"
+            className="text-accent"
+          >
+            Sign in
+          </Link>
+        </>
       }
     >
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <AuthField label="Email" name="email" type="email" required autoComplete="email" />
+      {sent ? (
+        <div className="space-y-5">
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm leading-6 text-emerald-800">
+            Check your email for a password reset link. Open the
+            newest email to continue.
+          </div>
 
-        {error && <p className="text-[13.5px] text-danger">{error}</p>}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-[3px] bg-accent px-6 py-3 text-[14.5px] font-semibold text-primary transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+          <button
+            type="button"
+            onClick={() => {
+              setSent(false);
+              setError("");
+            }}
+            className="w-full rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            Send another reset email
+          </button>
+        </div>
+      ) : (
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-5"
         >
-          {loading ? "Sending…" : "Send Reset Link"}
-        </button>
-      </form>
+          <div>
+            <label
+              htmlFor="reset-email"
+              className="mb-2 block text-sm font-semibold text-slate-700"
+            >
+              Email
+            </label>
+
+            <input
+              id="reset-email"
+              name="email"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              autoComplete="email"
+              placeholder="you@example.com"
+              required
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+            />
+          </div>
+
+          {error && (
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-xl bg-accent px-6 py-3 text-sm font-semibold text-primary transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? "Sending..." : "Send reset link"}
+          </button>
+        </form>
+      )}
     </AuthShell>
   );
 }

@@ -45,16 +45,24 @@ function VerifyForm() {
 
     setLoading(true);
 
-    const { error: verifyError } = await supabase.auth.verifyOtp({
-      email,
-      token,
-      type: "email",
-    });
+    const { data, error: verifyError } =
+      await supabase.auth.verifyOtp({
+        email: email.trim().toLowerCase(),
+        token,
+        type: "email",
+      });
 
     setLoading(false);
 
     if (verifyError) {
       setError(verifyError.message);
+      return;
+    }
+
+    if (!data.session) {
+      setError(
+        "Your email was verified, but no session was created. Please sign in."
+      );
       return;
     }
 

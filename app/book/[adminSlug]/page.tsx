@@ -1,10 +1,13 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import PublicBookingForm from "@/components/admin/PublicBookingForm";
+import CalendlyEmbed from "@/components/booking/CalendlyEmbed";
+
+const CALENDLY_URL =
+  process.env.NEXT_PUBLIC_CALENDLY_URL || "";
 
 export const dynamic = "force-dynamic";
 
-export default async function PublicAdminBookingPage({
+export default async function BookingPage({
   params,
 }: {
   params: { adminSlug: string };
@@ -14,7 +17,7 @@ export default async function PublicAdminBookingPage({
   const { data: admin } = await supabase
     .from("booking_admins")
     .select(
-      "id, slug, display_name, booking_title, bio, avatar_url, timezone, active, accepting_bookings"
+      "id, slug, display_name, booking_title, active, accepting_bookings"
     )
     .eq("slug", params.adminSlug)
     .eq("active", true)
@@ -25,50 +28,42 @@ export default async function PublicAdminBookingPage({
     notFound();
   }
 
-  const { data: eventTypes } = await supabase
-    .from("booking_event_types")
-    .select(
-      "id, name, slug, description, duration_minutes"
-    )
-    .eq("active", true)
-    .eq("public_bookable", true)
-    .order("duration_minutes");
+  if (!CALENDLY_URL) {
+    return (
+      <main className="min-h-screen bg-slate-50 px-5 py-16">
+        <div className="mx-auto max-w-xl rounded-2xl border border-red-200 bg-white p-8">
+          <h1 className="text-2xl font-bold text-slate-950">
+            Booking is being configured
+          </h1>
+
+          <p className="mt-3 text-sm text-slate-500">
+            Please check back shortly.
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-[#F7F9FC] px-5 py-12">
-      <div className="mx-auto max-w-4xl">
-        <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm md:p-10">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white">
-              <img
-                src={admin.avatar_url || "/images/logo-full.png"}
-                alt={admin.display_name}
-                className="h-full w-full object-contain"
-              />
-            </div>
-
-            <div>
-              <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#4F46E5]">
-                GiftGrid
-              </div>
-
-              <h1 className="mt-1 text-2xl font-bold text-slate-950">
-                Book a call with {admin.display_name}
-              </h1>
-
-              <p className="mt-2 text-sm leading-7 text-slate-500">
-                {admin.bio ||
-                  "Choose a convenient time. You do not need a GiftGrid account to book."}
-              </p>
-            </div>
+    <main className="min-h-screen bg-slate-50 px-5 py-10">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-7 text-center">
+          <div className="text-xs font-bold uppercase tracking-[0.18em] text-indigo-600">
+            GiftGrid
           </div>
 
-          <PublicBookingForm
-            adminId={admin.id}
-            adminSlug={admin.slug}
-            adminTimezone={admin.timezone}
-            eventTypes={eventTypes || []}
-          />
+          <h1 className="mt-2 text-3xl font-bold text-slate-950">
+            Book a call with {admin.display_name}
+          </h1>
+
+          <p className="mt-2 text-sm text-slate-500">
+            {admin.booking_title ||
+              "Choose a convenient time for your GiftGrid consultation."}
+          </p>
+        </div>
+
+        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <CalendlyEmbed url={CALENDLY_URL} />
         </div>
       </div>
     </main>

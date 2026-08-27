@@ -23,14 +23,35 @@ export default function SignInPage() {
     const email = form.get("email") as string;
     const password = form.get("password") as string;
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (!cleanEmail || !password) {
+      setLoading(false);
+      setError("Enter your email and password.");
+      return;
+    }
+
+    const { data, error } =
+      await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password,
+      });
 
     setLoading(false);
+
     if (error) {
       setError(error.message);
       return;
     }
-    router.push("/dashboard");
+
+    if (!data.session) {
+      setError(
+        "Sign-in did not create a session. Please confirm your email address and try again."
+      );
+      return;
+    }
+
+    router.replace("/dashboard");
     router.refresh();
   }
 
