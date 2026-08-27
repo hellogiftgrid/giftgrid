@@ -20,11 +20,8 @@ export default function CalendlyEmbed({
   url: string;
 }) {
   useEffect(() => {
-    const target = document.getElementById(
-      "giftgrid-calendly"
-    );
-
-    if (!target) return;
+    const target = document.getElementById("giftgrid-calendly");
+    if (!target || !url) return;
 
     const initialise = () => {
       if (!window.Calendly) return;
@@ -60,8 +57,9 @@ export default function CalendlyEmbed({
     <div
       id="giftgrid-calendly"
       style={{
+        width: "100%",
         minWidth: "320px",
-        height: "760px",
+        minHeight: "760px",
       }}
     />
   );
