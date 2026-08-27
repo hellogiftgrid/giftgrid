@@ -69,7 +69,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${sora.variable} ${inter.variable} ${plexMono.variable}`}>
-      <body>
+  <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4F8TJ70RR7"></script>
+    <script
+      dangerouslySetInnerHTML={{
+        __html: `
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-4F8TJ70RR7');
+        `,
+      }}
+    />
+  </head>
+  <body>
         <OrganizationJsonLd />
         <WebSiteJsonLd />
         {children}
