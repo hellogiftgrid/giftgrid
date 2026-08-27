@@ -116,7 +116,7 @@ export default function SiteFooter() {
 
         <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-7 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © 2024 GiftGrid. All rights reserved.
+            © 2019 GiftGrid. All rights reserved.
           </p>
 
           <p>
