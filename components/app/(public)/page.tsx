@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import Header from "@/components/shared/Header";
-import Footer from "@/components/shared/Footer";
 import Hero from "@/components/public/Hero";
 import PlatformBadges from "@/components/public/PlatformBadges";
 import Marquee from "@/components/public/Marquee";
@@ -51,7 +50,6 @@ export default function HomePage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

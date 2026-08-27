@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/shared/Header";
-import Footer from "@/components/shared/Footer";
-
 export const metadata: Metadata = {
   title: "Store Review — GiftGrid",
   description: "What GiftGrid actually checks before recommending your store for an opportunity.",
@@ -126,7 +124,6 @@ export default function StoreReviewPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

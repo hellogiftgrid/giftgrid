@@ -90,9 +90,9 @@ export default function RootLayout({
         <OrganizationJsonLd />
         <WebSiteJsonLd />
         {children}
-        <SiteFooter />
         <ChatWidget />
-      </body>
+              <SiteFooter />
+</body>
     </html>
   );
 }

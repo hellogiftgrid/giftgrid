@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/shared/Header";
-import Footer from "@/components/shared/Footer";
-
 export const metadata: Metadata = {
   title: "How It Works — GiftGrid",
   description: "The path from application to opportunity, step by step.",
@@ -110,7 +108,6 @@ export default function HowItWorksPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

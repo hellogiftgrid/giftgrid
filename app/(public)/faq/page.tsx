@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import Header from "@/components/shared/Header";
-import Footer from "@/components/shared/Footer";
-
 const faqs = [
   {
     q: "What is GiftGrid?",
@@ -90,7 +88,6 @@ export default function FAQPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

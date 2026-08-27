@@ -2,7 +2,6 @@
 
 import { useState, type FormEvent } from "react";
 import Header from "@/components/shared/Header";
-import Footer from "@/components/shared/Footer";
 import { siteConfig } from "@/config/branding";
 
 type Status = "idle" | "submitting" | "sent" | "error";
@@ -98,8 +97,7 @@ export default function ContactPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }
 
