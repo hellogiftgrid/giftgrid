@@ -13,7 +13,7 @@ function resend() {
 function from() {
   return (
     process.env.RESEND_FROM_EMAIL ||
-    "GiftGrid <support@degiftgrid.com>"
+    "GiftGrid <no-reply@degiftgrid.com>"
   );
 }
 
@@ -44,10 +44,18 @@ export async function sendGuestBookingEmail(input: {
   return client.emails.send(
     {
       from: from(),
+      replyTo: "support@degiftgrid.com",
       to: [input.guestEmail],
       subject: `Your GiftGrid call is confirmed — ${input.adminName}`,
       html: `
         <div style="font-family:Arial,sans-serif;max-width:640px;margin:auto;color:#0f172a">
+          <div style="margin-bottom:24px">
+            <img
+              src="https://www.degiftgrid.com/images/logo-horizontal.png"
+              alt="GiftGrid"
+              style="height:40px;width:auto;display:block"
+            />
+          </div>
           <h1>Your GiftGrid call is confirmed</h1>
           <p>Hello ${esc(input.guestName)},</p>
 
@@ -65,12 +73,13 @@ export async function sendGuestBookingEmail(input: {
           <p>
             <a href="${esc(joinUrl)}"
               style="background:#4F46E5;color:#fff;text-decoration:none;padding:13px 20px;border-radius:10px;font-weight:700">
-              Open your GiftGrid call
+              Open your GiftGrid booking
             </a>
           </p>
 
           <p style="margin-top:28px;color:#64748b;font-size:13px">
-            GiftGrid · support@degiftgrid.com
+            GiftGrid · support@degiftgrid.com<br />
+            This mailbox is not monitored for replies.
           </p>
         </div>
       `,

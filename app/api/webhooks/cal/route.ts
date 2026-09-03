@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import crypto from "node:crypto";
+import { NextResponse } from "next/server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyCalSignature } from "@/lib/cal/verify";
@@ -11,14 +11,65 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+function text(value: unknown): string | null {
+  return typeof value === "string" && value.trim()
+    ? value.trim()
+    : null;
+}
+
+function extractMeetingUrl(payload: any): string | null {
+  const candidates = [
+    payload?.videoCallUrl,
+    payload?.meetingUrl,
+    payload?.metadata?.videoCallUrl,
+    payload?.metadata?.meetingUrl,
+    payload?.videoCallData?.url,
+    payload?.videoCallData?.joinUrl,
+    payload?.location?.url,
+    payload?.location?.link,
+    payload?.location,
+  ];
+
+  for (const candidate of candidates) {
+    const value = text(candidate);
+
+    if (
+      value &&
+      /^https?:\/\//i.test(value) &&
+      !value.includes("cal.com")
+    ) {
+      return value;
+    }
+
+    if (value && /^https?:\/\//i.test(value)) {
+      return value;
+    }
+  }
+
+  return null;
+}
+
+function normalizeStatus(trigger: string) {
+  if (trigger === "BOOKING_CANCELLED") return "cancelled";
+  return "confirmed";
+}
+
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    service: "GiftGrid Cal webhook",
+  });
+}
+
 export async function POST(request: Request) {
   const rawBody = await request.text();
 
   const secret = process.env.CAL_WEBHOOK_SECRET;
 
   if (!secret) {
+    console.error("CAL_WEBHOOK_SECRET is not configured.");
     return NextResponse.json(
-      { error: "CAL_WEBHOOK_SECRET is not configured." },
+      { error: "Webhook configuration error." },
       { status: 503 }
     );
   }
@@ -28,6 +79,7 @@ export async function POST(request: Request) {
     request.headers.get("x-cal-signature-256");
 
   if (!verifyCalSignature(rawBody, signature, secret)) {
+    console.warn("Rejected Cal webhook: invalid signature.");
     return NextResponse.json(
       { error: "Invalid webhook signature." },
       { status: 401 }
@@ -61,11 +113,12 @@ export async function POST(request: Request) {
     });
   }
 
-  const p = event?.payload || event;
+  const payload = event?.payload || {};
 
-  const uid = p?.uid || p?.bookingUid || null;
-  const organizer = p?.organizer || {};
-  const attendee = p?.attendees?.[0] || {};
+  const uid =
+    text(payload?.uid) ||
+    text(payload?.bookingUid) ||
+    text(payload?.bookingId);
 
   if (!uid) {
     return NextResponse.json(
@@ -74,8 +127,8 @@ export async function POST(request: Request) {
     );
   }
 
-  const startTime = p?.startTime;
-  const endTime = p?.endTime;
+  const startTime = text(payload?.startTime);
+  const endTime = text(payload?.endTime);
 
   if (!startTime || !endTime) {
     return NextResponse.json(
@@ -84,24 +137,17 @@ export async function POST(request: Request) {
     );
   }
 
-  const timezone =
-    attendee?.timeZone ||
-    organizer?.timeZone ||
-    "UTC";
+  const attendee = payload?.attendees?.[0] || {};
+  const organizer = payload?.organizer || {};
 
   const guestName =
-    p?.responses?.name?.value ||
-    attendee?.name ||
+    text(payload?.responses?.name?.value) ||
+    text(attendee?.name) ||
     "Guest";
 
   const guestEmail =
-    p?.responses?.email?.value ||
-    attendee?.email ||
-    null;
-
-  const adminEmail =
-    organizer?.email ||
-    null;
+    text(payload?.responses?.email?.value) ||
+    text(attendee?.email);
 
   if (!guestEmail) {
     return NextResponse.json(
@@ -110,10 +156,17 @@ export async function POST(request: Request) {
     );
   }
 
-  const meetingUrl =
-    p?.metadata?.videoCallUrl ||
-    p?.location ||
-    null;
+  const adminEmail =
+    text(organizer?.email) ||
+    text(organizer?.username && `${organizer.username}`);
+
+  const timezone =
+    text(attendee?.timeZone) ||
+    text(payload?.attendee?.timeZone) ||
+    text(organizer?.timeZone) ||
+    "UTC";
+
+  const meetingUrl = extractMeetingUrl(payload);
 
   const supabase = createAdminClient();
 
@@ -122,18 +175,24 @@ export async function POST(request: Request) {
       .from("bookings")
       .update({
         status: "cancelled",
+        cal_meeting_url: meetingUrl,
       })
       .eq("cal_booking_uid", uid);
 
     if (error) {
       console.error("Cal cancellation update:", error);
+
       return NextResponse.json(
         { error: "Unable to update booking." },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({
+      ok: true,
+      cancelled: true,
+      bookingUid: uid,
+    });
   }
 
   const { data: existing } = await supabase
@@ -145,35 +204,57 @@ export async function POST(request: Request) {
   let booking = existing;
 
   if (!booking) {
-    const { data: adminRow } = await supabase
-      .from("booking_admins")
-      .select("id, profile_id")
-      .eq("active", true)
-      .eq("accepting_bookings", true)
-      .ilike("display_name", `%${organizer?.name || ""}%`)
-      .maybeSingle();
+    let primaryAdminId: string | null = null;
 
-    let primaryAdminId = adminRow?.id || null;
-
-    if (!primaryAdminId && adminEmail) {
+    if (adminEmail) {
       const { data: profile } = await supabase
         .from("profiles")
         .select("id")
         .eq("email", adminEmail)
         .maybeSingle();
 
-      if (profile) {
-        const { data: byProfile } = await supabase
+      if (profile?.id) {
+        const { data: bookingAdmin } = await supabase
           .from("booking_admins")
           .select("id")
           .eq("profile_id", profile.id)
+          .eq("active", true)
+          .eq("accepting_bookings", true)
           .maybeSingle();
 
-        primaryAdminId = byProfile?.id || null;
+        primaryAdminId = bookingAdmin?.id || null;
       }
     }
 
     if (!primaryAdminId) {
+      const organizerName = text(organizer?.name);
+
+      if (organizerName) {
+        const { data: bookingAdmin } = await supabase
+          .from("booking_admins")
+          .select("id")
+          .eq("active", true)
+          .eq("accepting_bookings", true)
+          .ilike("display_name", `%${organizerName}%`)
+          .maybeSingle();
+
+        primaryAdminId = bookingAdmin?.id || null;
+      }
+    }
+
+    if (!primaryAdminId) {
+      console.error(
+        "Unable to map Cal organizer:",
+        JSON.stringify(
+          {
+            organizerName: organizer?.name,
+            organizerEmail: organizer?.email,
+          },
+          null,
+          2
+        )
+      );
+
       return NextResponse.json(
         {
           error:
@@ -226,11 +307,11 @@ export async function POST(request: Request) {
         cal_meeting_url: meetingUrl,
         start_at: new Date(startTime).toISOString(),
         end_at: new Date(endTime).toISOString(),
-        status:
-          trigger === "BOOKING_CANCELLED"
-            ? "cancelled"
-            : "confirmed",
+        status: normalizeStatus(trigger),
         booked_call_token: bookedCallToken,
+        guest_name: guestName,
+        guest_email: guestEmail,
+        guest_timezone: timezone,
       })
       .eq("id", booking.id)
       .select("id, booked_call_token")
@@ -253,7 +334,7 @@ export async function POST(request: Request) {
     "https://www.degiftgrid.com";
 
   const bookedCallUrl =
-    `${site}/bookedcall/${booking.booked_call_token}`;
+    `${site.replace(/\/$/, "")}/bookedcall/${booking.booked_call_token}`;
 
   const start = new Date(startTime);
   const end = new Date(endTime);
@@ -277,19 +358,26 @@ export async function POST(request: Request) {
         .maybeSingle()
     : { data: null };
 
-  const emailJobs = [
-    sendGuestBookingEmail({
-      guestName,
-      guestEmail,
-      adminName: organizer?.name || "GiftGrid Team",
-      startTime: humanStart,
-      endTime: humanEnd,
-      timezone,
-      bookedCallUrl,
-      meetingUrl,
-      bookingUid: uid,
-    }),
-  ];
+  const organizerName =
+    text(organizer?.name) || "GiftGrid Team";
+
+  const emailJobs: Promise<any>[] = [];
+
+  if (trigger === "BOOKING_CREATED") {
+    emailJobs.push(
+      sendGuestBookingEmail({
+        guestName,
+        guestEmail,
+        adminName: organizerName,
+        startTime: humanStart,
+        endTime: humanEnd,
+        timezone,
+        bookedCallUrl,
+        meetingUrl,
+        bookingUid: uid,
+      })
+    );
+  }
 
   if (adminProfile?.email) {
     emailJobs.push(
@@ -297,7 +385,7 @@ export async function POST(request: Request) {
         adminEmail: adminProfile.email,
         adminName:
           adminProfile.full_name ||
-          organizer?.name ||
+          organizerName ||
           "GiftGrid Team",
         guestName,
         guestEmail,
@@ -314,12 +402,16 @@ export async function POST(request: Request) {
 
   for (const result of results) {
     if (result.status === "rejected") {
-      console.error("Resend booking email error:", result.reason);
+      console.error(
+        "Resend booking email error:",
+        result.reason
+      );
     }
   }
 
   return NextResponse.json({
     ok: true,
+    trigger,
     bookingId: booking.id,
     bookedCallUrl,
     meetingUrl,
