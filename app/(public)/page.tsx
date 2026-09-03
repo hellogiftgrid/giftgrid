@@ -40,8 +40,8 @@ export default function HomePage() {
                 style={{ background: "linear-gradient(90deg, #4F46E5, #F97316)" }}
               >
                 Apply as a Merchant
-            <BookCallCTA />
               </Link>
+              <BookCallCTA />
               <Link
                 href="/contact"
                 className="rounded-full border border-borderCustom bg-secondary px-7 py-3.5 text-[14.5px] font-semibold text-textPrimary hover:border-accent hover:text-accent"
