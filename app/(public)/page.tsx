@@ -8,6 +8,7 @@ import CategoryGrid from "@/components/public/CategoryGrid";
 import BridgeDiagram from "@/components/public/BridgeDiagram";
 import TrustSection from "@/components/public/TrustSection";
 import { siteConfig } from "@/config/branding";
+import BookCallCTA from "@/components/booking/BookCallCTA";
 
 export const metadata: Metadata = {
   title: `${siteConfig.name} — Position Your Brand for Corporate Gifting Opportunities`,
@@ -39,6 +40,7 @@ export default function HomePage() {
                 style={{ background: "linear-gradient(90deg, #4F46E5, #F97316)" }}
               >
                 Apply as a Merchant
+            <BookCallCTA />
               </Link>
               <Link
                 href="/contact"

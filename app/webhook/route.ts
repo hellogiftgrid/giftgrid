@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
+
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   sendAdminBookingEmail,
@@ -9,23 +10,25 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function verifySignature(
+function validSignature(
   body: string,
-  signature: string | null,
+  supplied: string | null,
   secret: string
 ) {
-  if (!signature) return false;
+  if (!supplied) return false;
 
   const expected = crypto
     .createHmac("sha256", secret)
     .update(body)
     .digest("hex");
 
-  const a = Buffer.from(signature, "utf8");
-  const b = Buffer.from(expected, "utf8");
+  const left = Buffer.from(supplied, "utf8");
+  const right = Buffer.from(expected, "utf8");
 
-  return a.length === b.length &&
-    crypto.timingSafeEqual(a, b);
+  return (
+    left.length === right.length &&
+    crypto.timingSafeEqual(left, right)
+  );
 }
 
 export async function GET() {
@@ -36,15 +39,13 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.text();
+  const rawBody = await request.text();
 
   const secret = process.env.CAL_WEBHOOK_SECRET;
 
   if (!secret) {
-    console.error("CAL_WEBHOOK_SECRET is missing");
-
     return NextResponse.json(
-      { error: "Webhook not configured." },
+      { error: "CAL_WEBHOOK_SECRET is not configured." },
       { status: 503 }
     );
   }
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
     request.headers.get("x-cal-signature-256") ||
     request.headers.get("X-Cal-Signature-256");
 
-  if (!verifySignature(body, signature, secret)) {
+  if (!validSignature(rawBody, signature, secret)) {
     return NextResponse.json(
       { error: "Invalid webhook signature." },
       { status: 401 }
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
   let event: any;
 
   try {
-    event = JSON.parse(body);
+    event = JSON.parse(rawBody);
   } catch {
     return NextResponse.json(
       { error: "Invalid JSON." },
@@ -71,16 +72,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const trigger = event?.triggerEvent;
-  const payload = event?.payload || {};
+  const type = event?.triggerEvent;
+  const payload = event?.payload || event;
 
-  console.log("GiftGrid Cal webhook:", trigger);
-
-  if (!["BOOKING_CREATED", "BOOKING_RESCHEDULED", "BOOKING_CANCELLED"].includes(trigger)) {
+  if (
+    ![
+      "BOOKING_CREATED",
+      "BOOKING_RESCHEDULED",
+      "BOOKING_CANCELLED",
+    ].includes(type)
+  ) {
     return NextResponse.json({
       ok: true,
       ignored: true,
-      trigger,
+      triggerEvent: type,
     });
   }
 
@@ -91,14 +96,14 @@ export async function POST(request: NextRequest) {
 
   if (!uid) {
     return NextResponse.json(
-      { error: "Cal booking UID missing." },
+      { error: "Missing Cal booking UID." },
       { status: 400 }
     );
   }
 
   const supabase = createAdminClient();
 
-  if (trigger === "BOOKING_CANCELLED") {
+  if (type === "BOOKING_CANCELLED") {
     const { error } = await supabase
       .from("bookings")
       .update({
@@ -107,10 +112,10 @@ export async function POST(request: NextRequest) {
       .eq("cal_booking_uid", uid);
 
     if (error) {
-      console.error(error);
+      console.error("Cancel booking error:", error);
 
       return NextResponse.json(
-        { error: "Could not cancel booking." },
+        { error: "Unable to cancel booking." },
         { status: 500 }
       );
     }
@@ -118,13 +123,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  const guest =
-    payload?.attendees?.[0] ||
-    {};
+  const attendees = Array.isArray(payload?.attendees)
+    ? payload.attendees
+    : [];
 
-  const organizer =
-    payload?.organizer ||
-    {};
+  const guest = attendees[0] || {};
+  const organizer = payload?.organizer || {};
 
   const guestName =
     payload?.responses?.name?.value ||
@@ -133,10 +137,12 @@ export async function POST(request: NextRequest) {
 
   const guestEmail =
     payload?.responses?.email?.value ||
-    guest?.email;
+    guest?.email ||
+    null;
 
   const adminEmail =
-    organizer?.email || null;
+    organizer?.email ||
+    null;
 
   const adminName =
     organizer?.name ||
@@ -158,15 +164,16 @@ export async function POST(request: NextRequest) {
   const meetingUrl =
     payload?.metadata?.videoCallUrl ||
     payload?.metadata?.videoCallUrlV2 ||
-    payload?.location ||
+    (
+      typeof payload?.location === "string"
+        ? payload.location
+        : payload?.location?.value
+    ) ||
     null;
 
   if (!guestEmail || !startTime || !endTime) {
     return NextResponse.json(
-      {
-        error:
-          "Required Cal booking information is missing.",
-      },
+      { error: "Incomplete Cal booking payload." },
       { status: 400 }
     );
   }
@@ -177,75 +184,84 @@ export async function POST(request: NextRequest) {
     .eq("cal_booking_uid", uid)
     .maybeSingle();
 
-  let bookingId: string;
-  let bookedCallToken: string;
+  const token =
+    existing?.booked_call_token ||
+    crypto.randomBytes(24).toString("hex");
 
   if (existing) {
-    bookingId = existing.id;
-    bookedCallToken =
-      existing.booked_call_token ||
-      crypto.randomBytes(24).toString("hex");
-
     const { error } = await supabase
       .from("bookings")
       .update({
         start_at: new Date(startTime).toISOString(),
         end_at: new Date(endTime).toISOString(),
+        guest_name: guestName,
+        guest_email: guestEmail,
         guest_timezone: timezone,
         cal_meeting_url: meetingUrl,
+        booked_call_token: token,
         status: "confirmed",
-        booked_call_token: bookedCallToken,
       })
-      .eq("id", bookingId);
+      .eq("id", existing.id);
 
     if (error) {
-      console.error(error);
+      console.error("Booking update error:", error);
 
       return NextResponse.json(
-        { error: "Could not update booking." },
+        { error: "Unable to update booking." },
         { status: 500 }
       );
     }
   } else {
-    const { data: byEmail } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("email", adminEmail || "")
-      .maybeSingle();
+    let adminId: string | null = null;
 
-    let primaryAdminId: string | null = null;
-
-    if (byEmail) {
-      const { data: bookingAdmin } = await supabase
-        .from("booking_admins")
+    if (adminEmail) {
+      const { data: profile } = await supabase
+        .from("profiles")
         .select("id")
-        .eq("profile_id", byEmail.id)
+        .eq("email", adminEmail)
         .maybeSingle();
 
-      primaryAdminId = bookingAdmin?.id || null;
+      if (profile) {
+        const { data: bookingAdmin } = await supabase
+          .from("booking_admins")
+          .select("id")
+          .eq("profile_id", profile.id)
+          .maybeSingle();
+
+        adminId = bookingAdmin?.id || null;
+      }
     }
 
-    if (!primaryAdminId) {
+    /*
+     * If the Cal organizer email is unavailable, try to map by name.
+     */
+    if (!adminId && adminName) {
+      const { data: namedAdmin } = await supabase
+        .from("booking_admins")
+        .select("id")
+        .eq("display_name", adminName)
+        .maybeSingle();
+
+      adminId = namedAdmin?.id || null;
+    }
+
+    if (!adminId) {
       return NextResponse.json(
         {
           error:
-            "Cal organizer is not linked to a GiftGrid admin.",
+            "Cal organizer is not linked to a GiftGrid booking admin.",
         },
         { status: 422 }
       );
     }
 
-    bookedCallToken = crypto
-      .randomBytes(24)
-      .toString("hex");
-
-    const { data: inserted, error } = await supabase
+    const { error } = await supabase
       .from("bookings")
       .insert({
         cal_booking_uid: uid,
         cal_meeting_url: meetingUrl,
-        booked_call_token: bookedCallToken,
-        primary_admin_id: primaryAdminId,
+        booked_call_token: token,
+        primary_admin_id: adminId,
         guest_name: guestName,
         guest_email: guestEmail,
         start_at: new Date(startTime).toISOString(),
@@ -253,20 +269,16 @@ export async function POST(request: NextRequest) {
         guest_timezone: timezone,
         status: "confirmed",
         meeting_type: "cal_video",
-      })
-      .select("id")
-      .single();
+      });
 
-    if (error || !inserted) {
-      console.error("Booking insert:", error);
+    if (error) {
+      console.error("Booking insert error:", error);
 
       return NextResponse.json(
-        { error: "Could not create GiftGrid booking." },
+        { error: "Unable to create booking." },
         { status: 500 }
       );
     }
-
-    bookingId = inserted.id;
   }
 
   const site =
@@ -274,26 +286,28 @@ export async function POST(request: NextRequest) {
     "https://www.degiftgrid.com";
 
   const bookedCallUrl =
-    `${site}/bookedcall/${bookedCallToken}`;
+    `${site}/bookedcall/${token}`;
 
-  const humanStart = new Intl.DateTimeFormat("en", {
-    dateStyle: "full",
-    timeStyle: "short",
-    timeZone: timezone,
-  }).format(new Date(startTime));
+  const formattedStart =
+    new Intl.DateTimeFormat("en", {
+      dateStyle: "full",
+      timeStyle: "short",
+      timeZone: timezone,
+    }).format(new Date(startTime));
 
-  const humanEnd = new Intl.DateTimeFormat("en", {
-    timeStyle: "short",
-    timeZone: timezone,
-  }).format(new Date(endTime));
+  const formattedEnd =
+    new Intl.DateTimeFormat("en", {
+      timeStyle: "short",
+      timeZone: timezone,
+    }).format(new Date(endTime));
 
-  const emailJobs: Promise<unknown>[] = [
+  const jobs: Promise<any>[] = [
     sendGuestBookingEmail({
       guestName,
       guestEmail,
       adminName,
-      startTime: humanStart,
-      endTime: humanEnd,
+      startTime: formattedStart,
+      endTime: formattedEnd,
       timezone,
       bookedCallUrl,
       meetingUrl,
@@ -302,14 +316,14 @@ export async function POST(request: NextRequest) {
   ];
 
   if (adminEmail) {
-    emailJobs.push(
+    jobs.push(
       sendAdminBookingEmail({
         adminEmail,
         adminName,
         guestName,
         guestEmail,
-        startTime: humanStart,
-        endTime: humanEnd,
+        startTime: formattedStart,
+        endTime: formattedEnd,
         timezone,
         adminUrl: `${site}/admin/calls`,
         bookingUid: uid,
@@ -317,7 +331,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const results = await Promise.allSettled(emailJobs);
+  const results = await Promise.allSettled(jobs);
 
   for (const result of results) {
     if (result.status === "rejected") {
@@ -327,8 +341,7 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     ok: true,
-    bookingId,
     bookedCallUrl,
-    meetingUrl,
+    bookingUid: uid,
   });
 }
