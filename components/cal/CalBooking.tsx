@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import Script from "next/script";
 
 declare global {
   interface Window {
@@ -9,86 +9,21 @@ declare global {
 }
 
 export default function CalBooking() {
-  const initialized = useRef(false);
-
-  useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
-
-    const src = "https://app.cal.com/embed/embed.js";
-
-    const initialize = () => {
-      if (!window.Cal) {
-        console.error("GiftGrid: Cal.com failed to load");
-        return;
-      }
-
-      window.Cal("init", "gift-grid-booking", {
-        origin: "https://app.cal.com",
-      });
-
-      window.Cal.config =
-        window.Cal.config || {};
-
-      window.Cal.config.forwardQueryParams = true;
-
-      window.Cal.ns["gift-grid-booking"](
-        "inline",
-        {
-          elementOrSelector: "#gift-grid-cal-booking",
-          calLink: "degiftgrid/gift-grid-30-min-call",
-          config: {
-            layout: "month_view",
-            useSlotsViewOnSmallScreen: "true",
-          },
-        }
-      );
-
-      window.Cal.ns["gift-grid-booking"](
-        "ui",
-        {
-          theme: "light",
-          hideEventTypeDetails: false,
-          layout: "month_view",
-          styles: {
-            branding: {
-              brandColor: "#4F46E5",
-            },
-          },
-        }
-      );
-    };
-
-    const existing = document.querySelector(
-      `script[src="${src}"]`
-    );
-
-    if (existing) {
-      initialize();
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = src;
-    script.async = true;
-    script.onload = initialize;
-
-    document.head.appendChild(script);
-
-    return () => {
-      script.onload = null;
-    };
-  }, []);
-
   return (
-    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-      <div
-        id="gift-grid-cal-booking"
-        style={{
-          width: "100%",
-          minHeight: "760px",
-        }}
+    <>
+      <Script
+        src="https://app.cal.com/embed/embed.js"
+        strategy="afterInteractive"
       />
-    </div>
+
+      <button
+        type="button"
+        data-cal-link="degiftgrid/gift-grid-30-min-call"
+        data-cal-config='{"layout":"month_view"}'
+        className="inline-flex items-center justify-center rounded-xl bg-[#4F46E5] px-7 py-4 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-[#4338CA] hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-indigo-100"
+      >
+        Book a Call →
+      </button>
+    </>
   );
 }
