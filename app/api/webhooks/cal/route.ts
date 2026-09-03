@@ -79,7 +79,7 @@ export async function POST(request: Request) {
     request.headers.get("x-cal-signature-256");
 
   if (!verifyCalSignature(rawBody, signature, secret)) {
-    console.warn("Rejected Cal webhook: invalid signature.");
+    console.warn("[GiftGrid Cal] invalid signature");
     return NextResponse.json(
       { error: "Invalid webhook signature." },
       { status: 401 }
@@ -98,6 +98,11 @@ export async function POST(request: Request) {
   }
 
   const trigger = event?.triggerEvent;
+
+  console.log("[GiftGrid Cal] webhook received", {
+    trigger,
+    hasPayload: !!event?.payload,
+  });
 
   if (
     ![
@@ -167,6 +172,15 @@ export async function POST(request: Request) {
     "UTC";
 
   const meetingUrl = extractMeetingUrl(payload);
+
+  console.log("[GiftGrid Cal] parsed booking", {
+    uid,
+    guestEmail,
+    organizerEmail: organizer?.email || null,
+    organizerName: organizer?.name || null,
+    timezone,
+    meetingUrl,
+  });
 
   const supabase = createAdminClient();
 
@@ -287,7 +301,7 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      console.error("Booking creation error:", error);
+      console.error("[GiftGrid Cal] booking creation error:", error);
 
       return NextResponse.json(
         { error: "Unable to create GiftGrid booking." },
@@ -398,14 +412,23 @@ export async function POST(request: Request) {
     );
   }
 
+  console.log("[GiftGrid Cal] sending emails", {
+    guestEmail,
+    adminEmail: adminProfile?.email || null,
+    emailJobCount: emailJobs.length,
+    bookedCallUrl,
+  });
+
   const results = await Promise.allSettled(emailJobs);
 
   for (const result of results) {
     if (result.status === "rejected") {
       console.error(
-        "Resend booking email error:",
+        "[GiftGrid Cal] Resend booking email error:",
         result.reason
       );
+    } else {
+      console.log("[GiftGrid Cal] Resend email accepted", result.value);
     }
   }
 
