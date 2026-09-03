@@ -15,11 +15,11 @@ export default function CalBooking() {
     if (initialized.current) return;
     initialized.current = true;
 
-    const scriptSrc = "https://app.cal.com/embed/embed.js";
+    const src = "https://app.cal.com/embed/embed.js";
 
     const initialize = () => {
       if (!window.Cal) {
-        console.error("Cal.com embed failed to load.");
+        console.error("GiftGrid: Cal.com failed to load");
         return;
       }
 
@@ -36,13 +36,11 @@ export default function CalBooking() {
         "inline",
         {
           elementOrSelector: "#gift-grid-cal-booking",
+          calLink: "degiftgrid/gift-grid-30-min-call",
           config: {
             layout: "month_view",
             useSlotsViewOnSmallScreen: "true",
-            hideEventTypeDetails: "true",
-            theme: "light",
           },
-          calLink: "degiftgrid/gift-grid-30-min-call",
         }
       );
 
@@ -50,7 +48,8 @@ export default function CalBooking() {
         "ui",
         {
           theme: "light",
-          hideEventTypeDetails: true,
+          hideEventTypeDetails: false,
+          layout: "month_view",
           styles: {
             branding: {
               brandColor: "#4F46E5",
@@ -61,7 +60,7 @@ export default function CalBooking() {
     };
 
     const existing = document.querySelector(
-      `script[src="${scriptSrc}"]`
+      `script[src="${src}"]`
     );
 
     if (existing) {
@@ -70,26 +69,25 @@ export default function CalBooking() {
     }
 
     const script = document.createElement("script");
-    script.src = scriptSrc;
+    script.src = src;
     script.async = true;
     script.onload = initialize;
-    script.onerror = () => {
-      console.error("Unable to load Cal.com embed.");
-    };
 
     document.head.appendChild(script);
 
     return () => {
       script.onload = null;
-      script.onerror = null;
     };
   }, []);
 
   return (
-    <div className="w-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
       <div
         id="gift-grid-cal-booking"
-        className="min-h-[760px] w-full"
+        style={{
+          width: "100%",
+          minHeight: "760px",
+        }}
       />
     </div>
   );

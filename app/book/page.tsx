@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Book a Call | GiftGrid",
   description:
-    "Book a consultation with a GiftGrid team member.",
+    "Book a call with a member of the GiftGrid team.",
 };
 
 export default function BookPage() {
@@ -15,27 +15,29 @@ export default function BookPage() {
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-5 py-14 lg:px-8">
           <div className="max-w-3xl">
-            <span className="inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[#4F46E5]">
+            <div className="inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[#4F46E5]">
               GiftGrid
-            </span>
+            </div>
 
             <h1 className="mt-5 text-4xl font-bold tracking-tight text-slate-950 md:text-5xl">
-              Book a call with the GiftGrid team.
+              Book a Call
             </h1>
 
             <p className="mt-4 text-base leading-8 text-slate-600">
-              Choose a convenient time to discuss your store review,
-              recommendations, corporate gifting, wholesale opportunities,
-              or anything else you need help with.
+              Choose a convenient time to speak with a member of the
+              GiftGrid team about your store, audit, recommendations,
+              corporate gifting, or commercial opportunities.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3 text-sm font-semibold text-slate-600">
               <span className="rounded-full bg-slate-100 px-4 py-2">
-                No GiftGrid account required
+                No account required
               </span>
+
               <span className="rounded-full bg-slate-100 px-4 py-2">
-                Local timezone
+                Your local timezone
               </span>
+
               <span className="rounded-full bg-slate-100 px-4 py-2">
                 Secure booking
               </span>
@@ -59,25 +61,25 @@ export default function BookPage() {
                   1. Choose a time
                 </div>
                 <p className="mt-1 text-sm leading-6 text-slate-500">
-                  Pick an available GiftGrid appointment.
+                  Select an available GiftGrid appointment.
                 </p>
               </div>
 
               <div>
                 <div className="font-bold text-slate-950">
-                  2. Meet the right team member
+                  2. Meet your GiftGrid team member
                 </div>
                 <p className="mt-1 text-sm leading-6 text-slate-500">
-                  Your booking identifies the person handling your call.
+                  Your booking identifies the team member handling your call.
                 </p>
               </div>
 
               <div>
                 <div className="font-bold text-slate-950">
-                  3. Join your call
+                  3. Receive confirmation
                 </div>
                 <p className="mt-1 text-sm leading-6 text-slate-500">
-                  Your confirmation contains your meeting details.
+                  Your appointment details are sent to your email.
                 </p>
               </div>
             </div>
@@ -86,6 +88,7 @@ export default function BookPage() {
               <p className="text-sm font-bold text-slate-900">
                 Need help?
               </p>
+
               <a
                 href="mailto:support@degiftgrid.com"
                 className="mt-1 block text-sm text-[#4F46E5] hover:underline"
