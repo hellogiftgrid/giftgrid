@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { sendGiftGridEmail } from "@/lib/email/resend";
 
+export const dynamic = "force-dynamic";
+
 export async function POST() {
   try {
     const result = await sendGiftGridEmail({
