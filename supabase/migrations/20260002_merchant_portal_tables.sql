@@ -7,7 +7,7 @@
 -- ----------------------------------------------------------
 create table if not exists public.audit_items (
   id               uuid primary key default gen_random_uuid(),
-  audit_id         uuid not null references public.store_audits(id) on delete cascade,
+  audit_id         uuid not null references public.audits(id) on delete cascade,
   category         text not null,              -- e.g. 'Mobile Experience', 'SEO Fundamentals'
   check_name       text not null,              -- e.g. 'Page speed score', 'Meta descriptions'
   result           text not null default 'not_checked',
@@ -72,10 +72,11 @@ create policy "merchant_read_own_audit_items"
   on public.audit_items for select
   using (
     exists (
-      select 1 from public.store_audits sa
-      join public.merchant_profiles mp on mp.id = sa.merchant_id
-      where sa.id = audit_items.audit_id
-        and mp.user_id = auth.uid()
+        select 1 from public.audits sa
+        join public.stores st on st.id = sa.store_id
+        join public.merchant_profiles mp on mp.id = st.merchant_id
+        where sa.id = audit_items.audit_id
+        and mp.profile_id = auth.uid()
     )
   );
 
@@ -85,7 +86,7 @@ create policy "team_all_audit_items"
   using (
     exists (
       select 1 from public.profiles
-      where id = auth.uid() and role in ('admin','team')
+      where id = auth.uid() and public.is_admin()
     )
   );
 
@@ -97,7 +98,7 @@ create policy "merchant_read_own_docs"
     and exists (
       select 1 from public.merchant_profiles
       where id = merchant_documents.merchant_id
-        and user_id = auth.uid()
+        and profile_id = auth.uid()
     )
   );
 
@@ -107,7 +108,7 @@ create policy "team_all_docs"
   using (
     exists (
       select 1 from public.profiles
-      where id = auth.uid() and role in ('admin','team')
+      where id = auth.uid() and public.is_admin()
     )
   );
 
@@ -122,6 +123,6 @@ create policy "team_manage_targets"
   using (
     exists (
       select 1 from public.profiles
-      where id = auth.uid() and role in ('admin','team')
+      where id = auth.uid() and public.is_admin()
     )
   );

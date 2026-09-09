@@ -22,6 +22,7 @@ create type user_role as enum (
 create table profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   role user_role not null default 'merchant',
+  is_active boolean not null default true,
   full_name text,
   avatar_url text,
   created_at timestamptz not null default now(),
@@ -34,6 +35,10 @@ create table merchant_profiles (
   profile_id uuid not null references profiles(id) on delete cascade,
   business_name text not null,
   contact_email text not null,
+  business_email text,
+  business_category text,
+  product_category text,
+  store_url text,
   phone text,
   created_at timestamptz not null default now()
 );

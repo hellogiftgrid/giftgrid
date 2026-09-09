@@ -105,17 +105,17 @@ create policy "admins_manage_buyer_applications" on public.buyer_applications fo
 create policy "published_listings_are_visible" on public.merchant_listings for select
   using (
     status = 'published'
-    or merchant_id in (select id from public.merchant_profiles where user_id = auth.uid())
+    or merchant_id in (select id from public.merchant_profiles where profile_id = auth.uid())
     or public.is_admin()
   );
 create policy "merchants_manage_own_listings" on public.merchant_listings for all
-  using (merchant_id in (select id from public.merchant_profiles where user_id = auth.uid()) or public.is_admin())
-  with check (merchant_id in (select id from public.merchant_profiles where user_id = auth.uid()) or public.is_admin());
+  using (merchant_id in (select id from public.merchant_profiles where profile_id = auth.uid()) or public.is_admin())
+  with check (merchant_id in (select id from public.merchant_profiles where profile_id = auth.uid()) or public.is_admin());
 
 create policy "inquiry_participants_read" on public.buyer_inquiries for select
   using (
     buyer_id in (select id from public.buyer_profiles where profile_id = auth.uid())
-    or merchant_id in (select id from public.merchant_profiles where user_id = auth.uid())
+    or merchant_id in (select id from public.merchant_profiles where profile_id = auth.uid())
     or public.is_admin()
   );
 create policy "approved_buyers_create_inquiries" on public.buyer_inquiries for insert
@@ -125,7 +125,7 @@ create policy "approved_buyers_create_inquiries" on public.buyer_inquiries for i
 create policy "inquiry_participants_update" on public.buyer_inquiries for update
   using (
     buyer_id in (select id from public.buyer_profiles where profile_id = auth.uid())
-    or merchant_id in (select id from public.merchant_profiles where user_id = auth.uid())
+    or merchant_id in (select id from public.merchant_profiles where profile_id = auth.uid())
     or public.is_admin()
   );
 
@@ -173,8 +173,8 @@ begin
       new.raw_user_meta_data->>'requirements'
     );
   else
-    insert into public.merchant_profiles (user_id, business_name, business_email)
-    values (new.id, coalesce(new.raw_user_meta_data->>'business_name', 'Unnamed brand'), new.email)
+    insert into public.merchant_profiles (profile_id, business_name, contact_email, business_email)
+    values (new.id, coalesce(new.raw_user_meta_data->>'business_name', 'Unnamed brand'), new.email, new.email)
     on conflict do nothing;
   end if;
   return new;
