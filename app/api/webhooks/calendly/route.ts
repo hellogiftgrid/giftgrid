@@ -5,51 +5,62 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
-    const payload = await request.json();
+    const body = await request.json();
 
-    console.log("Calendly webhook:", JSON.stringify(payload));
+    const event = body?.event ?? null;
+    const payload = body?.payload ?? {};
+    const invitee = payload?.invitee ?? {};
+    const scheduledEvent = payload?.scheduled_event ?? {};
 
-    const event = payload?.event;
-    const invitee = payload?.payload?.invitee;
-    const scheduledEvent = payload?.payload?.scheduled_event;
+    console.log(
+      "CALENDLY_DIAGNOSTIC",
+      JSON.stringify({
+        event,
+        invitee_uri: invitee?.uri ?? null,
+        invitee_email: invitee?.email ?? null,
+        invitee_name: invitee?.name ?? null,
+        invitee_timezone: invitee?.timezone ?? null,
+        scheduled_event:
+          invitee?.scheduled_event ??
+          scheduledEvent?.uri ??
+          null,
+      })
+    );
 
     if (
-      event !== "invitee.created" &&
-      event !== "invitee.canceled"
+      event === "invitee.created" ||
+      event === "invitee.canceled"
     ) {
       return NextResponse.json(
-        { received: true, ignored: true },
+        {
+          received: true,
+          event,
+          diagnostic: true,
+        },
         { status: 200 }
       );
     }
 
-    /*
-     * TEMPORARY:
-     * Confirm that Calendly can reach GiftGrid first.
-     *
-     * Next step will:
-     * - fetch full invitee/event data from Calendly
-     * - map the event to a GiftGrid admin
-     * - upsert the booking into Supabase
-     * - send GiftGrid email through Resend
-     */
-
-    console.log("Calendly event:", event);
-    console.log("Invitee URI:", invitee?.uri);
-    console.log(
-      "Scheduled event URI:",
-      scheduledEvent?.uri
-    );
-
     return NextResponse.json(
-      { received: true },
+      {
+        received: true,
+        ignored: true,
+      },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Calendly webhook error:", error);
+    console.error(
+      "CALENDLY_DIAGNOSTIC_ERROR",
+      error instanceof Error
+        ? error.message
+        : "unknown error"
+    );
 
     return NextResponse.json(
-      { received: false },
+      {
+        received: false,
+        error: "Invalid webhook payload",
+      },
       { status: 400 }
     );
   }

@@ -20,9 +20,9 @@ export const colors = {
   accentDim: "#3730A3",      
 
   // Status
-  success: "#16A34A",
-  warning: "#D97706",
-  danger: "#DC2626",
+  success: "#2563EB",
+  warning: "#3B82F6",
+  danger: "#1E40AF",
 
   // Footer
   footerBg: "#0F172A",
@@ -32,9 +32,9 @@ export const colors = {
 } as const;
 
 export const fonts = {
-  display: ["Sora", "sans-serif"],
-  body: ["Inter", "system-ui", "sans-serif"],
-  mono: ['"IBM Plex Mono"', "monospace"],
+  display: ['"Canva Sans"', '"Avenir Next"', "Avenir", '"Helvetica Neue"', "Arial", "sans-serif"],
+  body: ['"Canva Sans"', '"Avenir Next"', "Avenir", '"Helvetica Neue"', "Arial", "sans-serif"],
+  mono: ['"Canva Sans"', '"Avenir Next"', "Avenir", '"Helvetica Neue"', "Arial", "sans-serif"],
 } as const;
 
 export const siteConfig = {

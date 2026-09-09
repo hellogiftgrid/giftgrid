@@ -1,26 +1,32 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const navLinks = [
   { href: "/how-it-works", label: "How It Works" },
-  { href: "/store-review", label: "Store Review" },
   { href: "/about", label: "About" },
   { href: "/faq", label: "FAQ" },
   { href: "/blog", label: "Blog" },
+  { href: "/community", label: "Community" },
+  { href: "/console", label: "Console" },
   { href: "/contact", label: "Contact" },
 ];
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const isCommunity = pathname === "/community" || pathname === "/giftgrid" || (typeof window !== "undefined" && window.location.hostname === "community.degiftgrid.com");
+
+  if (isCommunity) return null;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-borderCustom bg-primary/85 backdrop-blur-md">
-      <nav className="mx-auto flex max-w-[1180px] items-center justify-between px-7 py-3">
+    <header className="fixed inset-x-0 top-4 z-50 px-4">
+      <nav className="mx-auto flex max-w-[1180px] items-center justify-between rounded-full border border-white/80 bg-white/90 px-4 py-2.5 shadow-[0_10px_35px_rgba(15,23,42,.10)] backdrop-blur-xl sm:px-5">
         <Link href="/" className="flex items-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/logo-horizontal.png" alt="GiftGrid" className="h-9 w-auto object-contain" />
+          <img src="/images/logo-horizontal.png" alt="GiftGrid" className="theme-logo h-9 w-auto object-contain" />
         </Link>
 
         <ul className="hidden gap-8 text-[14.5px] text-textSecondary md:flex">
@@ -34,13 +40,16 @@ export default function Header() {
         </ul>
 
         <div className="hidden items-center gap-4 md:flex">
+          <Link href="/buyers/apply" className="text-[14.5px] font-semibold text-indigo-700 hover:text-indigo-900">
+            Gifting Teams
+          </Link>
           <Link href="/auth/sign-in" className="text-[14.5px] text-textSecondary hover:text-textPrimary">
             Sign In
           </Link>
           <Link
             href="/auth/sign-up"
             className="rounded-full px-5 py-2.5 text-[14px] font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5"
-            style={{ background: "#4F46E5" }}
+            style={{ background: "#1D4ED8" }}
           >
             Apply as Merchant
           </Link>
@@ -70,13 +79,16 @@ export default function Header() {
             ))}
           </ul>
           <div className="mt-6 flex flex-col gap-3">
+            <Link href="/buyers/apply" className="text-[15px] font-semibold text-indigo-700">
+              Gifting Teams
+            </Link>
             <Link href="/auth/sign-in" className="text-[15px] text-textSecondary">
               Sign In
             </Link>
             <Link
               href="/auth/sign-up"
               className="rounded-full px-5 py-3 text-center text-[14px] font-semibold text-white"
-              style={{ background: "#4F46E5" }}
+              style={{ background: "#1D4ED8" }}
             >
               Apply as Merchant
             </Link>

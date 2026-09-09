@@ -5,7 +5,7 @@ export const metadata = { title: 'Recommendations — GiftGrid' }
 
 const STATUS_STYLE: Record<string, { label: string; color: string }> = {
   open: { label: 'Open', color: '#FACC15' },
-  in_progress: { label: 'In Progress', color: var(--accent) },
+  in_progress: { label: 'In Progress', color: 'var(--accent)' },
   resolved: { label: 'Resolved', color: '#22C55E' },
   dismissed: { label: 'Dismissed', color: 'var(--text-secondary)' },
 }

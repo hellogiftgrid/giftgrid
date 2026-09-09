@@ -8,7 +8,7 @@ export const metadata = {
 async function toggleOpportunity(formData: FormData) {
   "use server";
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const id = String(formData.get("id") || "");
   const active = String(formData.get("active") || "") === "true";
@@ -18,8 +18,8 @@ async function toggleOpportunity(formData: FormData) {
   const { error } = await supabase
     .from("opportunities")
     .update({
-      active,
-      public_display: publicDisplay,
+      is_active: active,
+      is_public: publicDisplay,
     })
     .eq("id", id);
 
@@ -30,12 +30,12 @@ async function toggleOpportunity(formData: FormData) {
 }
 
 export default async function AdminOpportunitiesPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: opportunities, error } = await supabase
     .from("opportunities")
     .select(
-      "id, company_name, category, relationship_label, description, active, public_display, created_at"
+      "id, company_name, category, relationship_label, description, active:is_active, public_display:is_public, created_at"
     )
     .order("created_at", { ascending: false });
 

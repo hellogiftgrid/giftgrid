@@ -1,24 +1,43 @@
-"use client";
-
 import React from "react";
-import MerchantSidebar from "@/components/merchant/MerchantSidebar";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import DashboardShell from "@/components/dashboard/DashboardShell";
 
-export default function MerchantLayout({
+export default async function MerchantLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className="flex min-h-screen bg-[#F8FAFC]">
-      {/* Sidebar navigation context */}
-      <MerchantSidebar />
+  const supabase = await createClient();
 
-      {/* Main scrolling content frame panel */}
-      <main className="flex-1 h-screen overflow-y-auto bg-[#F7F9FC]">
-        <div className="p-6 lg:p-10 max-w-[1280px] mx-auto">
-          {children}
-        </div>
-      </main>
-    </div>
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/auth/sign-in");
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("email, full_name, role")
+    .eq("id", user.id)
+    .single();
+
+  const role =
+    profile?.role === "super_admin"
+      ? "super_admin"
+      : profile?.role === "admin"
+        ? "admin"
+        : "merchant";
+
+  return (
+    <DashboardShell
+      role={role}
+      fullName={profile?.full_name || user.email || "GiftGrid User"}
+      email={profile?.email || user.email || ""}
+    >
+      {children}
+    </DashboardShell>
   );
 }

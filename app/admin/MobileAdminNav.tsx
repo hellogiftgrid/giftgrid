@@ -10,9 +10,12 @@ export default function MobileAdminNav() {
           ["/admin/merchants", "Merchants"],
           ["/admin/audits", "Audits"],
           ["/admin/opportunities", "Opportunities"],
+          ["/admin/marketplace", "Marketplace"],
           ["/admin/messages", "Messages"],
           ["/admin/support", "Support"],
           ["/admin/content", "Content"],
+          ["/admin/blog", "Blog"],
+          ["/admin/design", "Web Design"],
         ].map(([href, label]) => (
           <Link
             key={href}

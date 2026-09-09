@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,mkdtempSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {createRequire} from 'node:module';
+import ts from 'typescript';
+const temp=mkdtempSync(join(tmpdir(),'giftgrid-content-test-'));
+for(const [source,name] of [['lib/content/site-design.ts','site-design'],['lib/content/site-pages.ts','site-pages'],['lib/blog/types.ts','types']])writeFileSync(join(temp,name+'.js'),ts.transpileModule(readFileSync(source,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText);
+const require=createRequire(import.meta.url);const {normalizePages,defaultPages}=require(join(temp,'site-pages.js'));const {normalizeSiteDesign}=require(join(temp,'site-design.js'));const {validateArticle,articleHtml}=require(join(temp,'types.js'));
+const pages=normalizePages({'/':[{id:'hero',type:'hero',visible:false,title:'Saved title',image:'javascript:alert(1)',buttonUrl:'//evil.test',overlay:999,cards:[null]},{id:'hero',type:'text',title:'Duplicate'},{id:'x',type:'announcement'}]});
+assert.equal(pages['/'].length,1);assert.equal(pages['/'][0].visible,false);assert.equal(pages['/'][0].title,'Saved title');assert.equal(pages['/'][0].image,'');assert.equal(pages['/'][0].buttonUrl,'');assert.equal(pages['/'][0].overlay,80);assert.equal(pages['/about'][0].type,'hero');assert.deepEqual(normalizePages({'/':[]})['/'],[]);
+assert.equal(defaultPages()['/'][1].type,'platforms');assert.equal(defaultPages()['/faq'][1].type,'faq');
+const design=normalizeSiteDesign({accent:'url(evil)',desktopTitleSize:900,mobileBodySize:NaN,fontFamily:'invalid',heroTitle:'Custom title'});assert.equal(design.desktopTitleSize,112);assert.equal(design.accent,'#1d4ed8');assert.equal(design.mobileBodySize,17);assert.equal(design.heroTitle,'Custom title');
+const article={slug:'test-article',title:'Title',excerpt:'Summary',intro:'Intro',sections:Array.from({length:4},(_,i)=>({heading:'Heading '+i,paragraphs:['Useful '.repeat(180)]}))};assert.equal(validateArticle(article).wordCount,721);assert.throws(()=>validateArticle({...article,sections:[{heading:'Short',paragraphs:['Tiny.']}]}));assert.throws(()=>validateArticle({...article,slug:'../../bad'}));assert.ok(articleHtml({...article,intro:'<script>alert("test")</script>'}).includes('&lt;script&gt;'));assert.ok(!articleHtml({...article,intro:'<script>alert("test")</script>'}).includes('<script>'));
+console.log('Passed: section persistence and ordering, hidden/empty pages, unsafe URLs, duplicate sections, malformed cards, bounded theme values, minimum article length and HTML escaping.');

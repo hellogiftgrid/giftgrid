@@ -9,7 +9,7 @@ export const metadata = {
 async function updateAuditStatus(formData: FormData) {
   "use server";
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const id = String(formData.get("id") || "");
   const status = String(formData.get("status") || "");
@@ -24,8 +24,8 @@ async function updateAuditStatus(formData: FormData) {
     .from("audits")
     .update({
       status,
-      approved_at:
-        status === "approved"
+      published_at:
+        status === "approved" || status === "published"
           ? new Date().toISOString()
           : null,
     })
@@ -39,34 +39,24 @@ async function updateAuditStatus(formData: FormData) {
 }
 
 export default async function AdminAuditsPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: audits, error } = await supabase
     .from("audits")
     .select(
-      "id, store_id, status, executive_summary, overall_score, approved_at, created_at"
+      "id, merchant_id, status, executive_summary, overall_score, published_at, created_at"
     )
     .order("created_at", { ascending: false });
 
-  const storeIds = [...new Set((audits ?? []).map((a) => a.store_id))];
-
-  const { data: stores } = storeIds.length
-    ? await supabase
-        .from("stores")
-        .select("id, store_url, merchant_id")
-        .in("id", storeIds)
-    : { data: [] as any[] };
-
-  const merchantIds = [...new Set((stores ?? []).map((s) => s.merchant_id))];
+  const merchantIds = [...new Set((audits ?? []).map((a) => a.merchant_id))];
 
   const { data: merchants } = merchantIds.length
     ? await supabase
         .from("merchant_profiles")
-        .select("id, business_name, contact_email")
+        .select("id, business_name, business_email, store_url")
         .in("id", merchantIds)
     : { data: [] as any[] };
 
-  const storeMap = new Map((stores ?? []).map((s) => [s.id, s]));
   const merchantMap = new Map((merchants ?? []).map((m) => [m.id, m]));
 
   return (
@@ -92,10 +82,7 @@ export default async function AdminAuditsPage() {
       ) : (
         <div className="space-y-4">
           {audits?.map((audit) => {
-            const store = storeMap.get(audit.store_id);
-            const merchant = store
-              ? merchantMap.get(store.merchant_id)
-              : null;
+            const merchant = merchantMap.get(audit.merchant_id);
 
             return (
               <article
@@ -109,7 +96,7 @@ export default async function AdminAuditsPage() {
                     </h2>
 
                     <p className="mt-1 text-sm text-slate-500">
-                      {store?.store_url ?? "Unknown store"}
+                      {merchant?.store_url ?? "Unknown store"}
                     </p>
 
                     <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-400">

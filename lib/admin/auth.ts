@@ -9,7 +9,7 @@ export type AdminContext = {
 };
 
 export async function requireAdmin(): Promise<AdminContext> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -25,11 +25,7 @@ export async function requireAdmin(): Promise<AdminContext> {
     .eq("id", user.id)
     .single();
 
-  if (
-    error ||
-    !profile ||
-    !["admin", "super_admin"].includes(profile.role)
-  ) {
+  if (error || !profile || profile.role !== "super_admin") {
     redirect("/dashboard");
   }
 

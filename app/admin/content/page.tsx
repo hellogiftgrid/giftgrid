@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata = {
@@ -5,18 +6,18 @@ export const metadata = {
 };
 
 export default async function AdminContentPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const [{ data: content, error: contentError }, { data: faqs, error: faqError }] =
     await Promise.all([
       supabase
         .from("website_content")
-        .select("id, page_key, updated_at, updated_by")
-        .order("page_key"),
+        .select("id, section, key, value, updated_at")
+        .order("section"),
 
       supabase
         .from("faqs")
-        .select("id, question, answer, published, sort_order")
+        .select("id, question, answer, published:is_published, sort_order")
         .order("sort_order"),
     ]);
 
@@ -36,6 +37,7 @@ export default async function AdminContentPage() {
         </p>
       </div>
 
+      <Link href="/admin/blog" className="mb-6 inline-flex rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white">Manage journal and Blogger publishing ↗</Link>
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-bold text-slate-950">
@@ -58,8 +60,9 @@ export default async function AdminContentPage() {
                   className="rounded-xl border border-slate-200 p-4"
                 >
                   <div className="font-bold text-slate-950">
-                    {item.page_key}
+                    {item.section} · {item.key}
                   </div>
+                  <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-500">{item.value || "No content entered"}</p>
                   <div className="mt-1 text-xs text-slate-400">
                     Updated{" "}
                     {new Date(item.updated_at).toLocaleString()}

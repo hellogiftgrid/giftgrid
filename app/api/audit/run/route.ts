@@ -134,7 +134,7 @@ function severityFor(score: number) {
 
 export async function POST() {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const {
       data: { user },

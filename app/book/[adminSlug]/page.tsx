@@ -1,25 +1,23 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import CalendlyEmbed from "@/components/booking/CalendlyEmbed";
+import BookingForm from "@/components/booking/BookingForm";
 
 export const dynamic = "force-dynamic";
 
-const CALENDLY_URL =
-  process.env.NEXT_PUBLIC_CALENDLY_URL || "";
-
-export default async function BookingPage({
+export default async function AdminBookPage({
   params,
 }: {
-  params: { adminSlug: string };
+  params: Promise<{ adminSlug: string }>;
 }) {
-  const supabase = createClient();
+  const { adminSlug } = await params;
+  const supabase = await createClient();
 
   const { data: admin } = await supabase
     .from("booking_admins")
     .select(
-      "id, slug, display_name, booking_title, active, accepting_bookings"
+      "id, slug, display_name, booking_title, timezone, active, accepting_bookings"
     )
-    .eq("slug", params.adminSlug)
+    .eq("slug", adminSlug)
     .eq("active", true)
     .eq("accepting_bookings", true)
     .single();
@@ -28,39 +26,35 @@ export default async function BookingPage({
     notFound();
   }
 
-  return (
-    <main className="min-h-screen bg-slate-50 px-5 py-10">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-7 text-center">
-          <div className="text-xs font-bold uppercase tracking-[0.18em] text-indigo-600">
-            GiftGrid
-          </div>
+  const { data: eventTypes } = await supabase.from("booking_event_types").select("id,name,slug,description,duration_minutes").eq("active", true).eq("public_bookable", true).order("duration_minutes");
 
-          <h1 className="mt-2 text-3xl font-bold text-slate-950">
+  return (
+    <main className="min-h-screen bg-[#F7F9FC] px-4 py-10">
+      <div className="mx-auto max-w-6xl">
+
+        <div className="mb-8 text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#4F46E5]">
+            GiftGrid
+          </p>
+
+          <h1 className="mt-3 text-3xl font-bold text-slate-950">
             Book a call with {admin.display_name}
           </h1>
 
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-500">
             {admin.booking_title ||
               "Choose a convenient time to speak with the GiftGrid team."}
           </p>
         </div>
 
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-          {CALENDLY_URL ? (
-            <CalendlyEmbed url={CALENDLY_URL} />
-          ) : (
-            <div className="p-12 text-center">
-              <h2 className="text-xl font-bold text-slate-950">
-                Booking is being configured
-              </h2>
-
-              <p className="mt-2 text-sm text-slate-500">
-                Please check back shortly.
-              </p>
-            </div>
-          )}
+          <div className="p-5 sm:p-8"><BookingForm adminId={admin.id} adminSlug={admin.slug} adminTimezone={admin.timezone} eventTypes={eventTypes || []} /></div>
         </div>
+
+        <p className="mt-5 text-center text-xs text-slate-400">
+          No GiftGrid account is required to book.
+        </p>
+
       </div>
     </main>
   );

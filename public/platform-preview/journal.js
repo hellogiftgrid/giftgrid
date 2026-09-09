@@ -1,0 +1,1 @@
+window.GIFTGRID_JOURNAL=[];

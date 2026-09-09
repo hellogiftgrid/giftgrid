@@ -8,7 +8,7 @@ export const metadata = {
 async function updateTicket(formData: FormData) {
   "use server";
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const id = String(formData.get("id") || "");
   const status = String(formData.get("status") || "");
@@ -31,12 +31,12 @@ async function updateTicket(formData: FormData) {
 }
 
 export default async function AdminSupportPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: tickets, error } = await supabase
     .from("support_tickets")
     .select(
-      "id, merchant_id, subject, status, created_at, merchant:merchant_profiles(business_name, contact_email)"
+      "id, merchant_id, subject, status, created_at, merchant:merchant_profiles(business_name, business_email)"
     )
     .order("created_at", { ascending: false });
 
@@ -75,7 +75,7 @@ export default async function AdminSupportPage() {
 
                   <p className="mt-1 text-sm text-slate-500">
                     {ticket.merchant?.business_name ?? "Unknown merchant"} ·{" "}
-                    {ticket.merchant?.contact_email ?? ""}
+                    {ticket.merchant?.business_email ?? ""}
                   </p>
 
                   <p className="mt-2 text-xs text-slate-400">

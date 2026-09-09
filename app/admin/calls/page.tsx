@@ -21,7 +21,7 @@ function formatDate(value: string, timezone: string) {
 
 export default async function AdminCallsPage() {
   const admin = await requireAdmin();
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const [{ data: bookingAdmin }, { data: bookings }, { data: eventTypes }] =
     await Promise.all([
@@ -37,9 +37,6 @@ export default async function AdminCallsPage() {
         .from("bookings")
         .select(
           "id, guest_name, guest_email, start_at, end_at, status, meeting_url, zoom_join_url, primary_admin_id, secondary_admin_id, event_type:booking_event_types(name, duration_minutes)"
-        )
-        .or(
-          `primary_admin_id.eq.${admin.userId},secondary_admin_id.eq.${admin.userId}`
         )
         .order("start_at", { ascending: true })
         .limit(100),

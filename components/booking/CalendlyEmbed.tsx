@@ -21,9 +21,10 @@ export default function CalendlyEmbed({
 }) {
   useEffect(() => {
     const target = document.getElementById("giftgrid-calendly");
+
     if (!target || !url) return;
 
-    const initialise = () => {
+    const init = () => {
       if (!window.Calendly) return;
 
       target.innerHTML = "";
@@ -36,15 +37,17 @@ export default function CalendlyEmbed({
     };
 
     if (window.Calendly) {
-      initialise();
+      init();
       return;
     }
 
     const script = document.createElement("script");
+
     script.src =
       "https://assets.calendly.com/assets/external/widget.js";
+
     script.async = true;
-    script.onload = initialise;
+    script.onload = init;
 
     document.body.appendChild(script);
 

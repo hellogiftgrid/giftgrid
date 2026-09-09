@@ -3,11 +3,17 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  title: "Your secure GiftGrid call",
+  robots: { index: false, follow: false },
+};
+
 export default async function BookedCallPage({
   params,
 }: {
-  params: { token: string };
+  params: Promise<{ token: string }>;
 }) {
+  const { token } = await params;
   const supabase = createAdminClient();
 
   const { data: booking } = await supabase
@@ -23,7 +29,7 @@ export default async function BookedCallPage({
       cal_meeting_url,
       primary_admin_id
     `)
-    .eq("booked_call_token", params.token)
+    .eq("booked_call_token", token)
     .single();
 
   if (!booking) notFound();
@@ -57,8 +63,8 @@ export default async function BookedCallPage({
     end.getTime() > Date.now();
 
   return (
-    <main className="min-h-screen bg-[#F7F9FC] px-5 py-12">
-      <div className="mx-auto max-w-4xl">
+    <main className="site-themed min-h-screen bg-[#f4f6fa] px-5 py-10 sm:py-16">
+      <div className="mx-auto max-w-5xl">
         <div className="text-center">
           <div className="flex justify-center">
             <img
@@ -84,8 +90,9 @@ export default async function BookedCallPage({
           </p>
         </div>
 
-        <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-          <div className="grid gap-6 sm:grid-cols-3">
+        <div className="mt-9 overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-[0_30px_100px_-50px_rgba(15,23,42,.35)] lg:grid lg:grid-cols-[1fr_.72fr]">
+          <div className="p-7 sm:p-10">
+          <div className="grid gap-6 sm:grid-cols-3 lg:grid-cols-1">
             <div>
               <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
                 Date
@@ -114,35 +121,44 @@ export default async function BookedCallPage({
             </div>
           </div>
 
-          <div className="mt-8 border-t border-slate-100 pt-8 text-center">
+          <div className="mt-8 border-t border-slate-100 pt-6 text-xs text-slate-400">
+            Confirmation sent to {booking.guest_email}
+          </div>
+          </div>
+          <div className="flex flex-col justify-center bg-blue-600 p-7 text-center text-white sm:p-10">
+            <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-white/15 text-2xl">↗</span>
+            <h2 className="mt-5 text-2xl font-semibold">Your private meeting room</h2>
+            <p className="mt-3 text-sm leading-6 text-blue-100">Join directly inside GiftGrid. You may be asked to allow your camera and microphone.</p>
+          <div className="mt-7">
             {active && booking.cal_meeting_url ? (
               <>
                 <a
-                  href={booking.cal_meeting_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-xl bg-[#4F46E5] px-8 py-4 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#4338CA]"
+                  href={booking.cal_meeting_url.includes("meet.jit.si") ? "#giftgrid-room" : booking.cal_meeting_url}
+                  className="inline-flex items-center justify-center rounded-full bg-white px-8 py-4 text-sm font-bold text-blue-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-blue-50"
                 >
-                  Join GiftGrid Call →
+                  Enter your GiftGrid call →
                 </a>
 
-                <p className="mt-4 text-sm text-slate-500">
-                  Your secure GiftGrid booking page is the place to start your
-                  call. The meeting room opens securely when you join.
+                <p className="mt-4 text-xs leading-5 text-blue-100">
+                  This private GiftGrid URL is your call link. Keep it safe—the
+                  meeting room opens securely from this page when you join.
                 </p>
               </>
             ) : (
-              <div className="rounded-xl bg-slate-50 px-6 py-5 text-sm text-slate-500">
+              <div className="rounded-2xl bg-white/10 px-6 py-5 text-sm text-blue-100">
                 This call is not currently available.
               </div>
             )}
           </div>
 
-          <div className="mt-8 border-t border-slate-100 pt-6 text-center text-xs text-slate-400">
-            Confirmation sent to {booking.guest_email}
           </div>
-        </div>
+          </div>
       </div>
+      {active && booking.cal_meeting_url?.includes("meet.jit.si") && (
+        <div id="giftgrid-room" className="mx-auto mt-8 max-w-6xl scroll-mt-6 overflow-hidden rounded-[28px] border border-slate-200 bg-slate-950 shadow-xl">
+          <iframe src={booking.cal_meeting_url} title="GiftGrid video call" allow="camera; microphone; fullscreen; display-capture; autoplay" className="h-[72vh] min-h-[560px] w-full border-0" />
+        </div>
+      )}
     </main>
   );
 }

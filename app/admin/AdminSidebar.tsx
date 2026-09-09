@@ -14,6 +14,7 @@ const sections = [
       { href: "/admin/merchants", label: "Merchants" },
       { href: "/admin/audits", label: "Store Audits" },
       { href: "/admin/opportunities", label: "Opportunities" },
+      { href: "/admin/marketplace", label: "Buyer Marketplace" },
     ],
   },
   {
@@ -27,6 +28,8 @@ const sections = [
     heading: "Content",
     links: [
       { href: "/admin/content", label: "Website Content" },
+      { href: "/admin/blog", label: "Blog Publishing" },
+      { href: "/admin/design", label: "Website Design" },
     ],
   },
 ];
@@ -41,7 +44,7 @@ export default function AdminSidebar() {
               <img
                 src="/images/logo-full.png"
                 alt="GiftGrid"
-                className="h-8 w-8 object-contain"
+                className="theme-logo h-8 w-8 object-contain"
               />
             </div>
 

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
-import { redirect, revalidatePath } from 'next/navigation'
+import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 
 export const metadata = {
   title: 'Messages — GiftGrid',
@@ -8,7 +9,7 @@ export const metadata = {
 async function startConversation(formData: FormData) {
   'use server'
 
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const {
     data: { user },
@@ -60,7 +61,7 @@ async function startConversation(formData: FormData) {
 }
 
 export default async function MessagesPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const {
     data: { user },

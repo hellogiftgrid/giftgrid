@@ -8,7 +8,7 @@ export const metadata = {
 async function updateApplication(formData: FormData) {
   "use server";
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const id = String(formData.get("id") || "");
   const status = String(formData.get("status") || "");
@@ -16,7 +16,7 @@ async function updateApplication(formData: FormData) {
   const allowed = [
     "submitted",
     "under_review",
-    "needs_info",
+    "suspended",
     "approved",
     "rejected",
   ];
@@ -26,9 +26,9 @@ async function updateApplication(formData: FormData) {
   }
 
   const { error } = await supabase
-    .from("merchant_applications")
+    .from("merchant_profiles")
     .update({
-      status,
+      application_status: status,
       reviewed_at: status === "approved" || status === "rejected"
         ? new Date().toISOString()
         : null,
@@ -42,14 +42,12 @@ async function updateApplication(formData: FormData) {
 }
 
 export default async function AdminApplicationsPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: applications, error } = await supabase
-    .from("merchant_applications")
-    .select(
-      "id, merchant_id, store_id, status, notes, submitted_at, reviewed_at, merchant:merchant_profiles(business_name, contact_email), store:stores(store_url, platform)"
-    )
-    .order("submitted_at", { ascending: false });
+    .from("merchant_profiles")
+    .select("id, business_name, business_email, store_url, business_category, status:application_status, submitted_at:application_submitted_at, reviewed_at")
+    .order("application_submitted_at", { ascending: false, nullsFirst: false });
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -79,21 +77,21 @@ export default async function AdminApplicationsPage() {
               <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <h2 className="text-lg font-bold text-slate-950">
-                    {item.merchant?.business_name ?? "Unnamed merchant"}
+                    {item.business_name ?? "Unnamed merchant"}
                   </h2>
 
                   <p className="mt-1 text-sm text-slate-500">
-                    {item.merchant?.contact_email}
+                    {item.business_email}
                   </p>
 
                   <p className="mt-3 text-sm text-slate-600">
-                    {item.store?.store_url ?? "No store URL"}
+                    {item.store_url ?? "No store URL"}
                   </p>
 
                   <div className="mt-2 text-xs text-slate-400">
-                    Platform: {item.store?.platform ?? "Not specified"} ·
+                    Category: {item.business_category ?? "Not specified"} ·
                     Submitted{" "}
-                    {new Date(item.submitted_at).toLocaleDateString()}
+                    {item.submitted_at ? new Date(item.submitted_at).toLocaleDateString() : "Not submitted"}
                   </div>
                 </div>
 
@@ -106,7 +104,7 @@ export default async function AdminApplicationsPage() {
                 {[
                   "submitted",
                   "under_review",
-                  "needs_info",
+                  "suspended",
                   "approved",
                   "rejected",
                 ].map((status) => (

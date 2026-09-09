@@ -1,0 +1,8 @@
+[Unit]
+Description=GiftGrid daily blog publishing job
+After=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/giftgrid/giftgrid-cron.env
+ExecStart=/usr/bin/curl --fail --silent --show-error --max-time 300 -H "Authorization: Bearer ${CRON_SECRET}" https://www.degiftgrid.com/api/cron/blog

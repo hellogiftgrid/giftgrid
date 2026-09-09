@@ -252,8 +252,8 @@ export default function AuditPage() {
           {audit && (
             <div className="flex flex-wrap gap-3">
               <HireExpertButton
-                source="audit"
-                storeName={businessName}
+                adminSlug="support"
+                label="Book an Audit Call"
               />
               <AuditPdfButton
                 businessName={businessName}

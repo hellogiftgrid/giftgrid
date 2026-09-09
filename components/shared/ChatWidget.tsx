@@ -7,7 +7,7 @@ type Message = { role: "user" | "assistant"; content: string };
 
 const GREETING: Message = {
   role: "assistant",
-  content: `Hi, I'm the ${siteConfig.name} assistant. Ask me anything about how the platform works, applying as a merchant, or our opportunity network.`,
+  content: `Hi, I'm the ${siteConfig.name} assistant. I can help you source gifts in bulk, offer gifting products, or understand GiftGrid. What are you looking to do?`,
 };
 
 export default function ChatWidget() {
@@ -22,11 +22,11 @@ export default function ChatWidget() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, open]);
 
-  async function sendMessage() {
-    const text = input.trim();
+  async function sendMessage(retry = false) {
+    const text = retry ? messages.at(-1)?.content || "" : input.trim();
     if (!text || loading) return;
 
-    const next = [...messages, { role: "user" as const, content: text }];
+    const next = retry ? messages : [...messages, { role: "user" as const, content: text }];
     setMessages(next);
     setInput("");
     setLoading(true);
@@ -36,7 +36,8 @@ export default function ChatWidget() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next.filter((m) => m !== GREETING) }),
+        body: JSON.stringify({ messages: next.filter((m) => m !== GREETING).slice(-12) }),
+        signal: AbortSignal.timeout(50000),
       });
       const data = await res.json();
 
@@ -70,7 +71,7 @@ export default function ChatWidget() {
             </button>
           </div>
 
-          <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
+          <div ref={scrollRef} role="log" aria-live="polite" className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
@@ -95,20 +96,23 @@ export default function ChatWidget() {
                 </div>
               </div>
             )}
-            {error && <p className="text-center text-[12.5px] text-danger">{error}</p>}
+            {error && <div role="alert" className="text-center text-[12.5px] text-danger"><p>{error}</p><button onClick={() => sendMessage(true)} disabled={loading} className="mt-2 underline">Retry message</button></div>}
           </div>
 
+          <p className="px-4 text-[11px] text-textSecondary">AI responses can be mistaken. Messages are processed by our AI providers; avoid sharing private or sensitive details.</p>
           <div className="flex items-center gap-2 border-t border-borderCustom p-3">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+              maxLength={2000}
+              aria-label="Message the GiftGrid assistant"
               placeholder="Ask a question..."
               disabled={loading}
               className="flex-1 rounded-full border border-borderCustom bg-primary px-4 py-2 text-[13.5px] text-textPrimary outline-none focus:border-accent disabled:opacity-60"
             />
             <button
-              onClick={sendMessage}
+              onClick={() => sendMessage()}
               disabled={loading || !input.trim()}
               aria-label="Send message"
               className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-white shadow-sm transition-opacity disabled:opacity-40"

@@ -1,21 +1,4 @@
-import { Resend } from "resend";
-
-function resend() {
-  const key = process.env.RESEND_API_KEY;
-
-  if (!key) {
-    throw new Error("RESEND_API_KEY is not configured.");
-  }
-
-  return new Resend(key);
-}
-
-function from() {
-  return (
-    process.env.RESEND_FROM_EMAIL ||
-    "GiftGrid <no-reply@degiftgrid.com>"
-  );
-}
+import { sendEmail } from "@/lib/email/provider";
 
 function esc(value: unknown) {
   return String(value ?? "")
@@ -37,13 +20,9 @@ export async function sendGuestBookingEmail(input: {
   meetingUrl: string | null;
   bookingUid: string;
 }) {
-  const client = resend();
-
   const joinUrl = input.bookedCallUrl;
 
-  return client.emails.send(
-    {
-      from: from(),
+  return sendEmail({
       replyTo: "support@degiftgrid.com",
       to: [input.guestEmail],
       subject: `Your GiftGrid call is confirmed — ${input.adminName}`,
@@ -73,21 +52,19 @@ export async function sendGuestBookingEmail(input: {
           <p>
             <a href="${esc(joinUrl)}"
               style="background:#4F46E5;color:#fff;text-decoration:none;padding:13px 20px;border-radius:10px;font-weight:700">
-              Open your GiftGrid booking
+              Join your GiftGrid call
             </a>
           </p>
 
           <p style="margin-top:28px;color:#64748b;font-size:13px">
+            Use this private GiftGrid call URL at your scheduled time. It opens your secure meeting room.<br /><br />
             GiftGrid · support@degiftgrid.com<br />
             This mailbox is not monitored for replies.
           </p>
         </div>
       `,
-    },
-    {
       idempotencyKey: `giftgrid-guest-booking-${input.bookingUid}`,
-    }
-  );
+  });
 }
 
 export async function sendAdminBookingEmail(input: {
@@ -101,11 +78,7 @@ export async function sendAdminBookingEmail(input: {
   adminUrl: string;
   bookingUid: string;
 }) {
-  const client = resend();
-
-  return client.emails.send(
-    {
-      from: from(),
+  return sendEmail({
       to: [input.adminEmail],
       subject: `New GiftGrid booking — ${input.guestName}`,
       html: `
@@ -130,9 +103,6 @@ export async function sendAdminBookingEmail(input: {
           </p>
         </div>
       `,
-    },
-    {
       idempotencyKey: `giftgrid-admin-booking-${input.bookingUid}-${input.adminEmail}`,
-    }
-  );
+  });
 }

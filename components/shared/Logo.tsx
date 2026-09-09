@@ -4,7 +4,7 @@ export default function Logo({ size = 28 }: { size?: number }) {
       <defs>
         <linearGradient id="ggGrad" x1="4" y1="4" x2="36" y2="36" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#4F46E5" />
-          <stop offset="100%" stopColor="#F97316" />
+          <stop offset="100%" stopColor="#60A5FA" />
         </linearGradient>
       </defs>
       {/* A grid of four rounded cells reads as both "grid" and an abstract G */}

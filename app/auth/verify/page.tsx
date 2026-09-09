@@ -17,6 +17,10 @@ function VerifyForm() {
   const searchParams = useSearchParams();
 
   const email = searchParams.get("email") || "";
+  const requestedNext = searchParams.get("next") || "";
+  const nextPath = requestedNext.startsWith("/") && !requestedNext.startsWith("//")
+    ? requestedNext
+    : "/dashboard";
 
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -66,7 +70,7 @@ function VerifyForm() {
       return;
     }
 
-    router.replace("/dashboard");
+    router.replace(nextPath);
     router.refresh();
   }
 

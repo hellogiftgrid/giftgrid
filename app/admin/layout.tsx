@@ -2,6 +2,7 @@ import AdminSidebar from "./AdminSidebar";
 import MobileAdminNav from "./MobileAdminNav";
 import { requireAdmin } from "@/lib/admin/auth";
 import Link from "next/link";
+import ThemeToggle from "@/components/shared/ThemeToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -13,11 +14,11 @@ export default async function AdminLayout({
   const admin = await requireAdmin();
 
   return (
-    <div className="min-h-screen bg-[#F7F9FC]">
-      <div className="flex min-h-screen">
+    <div className="admin-shell h-screen overflow-hidden bg-[#F7F9FC]">
+      <div className="flex h-full min-h-0">
         <AdminSidebar />
 
-        <div className="min-w-0 flex-1">
+        <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
           <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
             <div className="flex h-16 items-center justify-between px-5 lg:px-8">
               <div>
@@ -30,6 +31,7 @@ export default async function AdminLayout({
               </div>
 
               <div className="flex items-center gap-4">
+                <ThemeToggle />
                 <div className="hidden text-right sm:block">
                   <div className="text-sm font-semibold text-slate-700">
                     {admin.fullName}

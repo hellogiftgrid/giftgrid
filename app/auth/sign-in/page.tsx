@@ -51,19 +51,29 @@ export default function SignInPage() {
       return;
     }
 
-    router.replace("/dashboard");
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", data.user.id)
+      .single();
+
+    router.replace(profile?.role === "corporate_buyer" ? "/buyer/dashboard" : "/dashboard");
     router.refresh();
   }
 
   return (
     <AuthShell
       title="Sign in"
-      subtitle="Access your merchant dashboard."
+      subtitle="Access your GiftGrid workspace."
       footer={
         <>
           Don&apos;t have an account?{" "}
           <Link href="/auth/sign-up" className="text-accent">
             Apply as a merchant
+          </Link>
+          {" "}or{" "}
+          <Link href="/buyers/apply" className="text-accent">
+            start a gifting request
           </Link>
         </>
       }
@@ -83,7 +93,7 @@ export default function SignInPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-[3px] bg-accent px-6 py-3 text-[14.5px] font-semibold text-primary transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+          className="w-full bg-blue-600 px-6 py-3.5 text-[14.5px] font-semibold text-white transition hover:-translate-y-0.5 hover:bg-blue-700 disabled:opacity-60"
         >
           {loading ? "Signing in…" : "Sign In"}
         </button>

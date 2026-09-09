@@ -9,7 +9,11 @@ const config: Config = {
   theme: {
     extend: {
       colors,
-      fontFamily: fonts,
+      fontFamily: {
+        display: [...fonts.display],
+        body: [...fonts.body],
+        mono: [...fonts.mono],
+      },
       keyframes: {
         driftGrid: {
           "0%": { backgroundPosition: "0 0, 0 0" },

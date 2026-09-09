@@ -6,12 +6,12 @@ export const metadata = {
 };
 
 export default async function AdminMerchantsPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: merchants, error } = await supabase
     .from("merchant_profiles")
     .select(
-      "id, business_name, contact_email, phone, created_at, profile:profiles(full_name, role)"
+      "id, business_name, business_email, phone, created_at, profile:profiles!merchant_profiles_user_id_fkey(full_name, role)"
     )
     .order("created_at", { ascending: false });
 
@@ -74,7 +74,7 @@ export default async function AdminMerchantsPage() {
                     </td>
 
                     <td className="px-5 py-4 text-slate-600">
-                      {merchant.contact_email}
+                      {merchant.business_email}
                       {merchant.phone && (
                         <div className="mt-1 text-xs text-slate-400">
                           {merchant.phone}

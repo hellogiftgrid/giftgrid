@@ -5,12 +5,12 @@ export const metadata = {
 };
 
 export default async function AdminMessagesPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: threads, error } = await supabase
     .from("message_threads")
     .select(
-      "id, subject, created_at, merchant:merchant_profiles(business_name, contact_email)"
+      "id, subject, created_at, merchant:merchant_profiles(business_name, business_email)"
     )
     .order("created_at", { ascending: false });
 
@@ -67,7 +67,7 @@ export default async function AdminMessagesPage() {
 
                     <p className="mt-1 text-sm text-slate-500">
                       {thread.merchant?.business_name ?? "Unknown merchant"} ·{" "}
-                      {thread.merchant?.contact_email ?? ""}
+                      {thread.merchant?.business_email ?? ""}
                     </p>
                   </div>
 

@@ -213,6 +213,20 @@ export async function POST(request: NextRequest) {
     }
   } else {
     let adminId: string | null = null;
+    const { data: eventType } = await supabase
+      .from("booking_event_types")
+      .select("id")
+      .eq("active", true)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+
+    if (!eventType?.id) {
+      return NextResponse.json(
+        { error: "GiftGrid call type is not configured." },
+        { status: 503 }
+      );
+    }
 
     if (adminEmail) {
       const { data: profile } = await supabase
@@ -258,6 +272,7 @@ export async function POST(request: NextRequest) {
     const { error } = await supabase
       .from("bookings")
       .insert({
+        event_type_id: eventType.id,
         cal_booking_uid: uid,
         cal_meeting_url: meetingUrl,
         booked_call_token: token,
@@ -286,7 +301,7 @@ export async function POST(request: NextRequest) {
     "https://www.degiftgrid.com";
 
   const bookedCallUrl =
-    `${site}/bookedcall/${token}`;
+    `${site.replace(/\/$/, "")}/call/${token}`;
 
   const formattedStart =
     new Intl.DateTimeFormat("en", {
@@ -337,6 +352,13 @@ export async function POST(request: NextRequest) {
     if (result.status === "rejected") {
       console.error("Resend error:", result.reason);
     }
+  }
+
+  if (results[0]?.status === "rejected") {
+    return NextResponse.json(
+      { error: "Booking saved, but the guest confirmation email was not accepted. Cal may retry this webhook." },
+      { status: 502 }
+    );
   }
 
   return NextResponse.json({

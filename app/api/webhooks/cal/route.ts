@@ -219,6 +219,21 @@ export async function POST(request: Request) {
 
   if (!booking) {
     let primaryAdminId: string | null = null;
+    const { data: eventType } = await supabase
+      .from("booking_event_types")
+      .select("id")
+      .eq("active", true)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+
+    if (!eventType?.id) {
+      console.error("[GiftGrid Cal] no active booking event type configured");
+      return NextResponse.json(
+        { error: "GiftGrid call type is not configured." },
+        { status: 503 }
+      );
+    }
 
     if (adminEmail) {
       const { data: profile } = await supabase
@@ -285,6 +300,7 @@ export async function POST(request: Request) {
     const { data: inserted, error } = await supabase
       .from("bookings")
       .insert({
+        event_type_id: eventType.id,
         cal_booking_uid: uid,
         cal_meeting_url: meetingUrl,
         booked_call_token: bookedCallToken,
@@ -348,7 +364,7 @@ export async function POST(request: Request) {
     "https://www.degiftgrid.com";
 
   const bookedCallUrl =
-    `${site.replace(/\/$/, "")}/bookedcall/${booking.booked_call_token}`;
+    `${site.replace(/\/$/, "")}/call/${booking.booked_call_token}`;
 
   const start = new Date(startTime);
   const end = new Date(endTime);
@@ -430,6 +446,13 @@ export async function POST(request: Request) {
     } else {
       console.log("[GiftGrid Cal] Resend email accepted", result.value);
     }
+  }
+
+  if (trigger === "BOOKING_CREATED" && results[0]?.status === "rejected") {
+    return NextResponse.json(
+      { error: "Booking saved, but the guest confirmation email was not accepted. Cal may retry this webhook." },
+      { status: 502 }
+    );
   }
 
   return NextResponse.json({

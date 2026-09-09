@@ -8,7 +8,7 @@ export const metadata = {
 type Merchant = {
   id: string;
   business_name: string;
-  contact_email: string;
+  business_email: string;
   created_at: string;
 };
 
@@ -18,12 +18,21 @@ type Application = {
   submitted_at: string;
   merchant: {
     business_name: string;
-    contact_email: string;
+    business_email: string;
   } | null;
   store: {
     store_url: string;
     platform: string | null;
   } | null;
+};
+
+type MerchantApplicationRow = {
+  id: string;
+  status: string;
+  submitted_at: string | null;
+  business_name: string;
+  business_email: string;
+  store_url: string;
 };
 
 type Audit = {
@@ -51,7 +60,7 @@ type SupportTicket = {
   created_at: string;
   merchant: {
     business_name: string;
-    contact_email: string;
+    business_email: string;
   } | null;
 };
 
@@ -144,7 +153,7 @@ function formatDate(value: string) {
 }
 
 export default async function AdminDashboard() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const [
     merchantsRes,
@@ -158,27 +167,24 @@ export default async function AdminDashboard() {
   ] = await Promise.all([
     supabase
       .from("merchant_profiles")
-      .select("id, business_name, contact_email, created_at")
+      .select("id, business_name, business_email, created_at")
       .order("created_at", { ascending: false }),
 
     supabase
-      .from("merchant_applications")
-      .select(
-        "id, status, submitted_at, merchant:merchant_profiles(business_name, contact_email), store:stores(store_url, platform)"
-      )
-      .order("submitted_at", { ascending: false }),
+      .from("merchant_profiles")
+      .select("id, status:application_status, submitted_at:application_submitted_at, business_name, business_email, store_url")
+      .not("application_status", "eq", "draft")
+      .order("application_submitted_at", { ascending: false, nullsFirst: false }),
 
     supabase
       .from("audits")
-      .select(
-        "id, status, overall_score, created_at, store_id, merchant_id"
-      )
+      .select("id, status, overall_score, created_at, merchant_id")
       .order("created_at", { ascending: false }),
 
     supabase
       .from("opportunities")
       .select(
-        "id, company_name, category, active, public_display, created_at"
+        "id, company_name, category, active:is_active, public_display:is_public, created_at"
       )
       .order("created_at", { ascending: false }),
 
@@ -195,7 +201,7 @@ export default async function AdminDashboard() {
     supabase
       .from("support_tickets")
       .select(
-        "id, subject, status, created_at, merchant:merchant_profiles(business_name, contact_email)"
+        "id, subject, status, created_at, merchant:merchant_profiles(business_name, business_email)"
       )
       .order("created_at", { ascending: false }),
 
@@ -217,11 +223,17 @@ export default async function AdminDashboard() {
   ].filter(Boolean);
 
   const merchants = (merchantsRes.data ?? []) as Merchant[];
-  const applications = (applicationsRes.data ?? []) as Application[];
+  const applications = ((applicationsRes.data ?? []) as unknown as MerchantApplicationRow[]).map((item) => ({
+    id: item.id,
+    status: item.status,
+    submitted_at: item.submitted_at || new Date(0).toISOString(),
+    merchant: { business_name: item.business_name, business_email: item.business_email },
+    store: { store_url: item.store_url, platform: null },
+  })) as Application[];
   const opportunities = (opportunitiesRes.data ?? []) as Opportunity[];
   const submissions = submissionsRes.data ?? [];
   const threads = threadsRes.data ?? [];
-  const tickets = (ticketsRes.data ?? []) as SupportTicket[];
+  const tickets = (ticketsRes.data ?? []) as unknown as SupportTicket[];
   const documents = documentsRes.data ?? [];
 
   /*
@@ -229,14 +241,6 @@ export default async function AdminDashboard() {
    * We load the IDs first, then resolve the related records.
    */
   const rawAudits = auditsRes.data ?? [];
-
-  const auditStoreIds = [
-    ...new Set(
-      rawAudits
-        .map((audit) => audit.store_id)
-        .filter(Boolean)
-    ),
-  ];
 
   const auditMerchantIds = [
     ...new Set(
@@ -246,33 +250,15 @@ export default async function AdminDashboard() {
     ),
   ];
 
-  const [{ data: auditStores }, { data: auditMerchants }] =
-    await Promise.all([
-      auditStoreIds.length
-        ? supabase
-            .from("stores")
-            .select("id, store_url, merchant_id")
-            .in("id", auditStoreIds)
-        : Promise.resolve({ data: [] }),
-
-      auditMerchantIds.length
-        ? supabase
-            .from("merchant_profiles")
-            .select("id, business_name")
-            .in("id", auditMerchantIds)
-        : Promise.resolve({ data: [] }),
-    ]);
-
-  const storeMap = new Map(
-    (auditStores ?? []).map((store) => [store.id, store])
-  );
+  const { data: auditMerchants } = auditMerchantIds.length
+    ? await supabase.from("merchant_profiles").select("id, business_name, store_url").in("id", auditMerchantIds)
+    : { data: [] as { id: string; business_name: string; store_url: string }[] };
 
   const merchantMap = new Map(
     (auditMerchants ?? []).map((merchant) => [merchant.id, merchant])
   );
 
   const audits: Audit[] = rawAudits.map((audit) => {
-    const store = storeMap.get(audit.store_id);
     const merchant = merchantMap.get(audit.merchant_id);
 
     return {
@@ -283,7 +269,7 @@ export default async function AdminDashboard() {
       merchant_name:
         merchant?.business_name ?? "Unknown merchant",
       store_url:
-        store?.store_url ?? "Store URL unavailable",
+        merchant?.store_url ?? "Store URL unavailable",
     };
   });
 
@@ -441,7 +427,7 @@ export default async function AdminDashboard() {
                 Applications needing attention
               </h2>
               <p className="mt-1 text-xs text-slate-400">
-                Live from merchant_applications
+                Live from merchant profiles
               </p>
             </div>
 
@@ -471,7 +457,7 @@ export default async function AdminDashboard() {
                     </div>
 
                     <div className="mt-1 text-xs text-slate-500">
-                      {item.merchant?.contact_email ?? ""}
+                      {item.merchant?.business_email ?? ""}
                     </div>
 
                     <div className="mt-1 text-xs text-slate-400">
@@ -574,7 +560,7 @@ export default async function AdminDashboard() {
                     </div>
 
                     <div className="mt-1 text-xs text-slate-400">
-                      {merchant.contact_email}
+                      {merchant.business_email}
                     </div>
                   </div>
 
@@ -684,7 +670,7 @@ export default async function AdminDashboard() {
                     {ticket.merchant?.business_name ??
                       "Unknown merchant"}{" "}
                     ·{" "}
-                    {ticket.merchant?.contact_email ?? ""}
+                    {ticket.merchant?.business_email ?? ""}
                   </div>
                 </div>
 

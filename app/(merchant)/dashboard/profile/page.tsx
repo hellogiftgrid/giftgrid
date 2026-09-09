@@ -14,6 +14,7 @@ type FormState = {
   businessCategory: string;
   productCategory: string;
   businessDescription: string;
+  avatarUrl: string;
 };
 
 export default function ProfilePage() {
@@ -25,17 +26,19 @@ export default function ProfilePage() {
     businessName: "",
     businessEmail: "",
     phone: "",
-    country: "",
+    country: "United States",
     storeUrl: "",
     businessCategory: "",
     productCategory: "",
     businessDescription: "",
+    avatarUrl: "",
   });
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -71,6 +74,7 @@ export default function ProfilePage() {
               business_category,
               product_category,
               business_description
+              ,avatar_url
             `)
             .eq("user_id", user.id)
             .limit(1),
@@ -105,11 +109,12 @@ export default function ProfilePage() {
           businessEmail:
             merchant.business_email || profile.email || user.email || "",
           phone: merchant.phone || profile.phone || "",
-          country: merchant.country || profile.country || "",
+          country: merchant.country || profile.country || "United States",
           storeUrl: merchant.store_url || "",
           businessCategory: merchant.business_category || "",
           productCategory: merchant.product_category || "",
           businessDescription: merchant.business_description || "",
+          avatarUrl: merchant.avatar_url || "",
         });
       } catch (err) {
         setError(
@@ -128,6 +133,17 @@ export default function ProfilePage() {
       ...current,
       [field]: value,
     }));
+  }
+
+  async function uploadAvatar(file?: File) {
+    if (!file) return;
+    setUploading(true); setError("");
+    const payload = new FormData(); payload.set("file", file);
+    const response = await fetch("/api/merchant/profile-image", { method: "POST", body: payload });
+    const result = await response.json();
+    if (!response.ok) setError(result.error || "Image upload failed.");
+    else setField("avatarUrl", result.url);
+    setUploading(false);
   }
 
   async function saveProfile() {
@@ -155,6 +171,7 @@ export default function ProfilePage() {
           business_category: form.businessCategory.trim() || null,
           product_category: form.productCategory.trim() || null,
           business_description: form.businessDescription.trim() || null,
+          avatar_url: form.avatarUrl.trim() || null,
         })
         .eq("user_id", user.id);
 
@@ -239,6 +256,11 @@ export default function ProfilePage() {
           </h2>
 
           <div className="mt-6 grid gap-5 md:grid-cols-2">
+            <label className="md:col-span-2">
+              <span className="mb-2 block text-sm font-semibold text-slate-700">Profile image</span>
+              <div className="flex items-center gap-4"><div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-indigo-100 text-xl font-bold text-indigo-700">{form.avatarUrl ? <img src={form.avatarUrl} alt="Profile preview" className="h-full w-full object-cover" /> : form.businessName.slice(0, 1).toUpperCase() || "M"}</div><label className="cursor-pointer rounded-xl border border-dashed border-indigo-300 px-4 py-3 text-sm font-semibold text-indigo-700">{uploading ? "Uploading…" : "Upload image"}<input type="file" accept="image/jpeg,image/png,image/webp" disabled={uploading} className="sr-only" onChange={(e) => { uploadAvatar(e.target.files?.[0]); e.currentTarget.value = ""; }} /></label></div>
+              <span className="mt-1 block text-xs text-slate-400">JPG, PNG, or WebP up to 2 MB. Shown to approved buyers.</span>
+            </label>
             <label>
               <span className="mb-2 block text-sm font-semibold text-slate-700">
                 Full name
@@ -294,7 +316,7 @@ export default function ProfilePage() {
 
             <label>
               <span className="mb-2 block text-sm font-semibold text-slate-700">
-                Phone
+                Phone (optional)
               </span>
               <input
                 value={form.phone}
@@ -307,12 +329,13 @@ export default function ProfilePage() {
               <span className="mb-2 block text-sm font-semibold text-slate-700">
                 Country
               </span>
-              <input
-                value={form.country}
+              <select
+                value={form.country || "United States"}
                 onChange={(e) => setField("country", e.target.value)}
-                placeholder="Nigeria"
                 className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
-              />
+              >
+                {["United States", "Canada", "United Kingdom", "Nigeria", "Ghana", "South Africa", "Kenya", "Australia", "France", "Germany", "India", "Brazil", "Other"].map((country) => <option key={country}>{country}</option>)}
+              </select>
             </label>
           </div>
         </section>

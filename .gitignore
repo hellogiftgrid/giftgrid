@@ -8,3 +8,8 @@ node_modules
 *.zip
 .vercel
 .env*
+
+# GiftGrid local work / backups
+.giftgrid-*/
+middleware.ts.backup-*
+public/_unused-assets-*/

@@ -1,0 +1,374 @@
+{
+  "design_system": {
+    "colors": {
+      "primary": "#0D1B2A",
+      "secondary": "#415A77",
+      "accent_purple": "#6366F1",
+      "accent_blue": "#3B82F6",
+      "accent_orange": "#F97316",
+      "accent_gradient": "linear-gradient(135deg, #FF6B6B 0%, #4D96FF 100%)",
+      "background_light": "#FFFFFF",
+      "background_alt": "#F4F7FC",
+      "background_dark": "#0A0E1A",
+      "text_dark": "#1E293B",
+      "text_muted": "#64748B",
+      "border_color": "#E2E8F0"
+    },
+    "typography": {
+      "font_family_sans": "Inter, system-ui, sans-serif",
+      "font_family_serif": "Playfair Display, Georgia, serif",
+      "hierarchy": {
+        "eyebrow": {
+          "font_size": "12px",
+          "font_weight": "700",
+          "text_transform": "uppercase",
+          "letter_spacing": "0.1em",
+          "color": "#64748B"
+        },
+        "hero_title": {
+          "font_size": "40px",
+          "line_height": "1.1",
+          "font_weight": "800",
+          "color": "#0D1B2A"
+        },
+        "section_title": {
+          "font_size": "28px",
+          "line_height": "1.2",
+          "font_weight": "800",
+          "color": "#0D1B2A"
+        },
+        "section_title_serif": {
+          "font_size": "32px",
+          "line_height": "1.2",
+          "font_weight": "700",
+          "font_family": "serif",
+          "color": "#0D1B2A"
+        },
+        "body_large": {
+          "font_size": "16px",
+          "line_height": "1.5",
+          "color": "#415A77"
+        },
+        "body_normal": {
+          "font_size": "14px",
+          "line_height": "1.5",
+          "color": "#64748B"
+        },
+        "card_title": {
+          "font_size": "16px",
+          "font_weight": "700",
+          "color": "#0D1B2A"
+        }
+      }
+    },
+    "spacing": {
+      "section_padding_y": "64px",
+      "container_max_width": "1200px",
+      "grid_gap": "24px"
+    }
+  },
+  "sections": [
+    {
+      "name": "Hero Section",
+      "vertical_range": "0px - 410px",
+      "background": "#FFFFFF",
+      "components": {
+        "eyebrow": {
+          "text": "B2B BRAND OPPORTUNITY PLATFORM"
+        },
+        "heading": {
+          "text": "Position Your Brand for Corporate Gifting Opportunities."
+        },
+        "subheading": {
+          "text": "GiftGrid helps e-commerce brands prepare, review, and provide their stores for opportunities with their corporate gifting ecosystem."
+        },
+        "cta_button": {
+          "text": "Book a Call with Our Team",
+          "style": "dark_pill",
+          "gradient_border": true
+        },
+        "social_proof": {
+          "avatars": ["avatar_1.png", "avatar_2.png", "avatar_3.png"],
+          "text": "Talk to Sarah: Our Gifting Strategist",
+          "action_badge": "Book Active"
+        },
+        "calendar_widget": {
+          "header": "September 2026",
+          "style": "minimalist_card"
+        }
+      }
+    },
+    {
+      "name": "Trust Badges & Integration Partners",
+      "vertical_range": "410px - 530px",
+      "background": "#F4F7FC",
+      "components": {
+        "trust_line": {
+          "label": "Connected to leading corporate gifting & rewards platforms",
+          "logos": [
+            "GiftGrid Logo",
+            "Tremendous",
+            "Snappy",
+            "Stadium",
+            "Gifted",
+            "Loop",
+            "Microsoft",
+            "Google"
+          ]
+        },
+        "integration_line": {
+          "label": "SUPPORTS E-COMMERCE PLATFORMS",
+          "logos": [
+            "Shopify",
+            "WooCommerce",
+            "Squarespace",
+            "Magento",
+            "Wix"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Team Gifting & Collaboration",
+      "vertical_range": "530px - 880px",
+      "background": "#FFFFFF",
+      "components": {
+        "eyebrow": {
+          "text": "TEAM GIFTING & COLLABORATION"
+        },
+        "heading": {
+          "text": "Coordinate Gifting Across Your Entire Organization"
+        },
+        "subheading": {
+          "text": "Inspired by Shopify's custom-corporate gifting platforms."
+        },
+        "visual_assets": {
+          "main_image": "team_meeting.png",
+          "app_screenshot": "dashboard_overview.png",
+          "interactive_elements": [
+            {
+              "type": "Gift Lists Widget",
+              "fields": ["Gift Card", "Approved", "Recipient"]
+            },
+            {
+              "type": "User Status Cards",
+              "users": ["Manager", "Recipient", "Mia Mizz"]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Global Sourcing, Fulfillment & Swag",
+      "vertical_range": "880px - 1180px",
+      "background": "#F4F7FC",
+      "components": {
+        "heading": {
+          "text": "Global Sourcing & Fulfillment"
+        },
+        "subheading": {
+          "text": "Inspired by Sendoso's reach and direct mail capabilities."
+        },
+        "benefit_headline": {
+          "text": "Reach Teams Globally with Seamless Sourcing Building & Fulfillment"
+        },
+        "logistics_grid": {
+          "images": [
+            "warehouse_1.png",
+            "warehouse_2.png",
+            "distribution_center.png",
+            "world_map_coverage.png"
+          ]
+        },
+        "swag_sub_section": {
+          "title": "Swag & Direct Mail",
+          "images": [
+            "branded_boxes.png",
+            "apparel_hoodies.png",
+            "stationery_cards.png"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Opportunity Network",
+      "vertical_range": "1180px - 1500px",
+      "background": "#FFFFFF",
+      "components": {
+        "heading": {
+          "text": "Opportunity Network"
+        },
+        "grid": {
+          "columns": 3,
+          "rows": 3,
+          "cards": [
+            { "title": "Corporate Gifting", "image": "corp_gifting.png" },
+            { "title": "Bulk Buyers", "image": "bulk_buyers.png" },
+            { "title": "Wholesale", "image": "wholesale.png" },
+            { "title": "Retail", "image": "retail.png" },
+            { "title": "Procurement Procurement", "image": "procurement.png" },
+            { "title": "Distributors", "image": "distributors.png" },
+            { "title": "Employee Reward Platforms", "image": "employee_rewards.png" },
+            { "title": "Hospitality", "image": "hospitality.png" },
+            { "title": "Events", "image": "events.png" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Campaign Performance & ROI Analytics",
+      "vertical_range": "1500px - 1700px",
+      "background": "#F4F7FC",
+      "components": {
+        "left_column": {
+          "headline": "You don't apply to a dozen platforms. You apply to one.",
+          "diagram": {
+            "center": "GiftGrid Core",
+            "connections": ["Shopify", "Tremendous", "Snappy", "Loop", "Custom API"],
+            "subtext": "GiftGrid acts as the single source of truth for all your corporate gifting integrations, partnerships and tracking."
+          }
+        },
+        "right_column": {
+          "heading": "Campaign Performance & ROI Analytics",
+          "subheading": "Track, Analyze, and Optimize Your Gifting Campaigns",
+          "dashboard_preview": "campaign_analytics_dashboard.png"
+        }
+      }
+    },
+    {
+      "name": "Built on Real Reviews",
+      "vertical_range": "1700px - 1860px",
+      "background": "#FFFFFF",
+      "components": {
+        "heading_serif": {
+          "text": "Built on real reviews."
+        },
+        "subheading": {
+          "text": "GiftGrid ratings — we're higher rated than any other platform on G2 and Capterra."
+        },
+        "benefit_cards": [
+          {
+            "icon": "shield-check",
+            "title": "Human Reviewed Audits",
+            "description": "Get real feedback from real experts to optimize your gifting campaigns."
+          },
+          {
+            "icon": "lock",
+            "title": "Your Data Stays Private",
+            "description": "We never share your customer data with anyone else — ever."
+          },
+          {
+            "icon": "eye",
+            "title": "Transparent Submissions",
+            "description": "Track everything in real-time, from submission to delivery and feedback."
+          },
+          {
+            "icon": "user-group",
+            "title": "Merchant Stories",
+            "description": "Read success stories from other brands in the network."
+          }
+        ]
+      }
+    },
+    {
+      "name": "Ongoing Employee Recognition",
+      "vertical_range": "1860px - 2020px",
+      "background": "#F4F7FC",
+      "components": {
+        "text_content": {
+          "heading": "Ongoing Employee Recognition",
+          "subheading": "Foster a Culture of Appreciation with Ongoing Recognition and Rewards"
+        },
+        "visual_elements": {
+          "team_photo": "employees_group.png",
+          "overlay_cards": [
+            { "text": "Sarah S. received a $50 coffee voucher" },
+            { "text": "David A. received a $100 coffee voucher" },
+            { "text": "Sarah S. received a $50 coffee voucher" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Final CTA",
+      "vertical_range": "2020px - 2110px",
+      "background": "#FFFFFF",
+      "components": {
+        "eyebrow": {
+          "text": "GET STARTED"
+        },
+        "heading": {
+          "text": "Ready to position your brand for the right opportunities?"
+        },
+        "actions": {
+          "primary_cta": {
+            "text": "Apply as a Merchant",
+            "style": "solid_gradient"
+          },
+          "secondary_cta": {
+            "text": "Book a Call",
+            "style": "solid_blue_dropdown"
+          },
+          "tertiary_cta": {
+            "text": "Talk to Our Team",
+            "style": "outline_pill"
+          }
+        },
+        "disclaimer": "Talk to our expert team about how to best prepare and position your store. Booking a call is talking directly with one of us."
+      }
+    },
+    {
+      "name": "Footer",
+      "vertical_range": "2110px - 2192px",
+      "background": "#050B14",
+      "components": {
+        "brand_column": {
+          "logo": "GiftGrid",
+          "description": "The premier B2B corporate gifting platform helping brands connect with top corporate buyers, rewards programs, and gifting curators.",
+          "email": "support@giftgrid.com",
+          "copyright": "© 2026 GiftGrid. All rights reserved."
+        },
+        "links_product": ["Key Features", "Pricing", "GitGrid Blog"],
+        "links_company": ["About Us", "Our Company", "FAQ", "Contact"],
+        "links_legal": ["Privacy", "Terms"],
+        "social_media_icons": ["Facebook", "Instagram", "Twitter", "LinkedIn"],
+        "community_feed": {
+          "title": "COMMUNITY FEED",
+          "tweets": [
+            {
+              "user": "@Ludhianavi",
+              "text": "Loving the new GiftGrid analytics dashboard. Direct correlation between our B2B reach and integration tracking!"
+            },
+            {
+              "user": "@Tanveer",
+              "text": "The custom corporate gifting pipeline is solid. Absolute gamechanger for Shopify brands trying to scale B2B."
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "engineering_notes": {
+    "interactivity": {
+      "hero_calendar": "Interactive calendar component built with date-fns or react-day-picker allowing live slot reservation.",
+      "opportunity_cards": "Hover states featuring smooth scaling (scale-105), a clean box-shadow transition, and subtle brightness adjustment on background images.",
+      "cta_buttons": "Gradients should use dynamic background-position transitions on hover to create a shimmering motion effect."
+    },
+    "reusable_react_components": [
+      "SectionWrapper: A generic responsive container with customizable background colors and padding.",
+      "GradientButton: Pill-shaped CTA button with gradient border or background options.",
+      "OpportunityCard: 1:1 aspect ratio card with absolute positioned text overlay and zoom-on-hover background image.",
+      "ReviewCard: Minimal benefit/feature card utilizing SVG icons and robust spacing."
+    ],
+    "seo_considerations": {
+      "semantic_tags": "Ensure standard heading levels (H1 in hero, H2 for section headings, H3 for cards).",
+      "structured_data": "Implement BreadcrumbList and Organization JSON-LD schemas targeting B2B procurement terms.",
+      "image_alt": "All opportunity card overlays must double as semantic image alt attributes."
+    },
+    "accessibility_considerations": {
+      "color_contrast": "Ensure white text overlays on Opportunity Cards use a semi-transparent dark linear-gradient background overlay (minimum 40% opacity) for proper AA contrast compliance.",
+      "keyboard_navigation": "Interactive calendar widget must support full tab-index indexing and arrow-key date selection.",
+      "focus_indicators": "Distinct focus rings for all buttons, links, and grid options."
+    }
+  }
+}

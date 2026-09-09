@@ -144,7 +144,7 @@ export default function BookingForm({
         throw new Error(data.error || "Booking failed.");
       }
 
-      window.location.href = `/book/${adminSlug}/confirmation?booking=${data.id}`;
+      window.location.href = `/call/${data.token}?booked=1`;
     } catch (err) {
       setError(
         err instanceof Error
