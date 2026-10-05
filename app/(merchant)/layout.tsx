@@ -20,11 +20,13 @@ export default async function MerchantLayout({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("email, full_name, role")
+    .select("full_name, role")
     .eq("id", user.id)
     .single();
 
-  const role =
+  const role = profile?.role === "corporate_buyer"
+    ? "corporate_buyer"
+    :
     profile?.role === "super_admin"
       ? "super_admin"
       : profile?.role === "admin"
@@ -33,9 +35,10 @@ export default async function MerchantLayout({
 
   return (
     <DashboardShell
+      avatarUrl={role === "admin" || role === "super_admin" ? "/images/logo-full.png" : undefined}
       role={role}
       fullName={profile?.full_name || user.email || "GiftGrid User"}
-      email={profile?.email || user.email || ""}
+      email={user.email || ""}
     >
       {children}
     </DashboardShell>

@@ -107,7 +107,7 @@ export default async function MessagesPage() {
           </h1>
 
           <p className="mt-2 text-sm text-slate-500">
-            Contact the GiftGrid team about your account, audit or opportunities.
+            Contact the GiftGrid team about your account, products or opportunities.
           </p>
         </div>
 

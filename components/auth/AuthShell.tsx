@@ -24,7 +24,7 @@ export default function AuthShell({
             <p className="text-xs font-bold uppercase tracking-[.18em] text-blue-200">Your GiftGrid workspace</p>
             <h2 className="mt-5 text-5xl font-semibold leading-[1.05] tracking-[-.045em]">Better gifting starts with better connections.</h2>
             <p className="mt-5 text-lg leading-8 text-blue-100">Prepare your brand, manage opportunities, and build genuine relationships with gifting teams.</p>
-            <div className="mt-8 flex gap-5 text-sm text-blue-100"><span>✓ Human reviewed</span><span>✓ Secure workspace</span></div>
+            <div className="mt-8 flex gap-5 text-sm text-blue-100"><span>For buyers</span><span>For merchants</span></div>
           </div>
         </aside>
 
@@ -43,7 +43,7 @@ export default function AuthShell({
         </div>
 
         {footer && <div className="mt-6 text-center text-[14px] text-textSecondary">{footer}</div>}
-          <div className="mt-8 flex justify-center gap-5 text-xs text-slate-400"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/contact">Help</Link></div>
+          <div className="mt-8 flex justify-center gap-5 text-xs text-slate-500"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="https://community.degiftgrid.com/docs">Help centre</Link></div>
           </div>
         </div>
       </div>

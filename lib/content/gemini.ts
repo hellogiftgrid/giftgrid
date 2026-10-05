@@ -22,7 +22,7 @@ Research this topic for GiftGrid:
 Primary keyword: ${keyword}
 Target market: ${country}
 
-GiftGrid is an ecommerce merchant platform focused on store audits,
+GiftGrid is an ecommerce merchant platform focused on merchant profiles,
 store readiness, corporate gifting, wholesale and commercial opportunities.
 
 Research:

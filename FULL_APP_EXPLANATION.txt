@@ -1,0 +1,193 @@
+GIFTGRID — FULL APPLICATION EXPLANATION
+Source review date: 2 October 2026
+Repository: C:\Users\Mr Solomon Wisdom\Desktop\giftgrid
+Production host: Vercel (www.degiftgrid.com)
+Primary data/auth/storage provider: Supabase
+
+PURPOSE AND SCOPE
+=================
+GiftGrid is a community and sourcing platform for corporate gifting. It brings together corporate buyers who describe gifting needs, merchants who list products, and visitors who browse public posts, member profiles, and products. Its core value is discovery and conversation. A product page is an enquiry or supplier referral; the app does not provide a complete shopping checkout, payment, shipping, or order-fulfilment system.
+
+This document describes the application source tree and configuration that were reviewed. It does not expose secret values, verify private production database contents, or assert that every SQL migration in the repository has been applied to the live Supabase project. A migration file in source is not proof that the corresponding production schema change has run. Do not send service-role keys, OAuth secrets, API keys, database URLs, signing keys, or user data to clients or into this document.
+
+1. TECHNOLOGY AND REQUEST FLOW
+==============================
+The primary website is a Next.js App Router application (Next.js 16, React 18, TypeScript, Tailwind CSS). Vercel builds and serves it. Supabase provides Authentication, PostgreSQL tables, Row Level Security, and Storage. Server-rendered pages use the Supabase server client and cookies. Client components use the publishable/anon key. Trusted server code may use the service-role client to perform carefully authorized operations that bypass RLS; that client is marked server-only and must never be imported into browser code.
+
+The request path is generally:
+Browser or mobile app -> GiftGrid Next.js page/API route -> Supabase Auth and database/storage -> response to that client.
+
+Some routes call external services on the server: Google Blogger for publishing, configured AI providers for chat/content, email providers for notifications, and supplier or merchant websites for product-source links. Secrets for these services belong only in deployment environment variables. Public Supabase configuration is intentionally supplied to the React Native app; the service-role secret is not.
+
+The root layout sets global metadata, theme variables, structured data, analytics, speed insights, and the PWA service-worker registration. Site appearance/page blocks are loaded from Supabase settings and normalized against safe defaults. The public marketing shell and community shell are separate route-group layouts. The `proxy.ts` host router maps selected community, console, and API subdomains onto route paths; it is not the authorization layer. Page layouts and route handlers enforce authentication/roles.
+
+2. PUBLIC WEBSITE AND MAIN ROUTES
+=================================
+Public marketing pages:
+- `/` — configurable GiftGrid homepage built from page blocks.
+- `/about`, `/how-it-works` — explains the platform and workflows.
+- `/faq`, `/contact`, `/terms`, `/privacy`, `/cookies` — information and contact.
+- `/app` — app download information. Download availability depends on a signed APK being present in `public/downloads`.
+- `/blog` and `/blog/[slug]` — editorial library and article pages; `/blog/feed.json` exposes a feed.
+
+Community pages:
+- `/community` — public social feed. On `community.degiftgrid.com`, the host router presents the feed at that hostname's `/` route.
+- `/members` and `/members/[id]` — registered-member directory and public profiles.
+- `/connect` — currently redirects to `/members`; it is not a separate connection/follow interface.
+- `/merchant` and `/merchant/[id]` — merchant discovery and merchant profile/product views.
+- `/market` and `/market/[id]` — public product catalogue and product detail. Legacy `/shop` and `/shop/[id]` redirect to `/market` and `/market/[id]`. Backend product endpoints deliberately remain `/api/shop` and `/api/shop/[id]`.
+- `/docs` and `/docs/[slug]` — public community/product guides.
+- `/messages` exists as a page, but member connections, follows, and private messaging APIs return HTTP 410 (removed). Do not describe these as working member features.
+- `/profile` is a legacy/public path; authenticated account profile work is under `/dashboard/profile`.
+
+Authentication and onboarding:
+- `/auth/join` asks whether someone is joining as a buyer or merchant and routes them to the corresponding flow.
+- `/auth/sign-in` uses email/password Supabase authentication. The initial role card is navigation only; it never changes the stored role. The authenticated profile determines access and destination.
+- `/auth/sign-up` creates a merchant-style account; `/merchant/setup` completes the business profile.
+- `/buyers/apply` starts the buyer application workflow.
+- `/auth/verify`, `/auth/forgot-password`, `/auth/reset-password`, `/auth/sign-out` support email confirmation, password recovery, and sign-out.
+- `/dashboard/profile` is the joined account/community profile route. It combines the public member profile editor with merchant business/trade-deck controls for merchant-role users. GiftGrid admin avatars are forced to the GiftGrid logo by shared identity logic.
+- `/buyer/dashboard` and `/dashboard` provide role-specific workspace entry points.
+
+3. COMMUNITY FEATURES AND PERMISSIONS
+=====================================
+Public reading does not require an account. The feed reads published posts, shows authors and media, and includes like/comment counts. A signed-in user can create a regular community post (up to 2,000 characters), attach owned community media, like/unlike a post, and comment (up to 1,500 characters). Ordinary community posts do not require a trade deck. A like is unique per member/post. Comments and likes are stored by GiftGrid, not synchronized with Blogger.
+
+The public feed exposes a sign-in prompt to visitors. Publishing requires a valid signed-in account; the author identity is derived from the stored profile, never trusted from the submitted browser payload. Likes and comments likewise require sign-in to write. Public read APIs expose published content. Community images are uploaded through a server route and are checked for ownership before attaching to a post.
+
+Member profiles contain public-facing display name, bio, country, and optional image. The account email is private. Countries are represented with names and flags in the profile controls. Member directory visibility is based on active registered profiles; a merchant's trade-deck or business approval is a separate matter.
+
+Connections, follows, and direct private messages have old database tables/migrations in the project history, but current endpoints explicitly return HTTP 410 and say those features were removed. Treat the tables as retained historical data, not live user controls.
+
+4. BUYER AND MERCHANT FLOWS
+===========================
+Buyer role:
+- Buyer registration is separate from merchant registration; a buyer submits an application and requires an approved/active buyer profile for buyer-only tools.
+- Buyers do not need a trade deck.
+- An approved buyer with completed company/contact profile fields can create a sourcing brief. The API limits this to five requests in 24 hours.
+- A request is shown publicly as an anonymized teaser. The detailed brief (quantity, budget, date, delivery/customization details and buyer company context) is placed into private inquiry records for eligible merchants. Buyer contact details are not included in the public teaser.
+- Important eligibility rule in current code: a buyer request is rejected if there are no active, approved merchants with an approved trade deck to receive it. Thus a public teaser is open to read, but creating a brief currently depends on there being a qualified recipient. This is not the same as ordinary community posting.
+- Buyers can review merchant responses/products in their dashboard and close their own open requests.
+
+Merchant role:
+- Merchant registration creates an account and leads to setup/business information. Merchant account approval and a trade deck are used for qualification.
+- Product entries include title, category, short and full descriptions, product image, price range, minimum order, and status. New listings are normally placed into review; administrators review/approve them before public availability.
+- A single 72-hour grace period starts with the first product listing. It cannot be reset by editing or removing products. After the grace window, listings without an approved deck are hidden from the public market. An approved deck is checked against the uploaded PDF stored in the trade-decks bucket and the review status; unreviewed/rejected decks do not qualify.
+- Web trade decks support PDF up to 10 MB. The current Expo app's upload UI imposes a stricter 4 MB client-side limit; the web/API rule is authoritative and this discrepancy should be reconciled before treating mobile upload limits as equivalent.
+- Merchants must have an approved deck and an eligible published product to respond to private buyer briefs. Their response includes product, price, minimum order, lead time, and message.
+- `/dashboard/workflow` generates follow-up task records for incomplete merchant setup, listings missing content, and buyer enquiries awaiting response. The merchant can pause/resume task generation and change task states. This is database-backed workflow/task automation, not a general-purpose external workflow engine.
+- A WordPress product-import endpoint can read public HTTPS product or collection pages with SSRF protections and parse Product JSON-LD/metadata. It creates draft/pending listings; it is not a Shopify connector.
+
+5. MARKETPLACE AND CATALOGUE
+============================
+`/market` combines published merchant listings with a local supplier feed at `config/supplier-products.json`. The supplier parser currently allows AliExpress and Faire entries only when URLs and image domains match allowlists. It rejects invented/invalid source data, future timestamps, duplicate supplier IDs, invalid prices, etc. Supplier entries older than seven days or explicitly out of stock are filtered out. Supplier cards identify the source and link out to that supplier; the supplier remains responsible for price, inventory, shipping, and purchase.
+
+The API is `GET /api/shop?category=&page=` and `GET /api/shop/[id]`. It returns visible published merchant products plus supplier entries. Catalogue pages paginate at 24 products per page. Product image URLs are restricted to HTTP(S). There is no GiftGrid cart, checkout, payment processing, inventory reservation, or order tracking.
+
+Shopify code is not a finished active connection flow: the repository has Shopify security utilities and a migration for connection/state/sync tables, but the active App Router route inventory has no Shopify OAuth connect/callback/sync endpoint. Do not claim that a merchant can currently connect Shopify and auto-list through this code. Shopify setup was previously paused.
+
+6. DASHBOARDS AND ADMIN
+=======================
+Authenticated workspace routes include `/dashboard`, `/dashboard/profile`, `/dashboard/listings`, `/dashboard/workflow`, and role-specific pages for activity, applications, communications, documents, messages, merchants, opportunities, support, system, and users. The merchant layout checks the session and determines behavior using the saved role. The unified profile path is `/dashboard/profile`.
+
+Admin routes include `/admin`, applications, merchants, marketplace, messages, opportunities, support, content, design, and blog publishing. Admin pages use Supabase records. Admin actions include reviewing applications/decks/listings, managing site content/design, and operational queues. Super-admin operations are separately guarded. Admin and super-admin user avatars use the GiftGrid logo. Which precise operations are available depends on the page and database schema.
+
+The user-role and trade-deck review APIs require administrator privileges. Public pages do not receive the Supabase service-role key. The app uses RLS for client-visible data and server-side role checks for privileged writes. Super-admin checks require the saved profile role, not a user-selected account card.
+
+7. DEVELOPER CONSOLE AND PROGRAMMATIC ACCESS
+============================================
+`/console` is the developer workspace. Routes cover apps, API keys, documentation, sandbox/usage/webhook/cron screens. The app API has scoped, hashed GiftGrid API keys with scopes such as `apps:read`, `apps:write`, `keys:write`, `webhooks:write`, `community:publish`, and `community:draft`. Keys are presented with a `gg_` prefix and the server stores a SHA-256 hash rather than the original key. Keys may expire or be revoked, and requests check app ownership, scope, active profile, payload size, and auth.
+
+Current developer API endpoints include:
+- `/api/developer/apps` — list/create owned apps.
+- `/api/developer/apps/[id]/keys` — list/create scoped keys.
+- `/api/developer/keys/[id]` — revoke/delete a key.
+- `/api/developer/apps/[id]/webhooks` — list/register webhook endpoints.
+- `/api/developer/community/drafts` and `/api/developer/community/posts` — draft/publish API-assisted community content.
+
+Webhook records are registration/configuration only; this source does not implement event delivery. Some console cards and plan descriptions are interface/product concepts, not proof of active metering, rate-limit billing, cron orchestration, or webhook delivery. The public endpoints currently include health, shop, community posts and developer resources; inspect route handlers before relying on any undocumented endpoint.
+
+Automated community publishing is guarded by API-key/session scopes, a configured publisher ID allowlist (`GIFTGRID_PUBLISHER_IDS`), accepted staff/developer roles, idempotency, three published automated posts maximum per account per 24 hours, and at least four hours between posts. If the publisher allowlist is empty, publishing is disabled. In current source the final role check accepts developer, admin, or super_admin for IDs in that allowlist, so it is not literally developer-role-only unless configuration/code is narrowed.
+
+8. BLOG, AI, EMAIL, AND SCHEDULED JOBS
+======================================
+Editorial content is held in the article library and associated database tables. The admin Blogger screen is super-admin-only. Its OAuth flow asks Google for Blogger access, verifies a state cookie, discovers blogs for which the account has author access, and saves refresh tokens encrypted on the server. Publishing is limited to the two configured Blogger hostnames in `lib/blog/blogger.ts`. Blog publishing also creates/announces GiftGrid community content and can update FAQ content. A daily Vercel cron in `vercel.json` calls `/api/cron/blog` at 09:00 UTC with `CRON_SECRET`; the route verifies the bearer secret. The admin can also manually trigger a run.
+
+Blogger requires working Google OAuth environment values and the `20260905210000_blog_publishing.sql` tables/functions to exist in Supabase. The repository contains that migration, but the migration's production application state was not verified as part of this source review. Build output during the last deployment printed that published blog articles could not be read; inspect `/admin/blog` for the live error state before assuming the publishing queue is operational. Google Blogger does not provide GiftGrid's community-like synchronization.
+
+The public chat widget posts up to 12 recent messages (each up to 2,000 characters) to `/api/chat`. Server-side providers are tried in configured order (self-hosted OpenAI-compatible endpoint, Groq, Cerebras, NVIDIA, GitHub Models, OpenRouter, Mistral, Hugging Face, Gemini). It has no database/member access or tool actions. If every configured provider fails, the API returns a temporary-unavailable response. AI article research/generation is a separate server-side content pipeline.
+
+Activity notification events can be queued for buyer enquiries, product listings, comments, and likes. A nightly Vercel cron calls `/api/cron/activity-notifications` at 23:00 UTC. A flush route may send queued records sooner. Email delivery depends on configured provider credentials and deployment configuration; it should not be treated as guaranteed delivery.
+
+9. MOBILE APPLICATIONS
+======================
+There are two different native mobile source trees:
+1) `mobile/` is an Expo SDK 57 / Expo Router project. It contains tabs for Home, Shop, Members, Dashboard, Profile, plus product/comments/sign-in/listings/workflow routes. It uses Supabase Auth and SecureStore-backed session persistence and calls GiftGrid server APIs with bearer tokens. It includes country/flag selection, image upload, member profile, merchant listing/trade-deck screens, and task workflow UI. Configure `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and optionally `EXPO_PUBLIC_API_ORIGIN` for local development.
+2) `mobile-native/` is a bare React Native 0.86 project using Android Gradle and a hand-built tab UI. It obtains public Supabase config from `/api/mobile/config` and calls the same Next APIs. A signed release requires the private signing material, Android toolchain, a verified APK, and testing. The download endpoint only serves an APK if the artifact exists under `public/downloads/giftgrid-android.apk`.
+
+The repository therefore contains both Expo and bare React Native code despite the prior preference to replace a PWA wrapper with native React Native. Neither source tree by itself proves that an app has been built, signed, store-submitted, or is installable. At source review, `public/downloads` contained only a README, not the expected APK. The main Next app also registers a PWA service worker; this is a web capability and not the same thing as a shipped native app.
+
+10. DATABASE, STORAGE, AND SECURITY
+===================================
+Supabase is the main system of record. The migration set describes users/profiles and roles, merchant profiles/applications/listings/documents, buyer profiles/applications/inquiries, community posts/comments/likes/media, site settings/content, developer apps/keys/webhooks, workflows, blog publishing, admin activity, and notification queues. Historical schema also includes booking and other earlier features. The presence of historical SQL is not evidence that the feature is active or that each migration has been applied.
+
+Storage buckets cover website media, community media, and private trade decks. Community media is referenced in posts only after server ownership validation. Trade-deck documents are private and should be served through authenticated/signed access paths. Trade-deck review status gates qualification.
+
+Security controls found in code include: safe same-origin post-login destinations; profile-role checks; active-account checks; API scope and app ownership checks; hashed developer keys; timing-safe signature/state comparisons; OAuth state cookies; encrypted Blogger tokens; Shopify HMAC/token helpers (partial Shopify feature); request body/field bounds; protected admin/service-role clients; URL/DNS checks for WordPress imports; supplier host allowlists; and no-store cache headers for private or changing data.
+
+Environment variables are read by the server/mobile projects for Supabase, Google Blogger, AI providers, email, scheduled jobs, developer automation, and optional Shopify/Zoom features. This document names variable groups only and contains no values. Keep all server secrets in Vercel or secure local environment storage. The local `.env.local` must never be pasted into a chat, committed, or included in generated docs.
+
+11. HOSTING AND DEPLOYMENT
+==========================
+The production website remains on Vercel. `vercel.json` defines the two scheduled routes described above. `proxy.ts` supports host-based rewrites for the community, console, and API subdomains. The public health endpoint checks a developer database query and whether an Android APK artifact is available; it reports readiness/unavailability but is not an exhaustive test of every feature.
+
+Supabase remains the production database/auth/storage provider. A separate operations note describes a possible Cloudflare hosting move and PostgreSQL recovery copy, but explicitly records these as plans, not completed deployments. Do not interpret that note as evidence of a Cloudflare or Netlify cutover. The latest verified site deployment in this work remained Vercel.
+
+12. ACTIVE FEATURES, PREPARATION, AND LEGACY MATERIAL
+=====================================================
+Current active route inventory does not include booking or store-audit pages/APIs. Old booking migration files and legacy/backup/reference files remain in the repository, but that is historical source material. The production route build did not list booking or store-audit routes. The active community routes use `/market`, while `/shop` is a compatibility redirect. API `/api/shop` remains intentionally unchanged.
+
+Implemented end-to-end at source level (subject to the live schema/env being available): public pages, authentication, member profiles, community posts/comments/likes, buyer applications and request/response handling, merchant onboarding/listings, deck review and grace eligibility, supplier catalogue, admin operations, developer API records/keys, Blogger publishing workflow, and merchant follow-up task workflow.
+
+Partial, planned, or dependent on further setup:
+- Shopify data/security/schema preparation exists, but an active OAuth/sync route flow is absent.
+- Developer webhook management stores registrations; event delivery is absent.
+- Console plan cards/metrics do not prove billing or usage enforcement.
+- AI chat and editorial features require at least one working configured provider.
+- Blogger publishing requires a successful Google authorization and the live blog schema.
+- Native app source is not the same as a verified downloadable release; no release APK was found in `public/downloads`.
+- A production PostgreSQL backup/replica and Cloudflare migration are not active merely because there are planning notes or environment variable names.
+- Follow/connection/private-message tables and APIs are retired from member-facing use; their API endpoints return 410.
+
+The root README is stale: it says the contact endpoint, auth, merchant portal, and other features are not implemented even though corresponding code now exists. Use active `app/`, `app/api/`, `components/`, and `lib/` code plus actual deployed behavior rather than those old README claims. The repository also includes older `components/app/` page copies and old design/reference assets; they are not the active route tree unless imported from current `app/` routes.
+
+13. DEVELOPER QUICK START AND VERIFICATION
+==========================================
+Web app from the repository root:
+- `npm ci`
+- Create a private `.env.local` with the required development Supabase public URL/publishable key and only the server credentials needed for the feature being tested. Never use the service-role key in browser/mobile builds.
+- `npm run dev` — start Next.js locally.
+- `npm run typecheck` — TypeScript check.
+- `npm run lint` — ESLint.
+- `npm run build` — generate content library and create production build.
+- `npm run giftgrid -- status` — use the repository CLI status command (API-key configuration is needed for authenticated operations).
+
+Expo project:
+- `cd mobile`, install its lockfile dependencies, configure its EXPO_PUBLIC variables, then run `npx expo start`.
+
+Bare native project:
+- Follow `docs/mobile-release.md`; signing material must remain private. Verify the resulting package and install/test on a device before publishing.
+
+Before trusting a feature, check its role guard, API handler, required database migration, Vercel environment configuration, and actual live outcome. A passing Next build proves compilation/routing only; it does not prove database migrations, third-party consent, email delivery, marketplace inventory, or mobile release readiness.
+
+KEY SOURCE LOCATIONS
+====================
+- `app/` — active Next.js routes, page handlers, layouts, API routes.
+- `components/` — shared/public/community/admin/merchant client components.
+- `lib/` — authentication, Supabase clients, marketplace, community, Blogger, AI, email, developer API, trade-deck, and mobile-release logic.
+- `config/` — branding, identity, country list, supplier feed, community host.
+- `supabase/migrations/` — versioned SQL history; check actual remote migration state separately.
+- `mobile/` — Expo/Expo Router native app source.
+- `mobile-native/` — bare React Native native app source.
+- `scripts/` — content preparation, supplier import, CLI, migration-era checks, mobile verification, and test scripts.
+- `docs/` — feature/operations notes; some notes may be historical and should be cross-checked with live code.

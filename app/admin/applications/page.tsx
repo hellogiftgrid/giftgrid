@@ -1,5 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { requireSuperAdmin } from "@/lib/admin/require-super-admin";
 
 export const metadata = {
   title: "Applications — GiftGrid Admin",
@@ -8,6 +9,7 @@ export const metadata = {
 async function updateApplication(formData: FormData) {
   "use server";
 
+  await requireSuperAdmin();
   const supabase = await createClient();
 
   const id = String(formData.get("id") || "");
@@ -24,6 +26,7 @@ async function updateApplication(formData: FormData) {
   if (!allowed.includes(status)) {
     throw new Error("Invalid application status.");
   }
+  if (!/^[0-9a-f-]{36}$/i.test(id)) throw new Error("Invalid application.");
 
   const { error } = await supabase
     .from("merchant_profiles")
@@ -39,6 +42,7 @@ async function updateApplication(formData: FormData) {
 
   revalidatePath("/admin/applications");
   revalidatePath("/admin");
+  revalidatePath("/dashboard");
 }
 
 export default async function AdminApplicationsPage() {

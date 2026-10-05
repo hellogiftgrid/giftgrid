@@ -26,7 +26,6 @@ export type SiteDesign = {
   heroTitle: string;
   heroDescription: string;
   merchantButton: string;
-  bookingButton: string;
 };
 
 export const defaultSiteDesign: SiteDesign = {
@@ -53,11 +52,10 @@ export const defaultSiteDesign: SiteDesign = {
   mobilePagePadding: 20,
   cardPadding: 28,
   buttonHeight: 50,
-  heroEyebrow: "The unboxing experience",
-  heroTitle: "Make every gift feel worth opening.",
-  heroDescription: "GiftGrid brings standout brands and workplace gifting teams together for gifts people genuinely want to receive.",
-  merchantButton: "Apply as a Merchant",
-  bookingButton: "Book a Call",
+  heroEyebrow: "The GiftGrid community",
+  heroTitle: "Gifting works better when we work together.",
+  heroDescription: "A community for gifting buyers, independent brands, and partners to share products, sourcing needs, and practical ideas.",
+  merchantButton: "Explore the community",
 };
 
 export function normalizeSiteDesign(value: unknown): SiteDesign {

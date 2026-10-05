@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "products": [
+    {
+      "id": "supplier-aliexpress-1005008795546953",
+      "source": "aliexpress",
+      "source_id": "1005008795546953",
+      "source_url": "https://www.aliexpress.us/item/1005008795546953.html",
+      "supplier_name": "AliExpress",
+      "title": "New Men's Sneakers Casual Shoes 2025 New Men's Summer Shoes Lightweight and Comfortable Men's Canvas Shoe",
+      "description": "Men's lightweight canvas summer sneakers. See AliExpress for available sizes, variants, current pricing, shipping and stock.",
+      "category": "Shoes",
+      "image_url": "https://ae-pic-a1.aliexpress-media.com/kf/Sdbb974767b3f454998baf709ef8b5e41Y.jpg",
+      "price": null,
+      "currency": null,
+      "minimum_order_quantity": null,
+      "availability": "unknown",
+      "checked_at": "2026-10-01T15:07:57.000Z"
+    },
+    {
+      "id": "supplier-aliexpress-1005012601245408",
+      "source": "aliexpress",
+      "source_id": "1005012601245408",
+      "source_url": "https://www.aliexpress.us/item/1005012601245408.html",
+      "supplier_name": "AliExpress",
+      "title": "2026 Summer Leopard Print Striped Women's Shoes, Sizes 35-44, Fashionable Couple's Thick-Soled New Style, Trendy Women's Student Running Outdoor Sports Casual Shoes",
+      "description": "Women's leopard print striped casual shoes. See AliExpress for available sizes, variants, current pricing, shipping and stock.",
+      "category": "Shoes",
+      "image_url": "https://ae-pic-a1.aliexpress-media.com/kf/S85b779ce80dd4c46af84b46d2a944281Y.jpg",
+      "price": null,
+      "currency": null,
+      "minimum_order_quantity": null,
+      "availability": "unknown",
+      "checked_at": "2026-10-01T15:07:57.000Z"
+    }
+  ]
+}

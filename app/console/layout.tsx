@@ -1,3 +1,4 @@
+import SignOutButton from "@/components/shared/SignOutButton";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/require-user";
 import ThemeToggle from "@/components/shared/ThemeToggle";
@@ -12,7 +13,7 @@ const navigation = [
   ["Webhooks", "/console/webhooks"],
   ["Cron jobs", "/console/cron"],
   ["Usage & logs", "/console/usage"],
-  ["Docs", "/docs"],
+  ["Docs", "/console/docs"],
 ] as const;
 
 export default async function ConsoleLayout({ children }: { children: React.ReactNode }) {
@@ -36,7 +37,7 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
         <main className="min-w-0 flex-1">
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-5 py-5 lg:px-10">
             <div><div className="text-xs uppercase tracking-[0.18em] text-indigo-300">Developer workspace</div><div className="mt-1 text-sm text-slate-300">{user.email}</div></div>
-            <div className="flex items-center gap-3"><ThemeToggle /><Link href="/console/docs" className="rounded-lg border border-white/15 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10">API docs</Link><Link href="/auth/sign-out" className="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-slate-900">Sign out</Link></div>
+            <div className="flex items-center gap-3"><ThemeToggle /><Link href="/console/docs" className="rounded-lg border border-white/15 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10">API docs</Link><SignOutButton className="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-slate-900" /></div>
           </header>
           <div className="border-b border-white/10 px-5 py-3 lg:hidden"><div className="flex gap-2 overflow-x-auto">{navigation.map(([label, href]) => <Link key={href} href={href} className="whitespace-nowrap rounded-md bg-white/10 px-3 py-2 text-xs text-slate-200">{label}</Link>)}</div></div>
           <div className="px-5 py-8 lg:px-10">{children}</div>

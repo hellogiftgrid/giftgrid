@@ -31,42 +31,13 @@ export default async function SystemPage() {
 
   const admin = createAdminClient();
 
-  const [{ error: bookingAdminBootstrapError }, { error: eventTypeBootstrapError }] =
-    await Promise.all([
-      admin.from("booking_admins").upsert(
-        {
-          profile_id: profile.id,
-          slug: `giftgrid-${profile.id.replaceAll("-", "").slice(0, 12)}`,
-          display_name: profile.full_name || "GiftGrid Team",
-          booking_title: "Meet with GiftGrid",
-          timezone: "UTC",
-          active: true,
-          accepting_bookings: true,
-        },
-        { onConflict: "profile_id" }
-      ),
-      admin.from("booking_event_types").upsert(
-        {
-          name: "GiftGrid introduction call",
-          slug: "giftgrid-intro-call",
-          description: "A 30-minute introduction to GiftGrid for brands and gifting teams.",
-          duration_minutes: 30,
-          buffer_before_minutes: 0,
-          buffer_after_minutes: 10,
-          minimum_notice_minutes: 60,
-          booking_window_days: 60,
-          active: true,
-          public_bookable: true,
-        },
-        { onConflict: "slug" }
-      ),
-    ]);
+  
 
   const [
     merchantCount,
     adminCount,
-    bookingCount,
-    activeBookingCount,
+    
+    
     activityCount,
   ] = await Promise.all([
     admin
@@ -87,27 +58,9 @@ export default async function SystemPage() {
         "super_admin",
       ]),
 
-    admin
-      .from("bookings")
-      .select("id", {
-        count: "exact",
-        head: true,
-      }),
+    
 
-    admin
-      .from("bookings")
-      .select("id", {
-        count: "exact",
-        head: true,
-      })
-      .in("status", [
-        "confirmed",
-        "scheduled",
-      ])
-      .gte(
-        "start_at",
-        new Date().toISOString()
-      ),
+    
 
     admin
       .from("activity_logs")
@@ -130,12 +83,12 @@ export default async function SystemPage() {
         </h1>
 
         <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-500">
-          Manage users, access, bookings and platform operations
+          Manage users, access and platform operations
           without leaving GiftGrid.
         </p>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
         <Metric
           label="Merchants"
@@ -147,15 +100,9 @@ export default async function SystemPage() {
           value={adminCount.count || 0}
         />
 
-        <Metric
-          label="All bookings"
-          value={bookingCount.count || 0}
-        />
+        
 
-        <Metric
-          label="Upcoming"
-          value={activeBookingCount.count || 0}
-        />
+        
 
         <Metric
           label="Activity"
@@ -167,17 +114,13 @@ export default async function SystemPage() {
       <section className="grid gap-4 md:grid-cols-3">
         <ServiceStatus
           name="Supabase"
-          detail={bookingAdminBootstrapError?.message || eventTypeBootstrapError?.message || merchantCount.error?.message || bookingCount.error?.message || "Database, call type, and super-admin booking profile connected"}
-          ok={!bookingAdminBootstrapError && !eventTypeBootstrapError && !merchantCount.error && !bookingCount.error}
+          detail={merchantCount.error?.message || "Database connected"}
+          ok={!merchantCount.error}
         />
-        <ServiceStatus
-          name="Cal booking"
-          detail={process.env.CAL_WEBHOOK_SECRET ? "Secure webhook and branded call links configured" : "CAL_WEBHOOK_SECRET is missing"}
-          ok={Boolean(process.env.CAL_WEBHOOK_SECRET)}
-        />
+        
         <ServiceStatus
           name="Transactional email"
-          detail={process.env.BREVO_API_KEY || process.env.RESEND_API_KEY ? "Booking confirmations are enabled" : "Email credentials are incomplete"}
+          detail={process.env.BREVO_API_KEY || process.env.RESEND_API_KEY ? "Email credentials are configured" : "Email credentials are incomplete"}
           ok={Boolean(process.env.BREVO_API_KEY || process.env.RESEND_API_KEY)}
         />
       </section>
@@ -193,14 +136,10 @@ export default async function SystemPage() {
         <Action
           href="/dashboard/activity"
           title="Activity Log"
-          text="Review administrative and booking events."
+          text="Review administrative events."
         />
 
-        <Action
-          href="/dashboard/calls"
-          title="Booking Operations"
-          text="Monitor appointments and booking links."
-        />
+        
 
         <Action
           href="/dashboard/merchants"

@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState, type CSSProperties } from 'react';
+import { Fragment, useEffect, useState, type CSSProperties } from 'react';
 import { supportedPlatforms } from '@/config/branding';
 import { useSitePages } from './SitePagesProvider';
 import { type PageBlock } from '@/lib/content/site-pages';
@@ -14,14 +14,15 @@ function containsAuditLanguage(value: unknown) {
 }
 
 function removeAuditContent(block: PageBlock): PageBlock | null {
+ if ([block.buttonUrl, block.secondaryUrl].some(url => /\/(store-review|dashboard\/audits?|admin\/audits)(?:\/|$)/.test(url || ''))) return null;
  if (containsAuditLanguage(block.title) || containsAuditLanguage(block.eyebrow) || containsAuditLanguage(block.body)) return null;
- const cards = block.cards?.filter((card) => !containsAuditLanguage(card.title) && !containsAuditLanguage(card.body));
+ const cards = block.cards?.filter((card) => !containsAuditLanguage(card.title) && !containsAuditLanguage(card.body) && !/\/(store-review|dashboard\/audits?|admin\/audits)(?:\/|$)/.test(card.href || ''));
  return cards ? { ...block, cards } : block;
 }
 
 export default function PageSections({path}:{path:string}) {
  const pages=useSitePages();const blocks=(pages[path]||[]).map(removeAuditContent).filter((block): block is PageBlock => block !== null);
- return <>{blocks.filter(b=>b.visible).map(block=><PageSection key={block.id} block={block} path={path}/>)}</>;
+ return <>{blocks.filter(b=>b.visible).map((block,index)=><Fragment key={block.id}><PageSection block={block} path={path}/>{path==='/'&&index===0&&block.type==='hero'&&<section className="border-b border-slate-200 bg-white px-6 py-5 text-center"><p className="mx-auto max-w-4xl text-base font-semibold leading-7 text-slate-800">GiftGrid brings buyers, independent brands, and partners together to share products, sourcing needs, and ideas.</p><div className="mt-3 flex justify-center gap-3"><Link href="/auth/join" className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white">Explore the community</Link><Link href="/about" className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700">What we do</Link></div></section>}</Fragment>)}</>;
 }
 export function PageSection({block:b,path}:{block:PageBlock;path?:string}) {
  const [editing,setEditing]=useState(false);

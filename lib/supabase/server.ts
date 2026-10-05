@@ -1,5 +1,6 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { createClient as createJwtClient } from "@supabase/supabase-js";
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -11,6 +12,16 @@ export async function createClient() {
     throw new Error("Supabase publishable key is not configured.");
   }
 
+  const authorization = (await headers()).get("authorization");
+  if (authorization?.startsWith("Bearer ")) {
+    const token=authorization.slice(7);
+    const native=createJwtClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,publishableKey,{
+      global:{headers:{Authorization:authorization}},auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
+    });
+    const verify=native.auth.getUser.bind(native.auth);
+    native.auth.getUser=()=>verify(token);
+    return native;
+  }
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     publishableKey,

@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { communityUrl } from "@/config/community";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import BuyerDashboard from "@/components/buyer/BuyerDashboard";
+import OpenSourcingPanel from "@/components/public/OpenSourcingPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +46,11 @@ export default async function DashboardPage() {
     );
   }
 
-  return <MerchantOverview userId={user.id} />;
+  if (profile.role === "corporate_buyer") {
+    return <><OpenSourcingPanel /><BuyerDashboard /></>;
+  }
+
+  return <><OpenSourcingPanel /><MerchantOverview userId={user.id} /></>;
 }
 
 async function AdminOverview({
@@ -55,18 +62,17 @@ async function AdminOverview({
 }) {
   const supabase = await createClient();
 
-  const now =
-    new Date().toISOString();
+  
 
   const [
     merchants,
     applications,
-    audits,
-    upcomingCalls,
+    
+    
     messages,
     support,
     documents,
-    recentBookings,
+    
     recentActivity,
   ] = await Promise.all([
     supabase
@@ -83,24 +89,9 @@ async function AdminOverview({
         head: true,
       }),
 
-    supabase
-      .from("audits")
-      .select("id", {
-        count: "exact",
-        head: true,
-      }),
+    
 
-    supabase
-      .from("bookings")
-      .select(
-        "id, guest_name, guest_email, start_at, status, meeting_url"
-      )
-      .gte("start_at", now)
-      .not("status", "in", "(cancelled,completed,no_show)")
-      .order("start_at", {
-        ascending: true,
-      })
-      .limit(5),
+    
 
     supabase
       .from("message_threads")
@@ -123,15 +114,7 @@ async function AdminOverview({
         head: true,
       }),
 
-    supabase
-      .from("bookings")
-      .select(
-        "id, guest_name, guest_email, start_at, status, meeting_url"
-      )
-      .order("start_at", {
-        ascending: false,
-      })
-      .limit(8),
+    
 
     supabase
       .from("activity_logs")
@@ -155,17 +138,8 @@ async function AdminOverview({
       value: applications.count || 0,
       href: "/dashboard/applications",
     },
-    {
-      label: "Audits",
-      value: audits.count || 0,
-      href: "/dashboard/audits",
-    },
-    {
-      label: "Upcoming Calls",
-      value:
-        upcomingCalls.data?.length || 0,
-      href: "/dashboard/calls",
-    },
+    
+    
     {
       label: "Messages",
       value: messages.count || 0,
@@ -201,19 +175,9 @@ async function AdminOverview({
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Link
-              href="/dashboard/calls"
-              className="rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white hover:bg-indigo-700"
-            >
-              Open Calls
-            </Link>
+            
 
-            <Link
-              href="/book"
-              className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-800 hover:bg-slate-50"
-            >
-              Public Booking
-            </Link>
+            
 
             {role === "super_admin" && (
               <Link
@@ -227,7 +191,7 @@ async function AdminOverview({
         </div>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {cards.map((card) => (
           <Link
             key={card.label}
@@ -251,86 +215,7 @@ async function AdminOverview({
 
       <section className="grid gap-6 lg:grid-cols-2">
 
-        <div className="rounded-3xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-100 px-6 py-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-bold text-slate-950">
-                  Upcoming calls
-                </h2>
-
-                <p className="mt-1 text-sm text-slate-500">
-                  Real appointments in your booking database.
-                </p>
-              </div>
-
-              <Link
-                href="/dashboard/calls"
-                className="text-sm font-bold text-indigo-600"
-              >
-                View all
-              </Link>
-            </div>
-          </div>
-
-          <div className="divide-y divide-slate-100">
-            {(upcomingCalls.data || []).map(
-              (booking) => (
-                <div
-                  key={booking.id}
-                  className="flex items-center justify-between gap-4 px-6 py-4"
-                >
-                  <div className="min-w-0">
-                    <div className="truncate font-bold text-slate-900">
-                      {booking.guest_name}
-                    </div>
-
-                    <div className="truncate text-xs text-slate-400">
-                      {booking.guest_email}
-                    </div>
-                  </div>
-
-                  <div className="shrink-0 text-right">
-                    <div className="text-sm font-semibold text-slate-700">
-                      {new Intl.DateTimeFormat(
-                        "en",
-                        {
-                          month: "short",
-                          day: "numeric",
-                          hour: "numeric",
-                          minute: "2-digit",
-                        }
-                      ).format(
-                        new Date(
-                          booking.start_at
-                        )
-                      )}
-                    </div>
-
-                    {booking.meeting_url && (
-                      <a
-                        href={
-                          booking.meeting_url
-                        }
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-xs font-bold text-indigo-600"
-                      >
-                        Join
-                      </a>
-                    )}
-                  </div>
-                </div>
-              )
-            )}
-
-            {!upcomingCalls.data?.length && (
-              <div className="px-6 py-12 text-center text-sm text-slate-400">
-                No upcoming calls.
-              </div>
-            )}
-          </div>
-        </div>
+        
 
         <div className="rounded-3xl border border-slate-200 bg-white shadow-sm">
           <div className="border-b border-slate-100 px-6 py-5">
@@ -408,7 +293,7 @@ async function AdminOverview({
               </h2>
 
               <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">
-                Manage roles, review the activity log, inspect bookings and
+                Manage roles, review the activity log and
                 operate the admin workspace.
               </p>
             </div>
@@ -423,66 +308,7 @@ async function AdminOverview({
         </section>
       )}
 
-      <section>
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-bold text-slate-950">
-              Recent bookings
-            </h2>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Latest records from Supabase.
-            </p>
-          </div>
-        </div>
-
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="divide-y divide-slate-100">
-            {(recentBookings.data || []).map(
-              (booking) => (
-                <div
-                  key={booking.id}
-                  className="grid gap-2 px-6 py-4 md:grid-cols-[1fr_auto_auto]"
-                >
-                  <div>
-                    <div className="font-semibold text-slate-900">
-                      {booking.guest_name}
-                    </div>
-
-                    <div className="text-xs text-slate-400">
-                      {booking.guest_email}
-                    </div>
-                  </div>
-
-                  <div className="text-sm text-slate-600">
-                    {new Intl.DateTimeFormat(
-                      "en",
-                      {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                      }
-                    ).format(
-                      new Date(
-                        booking.start_at
-                      )
-                    )}
-                  </div>
-
-                  <div className="text-sm font-semibold capitalize text-slate-600">
-                    {booking.status}
-                  </div>
-                </div>
-              )
-            )}
-
-            {!recentBookings.data?.length && (
-              <div className="px-6 py-12 text-center text-sm text-slate-400">
-                No bookings found.
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
+      
 
     </div>
   );
@@ -497,7 +323,7 @@ async function MerchantOverview({
 
   const [
     merchantRes,
-    auditsRes,
+    
     submissionsRes,
     documentsRes,
   ] = await Promise.all([
@@ -509,15 +335,7 @@ async function MerchantOverview({
       .eq("user_id", userId)
       .single(),
 
-    supabase
-      .from("audits")
-      .select(
-        "id, status, overall_score, created_at"
-      )
-      .order("created_at", {
-        ascending: false,
-      })
-      .limit(5),
+    
 
     supabase
       .from("opportunity_submissions")
@@ -552,14 +370,15 @@ async function MerchantOverview({
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link
-            href="/book"
-            className="rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white hover:bg-indigo-700"
-          >
-            Book a Call
-          </Link>
+          
 
         </div>
+      </section>
+
+      <section className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
+        <h2 className="text-lg font-bold text-slate-950">Your public profile</h2>
+        <p className="mt-2 text-sm leading-7 text-slate-500">Your profile is public. Keep your business details current so buyers can understand what you offer.</p>
+        <div className="mt-4 flex flex-wrap gap-3"><Link href={communityUrl(`/merchant/${userId}`)} className="rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white">View public merchant profile</Link><Link href="/dashboard/profile" className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold">Edit profile</Link><Link href={communityUrl()} className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold">Open community</Link></div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">

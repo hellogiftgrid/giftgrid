@@ -35,14 +35,7 @@ type MerchantApplicationRow = {
   store_url: string;
 };
 
-type Audit = {
-  id: string;
-  status: string;
-  overall_score: number | null;
-  created_at: string;
-  merchant_name: string;
-  store_url: string;
-};
+
 
 type Opportunity = {
   id: string;
@@ -158,7 +151,7 @@ export default async function AdminDashboard() {
   const [
     merchantsRes,
     applicationsRes,
-    auditsRes,
+    
     opportunitiesRes,
     submissionsRes,
     threadsRes,
@@ -176,10 +169,7 @@ export default async function AdminDashboard() {
       .not("application_status", "eq", "draft")
       .order("application_submitted_at", { ascending: false, nullsFirst: false }),
 
-    supabase
-      .from("audits")
-      .select("id, status, overall_score, created_at, merchant_id")
-      .order("created_at", { ascending: false }),
+    
 
     supabase
       .from("opportunities")
@@ -214,7 +204,7 @@ export default async function AdminDashboard() {
   const errors = [
     merchantsRes.error,
     applicationsRes.error,
-    auditsRes.error,
+    
     opportunitiesRes.error,
     submissionsRes.error,
     threadsRes.error,
@@ -236,42 +226,16 @@ export default async function AdminDashboard() {
   const tickets = (ticketsRes.data ?? []) as unknown as SupportTicket[];
   const documents = documentsRes.data ?? [];
 
-  /*
-   * Audits need merchant/store names.
-   * We load the IDs first, then resolve the related records.
-   */
-  const rawAudits = auditsRes.data ?? [];
+  
+  
 
-  const auditMerchantIds = [
-    ...new Set(
-      rawAudits
-        .map((audit) => audit.merchant_id)
-        .filter(Boolean)
-    ),
-  ];
+  
 
-  const { data: auditMerchants } = auditMerchantIds.length
-    ? await supabase.from("merchant_profiles").select("id, business_name, store_url").in("id", auditMerchantIds)
-    : { data: [] as { id: string; business_name: string; store_url: string }[] };
+  
 
-  const merchantMap = new Map(
-    (auditMerchants ?? []).map((merchant) => [merchant.id, merchant])
-  );
+  
 
-  const audits: Audit[] = rawAudits.map((audit) => {
-    const merchant = merchantMap.get(audit.merchant_id);
 
-    return {
-      id: audit.id,
-      status: audit.status,
-      overall_score: audit.overall_score,
-      created_at: audit.created_at,
-      merchant_name:
-        merchant?.business_name ?? "Unknown merchant",
-      store_url:
-        merchant?.store_url ?? "Store URL unavailable",
-    };
-  });
 
   /*
    * Real status calculations.
@@ -285,15 +249,9 @@ export default async function AdminDashboard() {
     )
   );
 
-  const auditsAwaitingReview = audits.filter((item) =>
-    ["pending", "running", "admin_review", "draft"].includes(
-      item.status
-    )
-  );
+  
 
-  const publishedAudits = audits.filter((item) =>
-    ["published", "approved"].includes(item.status)
-  );
+  
 
   const activeOpportunities = opportunities.filter(
     (item) => item.active
@@ -312,7 +270,7 @@ export default async function AdminDashboard() {
   );
 
   const recentApplications = applications.slice(0, 5);
-  const recentAudits = audits.slice(0, 5);
+  
   const recentTickets = tickets.slice(0, 5);
   const recentMerchants = merchants.slice(0, 5);
 
@@ -336,7 +294,7 @@ export default async function AdminDashboard() {
 
           <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-500">
             Real-time operational view of merchants, applications,
-            audits, opportunities and support.
+            opportunities and support.
           </p>
         </div>
 
@@ -370,21 +328,9 @@ export default async function AdminDashboard() {
             detail="Submitted / review / information"
           />
 
-          <StatCard
-            label="Audits awaiting review"
-            value={auditsAwaitingReview.length}
-            href="/admin/audits"
-            tone="amber"
-            detail="Not yet finalized"
-          />
+          
 
-          <StatCard
-            label="Published audits"
-            value={publishedAudits.length}
-            href="/admin/audits"
-            tone="green"
-            detail="Merchant-visible results"
-          />
+          
 
           <StatCard
             label="Active opportunities"
@@ -479,47 +425,7 @@ export default async function AdminDashboard() {
           </div>
         </div>
 
-        <div className="rounded-2xl bg-slate-950 p-6 text-white shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-indigo-300">
-            Audit operations
-          </p>
-
-          <h2 className="mt-3 text-2xl font-bold">
-            Keep the AI review human-controlled.
-          </h2>
-
-          <p className="mt-3 text-sm leading-7 text-slate-300">
-            AI can prepare evidence, findings and recommendations.
-            Admin decides what becomes an official GiftGrid audit.
-          </p>
-
-          <div className="mt-6 grid grid-cols-2 gap-3">
-            <div className="rounded-xl bg-white/5 p-4">
-              <div className="text-2xl font-bold">
-                {auditsAwaitingReview.length}
-              </div>
-              <div className="mt-1 text-xs text-slate-400">
-                Awaiting review
-              </div>
-            </div>
-
-            <div className="rounded-xl bg-white/5 p-4">
-              <div className="text-2xl font-bold">
-                {publishedAudits.length}
-              </div>
-              <div className="mt-1 text-xs text-slate-400">
-                Published
-              </div>
-            </div>
-          </div>
-
-          <Link
-            href="/admin/audits"
-            className="mt-6 inline-flex rounded-xl bg-[#4F46E5] px-5 py-3 text-sm font-bold text-white hover:bg-[#4338CA]"
-          >
-            Open Audit Queue →
-          </Link>
-        </div>
+        
       </section>
 
       {/* RECENT ACTIVITY */}
@@ -573,60 +479,7 @@ export default async function AdminDashboard() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
-            <div>
-              <h2 className="font-bold text-slate-950">
-                Recent audits
-              </h2>
-              <p className="mt-1 text-xs text-slate-400">
-                Latest store assessments
-              </p>
-            </div>
-
-            <Link
-              href="/admin/audits"
-              className="text-xs font-bold text-[#4F46E5] hover:underline"
-            >
-              Audit queue →
-            </Link>
-          </div>
-
-          <div className="divide-y divide-slate-100">
-            {!recentAudits.length ? (
-              <div className="px-6 py-10 text-center text-sm text-slate-400">
-                No audits yet.
-              </div>
-            ) : (
-              recentAudits.map((audit) => (
-                <div
-                  key={audit.id}
-                  className="flex items-center justify-between gap-4 px-6 py-4"
-                >
-                  <div className="min-w-0">
-                    <div className="truncate font-semibold text-slate-950">
-                      {audit.merchant_name}
-                    </div>
-
-                    <div className="mt-1 truncate text-xs text-slate-400">
-                      {audit.store_url}
-                    </div>
-                  </div>
-
-                  <div className="flex shrink-0 items-center gap-3">
-                    {audit.overall_score !== null && (
-                      <span className="text-sm font-bold text-slate-950">
-                        {audit.overall_score}/100
-                      </span>
-                    )}
-
-                    <StatusBadge status={audit.status} />
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
+        
       </section>
 
       {/* SUPPORT */}
@@ -696,7 +549,7 @@ export default async function AdminDashboard() {
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
             ["Review Applications", "/admin/applications"],
-            ["Review Audits", "/admin/audits"],
+            
             ["Manage Opportunities", "/admin/opportunities"],
             ["Handle Support", "/admin/support"],
           ].map(([label, href]) => (

@@ -51,6 +51,22 @@
 .site-themed button[class*="bg-indigo-600"] { background-color: var(--site-accent, #1d4ed8); }
 
 html[data-theme="dark"] body { background: #0b1120; color: #dbe4f0; }
+html[data-theme="dark"] .community-shell,
+html[data-theme="dark"] .community-shell .bg-\[\#f0f2f5\] { background-color: #0b1120; color: #cbd5e1; }
+html[data-theme="dark"] .community-shell .bg-white,
+html[data-theme="dark"] .community-shell .bg-slate-50,
+html[data-theme="dark"] .community-shell .bg-slate-100,
+html[data-theme="dark"] .community-shell input,
+html[data-theme="dark"] .community-shell textarea,
+html[data-theme="dark"] .community-shell select { background-color: #111827; color: #f8fafc; }
+html[data-theme="dark"] .community-shell .text-slate-950,
+html[data-theme="dark"] .community-shell .text-slate-900 { color: #f8fafc; }
+html[data-theme="dark"] .community-shell .text-slate-700,
+html[data-theme="dark"] .community-shell .text-slate-600,
+html[data-theme="dark"] .community-shell .text-slate-500 { color: #cbd5e1; }
+html[data-theme="dark"] .community-shell .border-slate-200,
+html[data-theme="dark"] .community-shell .border-slate-100,
+html[data-theme="dark"] .community-shell .border-slate-300 { border-color: #334155; }
 html[data-theme="dark"] .site-themed {
   --site-page: #0b1120;
   --site-heading: #f8fafc;

@@ -11,7 +11,7 @@ export default function OrganizationJsonLd() {
     },
     email: "support@degiftgrid.com",
     description:
-      "GiftGrid is an e-commerce merchant platform that helps brands audit their stores, improve buyer readiness, and prepare for corporate gifting, wholesale, and commercial opportunities.",
+      "GiftGrid connects merchants and gifting teams through product listings, profiles and community conversations.",
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer support",

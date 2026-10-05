@@ -21,6 +21,9 @@ export default function BuyerApplyPage() {
     const categories = form.getAll("categories").map(String);
     const email = String(form.get("email") || "").trim().toLowerCase();
     const password = String(form.get("password") || "");
+    if (!String(form.get("fullName") || "").trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 6) {
+      setLoading(false); setError("Enter your name, a valid email, and a password of at least 6 characters."); return;
+    }
 
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
@@ -29,8 +32,7 @@ export default function BuyerApplyPage() {
         data: {
           account_type: "corporate_buyer",
           full_name: String(form.get("fullName") || "").trim(),
-          company_name: String(form.get("companyName") || "").trim(),
-          website: String(form.get("website") || "").trim(),
+          company_name: String(form.get("companyName") || form.get("fullName") || "").trim(),
           job_title: String(form.get("jobTitle") || "").trim(),
           company_size: String(form.get("companySize") || ""),
           annual_gifting_budget: String(form.get("budget") || ""),
@@ -46,11 +48,11 @@ export default function BuyerApplyPage() {
     setLoading(false);
     if (signUpError) return setError(signUpError.message);
     if (data.session) {
-      router.push("/buyer/dashboard");
+      router.push("/dashboard");
       router.refresh();
       return;
     }
-    router.push("/auth/verify?email=" + encodeURIComponent(email) + "&next=/buyer/dashboard");
+    router.push("/auth/verify?email=" + encodeURIComponent(email) + "&next=/dashboard");
   }
 
   return (
@@ -61,16 +63,16 @@ export default function BuyerApplyPage() {
           <aside className="overflow-hidden"><PageSections path="/buyers/apply" /></aside>
           <div className="p-6 sm:p-10 lg:p-14">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-indigo-600">Gifting teams</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-[-.035em] text-slate-950 sm:text-4xl">Tell us what you&apos;re planning.</h2>
-          <p className="mt-3 leading-7 text-slate-600">Create your free workspace and start finding a better fit for your next gifting moment.</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-[-.035em] text-slate-950 sm:text-4xl">Create your gift-sourcing account.</h2>
+          <p className="mt-3 leading-7 text-slate-600">Start with your name, email, and password. No website or storefront is required. <Link href="/auth/sign-up" className="text-blue-700 underline">Selling products? Apply as a merchant.</Link></p>
 
           <form onSubmit={submit} className="mt-9 grid gap-5 sm:grid-cols-2">
             <Field name="fullName" label="Your full name" required />
-            <Field name="jobTitle" label="Job title" required />
-            <Field name="companyName" label="Company name" required />
-            <Field name="website" label="Company website" type="url" required />
+            <Field name="jobTitle" label="Job title (optional)" />
+            <Field name="companyName" label="Company name (optional)" />
             <Field name="email" label="Work email" type="email" required />
             <Field name="password" label="Password" type="password" minLength={6} required />
+            <details className="sm:col-span-2"><summary className="cursor-pointer text-sm font-bold text-slate-700">Optional: tell us about a gifting request</summary><div className="mt-5 grid gap-5 sm:grid-cols-2">
             <Select name="companySize" label="Company size" options={["1–10", "11–50", "51–200", "201–1,000", "1,000+"]} />
             <Select name="budget" label="Annual gifting budget" options={["Under $10k", "$10k–$50k", "$50k–$250k", "$250k+"]} />
             <Select name="useCase" label="Primary use case" options={["Employee recognition", "Client appreciation", "Sales prospecting", "Events", "Corporate procurement"]} />
@@ -93,9 +95,10 @@ export default function BuyerApplyPage() {
               <textarea name="requirements" rows={4} className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100" placeholder="Product types, quantities, customization, delivery regions…" />
             </label>
 
+            </div></details>
             {error && <p className="rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-700 sm:col-span-2">{error}</p>}
             <button disabled={loading} className="rounded-full bg-blue-600 px-6 py-4 text-sm font-bold text-white transition hover:bg-blue-700 disabled:opacity-60 sm:col-span-2">
-              {loading ? "Creating your gifting account…" : "Submit gifting request"}
+              {loading ? "Creating your gifting account…" : "Create buyer account"}
             </button>
           </form>
           </div>

@@ -10,16 +10,8 @@ const NAV = [
     href: '/dashboard',
     icon: 'grid',
   },
-  {
-    label: 'Store Audit',
-    href: '/dashboard/audit',
-    icon: 'check',
-  },
-  {
-    label: 'Recommendations',
-    href: '/dashboard/recommendations',
-    icon: 'star',
-  },
+  
+  
   {
     label: 'Documents',
     href: '/dashboard/documents',

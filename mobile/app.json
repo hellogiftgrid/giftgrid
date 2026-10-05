@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "GiftGrid",
+    "slug": "giftgrid",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "giftgrid",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "bundleIdentifier": "com.hellogiftgrid.app",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.hellogiftgrid.app",
+      "versionCode": 2,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Choose product and community images.",
+          "cameraPermission": "Take a product or community photo.",
+          "microphonePermission": false
+        }
+      ],
+      "expo-document-picker",
+      "expo-router",
+      "expo-status-bar"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "391ac714-e5f2-4aba-88bc-e19675c728aa"
+      }
+    },
+    "owner": "sptwint"
+  }
+}

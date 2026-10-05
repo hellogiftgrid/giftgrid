@@ -39,9 +39,9 @@ export const fonts = {
 
 export const siteConfig = {
   name: "GiftGrid",
-  tagline: "Prepare. Connect. Pursue.",
+  tagline: "Discover. Share. Connect.",
   description:
-    "GiftGrid helps e-commerce brands prepare, review, and position their stores for opportunities within the corporate gifting ecosystem.",
+    "GiftGrid is a community where gifting buyers, independent brands, and partners share products, sourcing needs, and ideas to make better gifting happen.",
   supportEmail: "support@degiftgrid.com",
 };
 

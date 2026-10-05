@@ -40,6 +40,12 @@
     "components/app",
     "components/lib",
     "components/config",
-    "components/tailwind.config.ts"
+    "components/tailwind.config.ts",
+    "public",
+    "android",
+    ".giftgrid-*",
+    "mobile",
+    "mobile-native",
+    "ios"
   ]
 }

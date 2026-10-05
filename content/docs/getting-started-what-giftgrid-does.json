@@ -1,0 +1,69 @@
+{
+  "slug": "getting-started-what-giftgrid-does",
+  "intro": "GiftGrid is a community‑first platform that connects gifting buyers and merchants. It lets users browse conversations, explore product listings, and reach out to suppliers before making a purchase. This guide walks you through the workflow, explains how to use the community to discover people and discuss corporate gifting, and shows how to navigate the shop, contact merchants, and verify product availability. It also covers common pitfalls, recovery steps, and a final verification checklist to ensure you’re ready to use GiftGrid confidently.",
+  "sections": [
+    {
+      "heading": "Getting Started with Your Account",
+      "paragraphs": [
+        "The first step is to create an account on community.degiftgrid.com. You can sign up via the /auth/join page, choosing whether you’ll be a buyer or a merchant. Even if you don’t have a business deck yet, you can still create an account; the platform will allow you to browse the community and view public merchant profiles. Once you’ve signed up, you’ll receive a confirmation email and can log in through /auth/sign-in. The sign‑in page presents role cards—buyer or merchant—so that your experience is tailored to your needs. If you forget your password, use /auth/forgot-password to reset it. After logging in, you’ll see the Connect page, which lists all active community members, including those with incomplete profiles.",
+        "After you’re logged in, take a moment to review your profile. For buyers, a complete profile isn’t required to browse or comment, but adding a short bio and company name can help merchants identify you. Merchants should upload a public PDF deck (max 4 MB) to /dashboard/profile; this deck is visible to all community members and can include product details, brand story, and contact information. Remember that a single 72‑hour grace period starts on the first listing; after that, listings without a deck will be hidden. Listing approval is separate from deck qualification, so you can still list products even if your deck is pending, but they may not appear to buyers until the deck is uploaded."
+      ]
+    },
+    {
+      "heading": "Exploring the Community Feed",
+      "paragraphs": [
+        "The community feed is the heart of GiftGrid’s social discovery. Navigate to /api/community/posts to see public posts and comments from all members. Posts can be up to 2000 characters, while comments are limited to 1500 characters. You can like a post once per member; the Like/Liked toggle is visible on each post. Following a member adds them to your Following filter, which you can access via the member cards. Direct messages are available through the /messages endpoint and can be initiated from any member’s card. These features let you engage in real‑time discussions about corporate gifting trends, product ideas, and supplier experiences.",
+        "When browsing the feed, look for posts that mention specific merchants or product categories. You can use the search bar on the community page to filter by keyword or hashtag. Pay attention to comments that discuss supplier reliability, shipping times, or product quality, as these insights can guide your purchasing decisions. If you find a post that sparks a question, click the comment button to add your input. Remember that only signed‑in users can write; guests can only read. This ensures that the community remains a trusted space for professional gifting conversations."
+      ]
+    },
+    {
+      "heading": "Navigating the Shop",
+      "paragraphs": [
+        "The shop is accessed via /api/shop?category=&page=, which lists all product entries. Each product is enquiry‑based and may link to an external supplier such as AliExpress or Faire. The platform does not import supplier stock, so no checkout or payment processing is available. Products older than seven days or known to be out of stock are hidden, and any unknown price or stock status remains unknown. Browsing a product does not reserve inventory or place an order; it simply provides information for you to contact the merchant or supplier directly.",
+        "When you click on a product, you’ll see details such as title, description, and any available images. If the product links to an external supplier, a URL will be provided that takes you to the supplier’s website. Before you decide to purchase, use the contact button to reach out to the merchant. This allows you to confirm availability, negotiate pricing, and discuss shipping options. If the merchant responds positively, you can then proceed to place an order through the supplier’s own checkout process. This workflow keeps the community safe from accidental purchases and ensures that you have verified information before committing."
+      ]
+    },
+    {
+      "heading": "Contacting Merchants",
+      "paragraphs": [
+        "To contact a merchant, click the “Contact” button on the product page or on the merchant’s public profile at /members/{id}. The message will appear in the /messages endpoint, which is accessible from the member card. When drafting your message, be clear about the product you’re interested in, the quantity, and any customization requests. Merchants can respond via the same messaging interface, allowing you to negotiate terms and confirm details before proceeding to the supplier’s site.",
+        "If a merchant does not respond within a reasonable timeframe—typically 48 hours—you can follow up with a polite reminder. If the merchant remains unresponsive, consider exploring alternative listings or contacting the supplier directly if a link is provided. Always keep a record of your communication in the conversation thread for future reference. This practice helps maintain transparency and protects both parties in case of disputes or misunderstandings."
+      ]
+    },
+    {
+      "heading": "Understanding Merchant Decks",
+      "paragraphs": [
+        "Merchant decks are public PDFs uploaded to /dashboard/profile. They serve as a portfolio for the merchant, showcasing product ranges, brand values, and contact information. The deck is limited to 4 MB, so include only essential visuals and concise text. Once uploaded, the deck becomes visible to all community members, and it can be downloaded from the merchant’s profile page.",
+        "A deck is not required for a listing to appear, but it enhances credibility. If a merchant’s deck is missing, their products may still be listed during the initial 72‑hour grace period. After that, listings without a deck are hidden, so it’s in the merchant’s best interest to upload a deck promptly. Buyers can use the deck to assess the merchant’s professionalism and product quality before initiating contact."
+      ]
+    },
+    {
+      "heading": "Handling Product Availability",
+      "paragraphs": [
+        "Because GiftGrid does not import supplier stock, you cannot rely on the platform to confirm product availability. External entries older than seven days or known out-of-stock items are hidden automatically. For items with unknown prices or stock levels, the platform will display “price unknown” or “stock unknown.” This design prevents accidental orders and encourages direct communication with the merchant or supplier.",
+        "If you discover a product that appears available but the merchant later indicates it’s out of stock, you can flag the listing by leaving a comment. This helps keep the community informed and reduces the likelihood of other buyers encountering the same issue. Merchants should also update their listings promptly if stock levels change, ensuring that the community has accurate information."
+      ]
+    },
+    {
+      "heading": "Using the Console and API",
+      "paragraphs": [
+        "The console at /console allows you to manage app records, scoped API keys, and webhook registrations. You can create a new API key with scopes such as apps:read, apps:write, keys:write, and webhooks:write. These keys are stored in your environment variable GIFTGRID_API_KEY and used to authenticate requests to the public GET /api/health, /api/shop, and /api/community/posts endpoints. The console does not deliver events; it only registers webhooks for future use.",
+        "If you need to automate community publishing or integrate with other tools, you can use the CLI commands in the repository. For example, running npm run giftgrid -- status will show the current status of your API key. The shop list command lists products, optionally filtered by category or page number. The community list command retrieves recent posts. These tools are useful for developers who want to build custom integrations or scripts that interact with GiftGrid’s data."
+      ]
+    },
+    {
+      "heading": "Common Failure Scenarios and Recovery",
+      "paragraphs": [
+        "A frequent issue is encountering a product with an unknown price or stock status. In this case, the best practice is to contact the merchant directly to confirm details before proceeding. If the merchant does not respond, look for alternative listings or suppliers. Another common failure is a missing deck for a merchant’s product after the 72‑hour grace period. Merchants should upload a deck promptly to avoid their listings being hidden. Buyers can report the issue by leaving a comment on the product page, prompting the merchant to update their deck.",
+        "If you experience authentication problems, verify that your GIFTGRID_API_KEY is correctly set in your environment and that you’re using the correct scopes. If the console shows an error when registering a webhook, double‑check the webhook URL and ensure it is reachable. For messaging issues, confirm that you are logged in and that the recipient’s profile is public. If problems persist, use the /contact page to reach support, acknowledging that response times are not guaranteed."
+      ]
+    },
+    {
+      "heading": "Verification Checklist",
+      "paragraphs": [
+        "Before you start a purchasing workflow, run through the following steps: 1) Confirm you have a valid account and are logged in. 2) Verify the merchant’s deck is uploaded and visible. 3) Check the product listing for price and stock status; if unknown, contact the merchant. 4) Use the Direct Message feature to negotiate terms and confirm availability. 5) Follow up if no response within 48 hours. 6) Once confirmed, visit the supplier’s website to place the order. 7) Keep a record of all communications in the conversation thread.",
+        "After completing a purchase, revisit the community feed to share your experience. Post a review or comment on the merchant’s profile to help future buyers make informed decisions. This feedback loop strengthens the community and ensures that GiftGrid remains a reliable resource for corporate gifting."
+      ]
+    }
+  ]
+}

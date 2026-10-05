@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">GiftGrid</string>
-    <string name="title_activity_main">GiftGrid</string>
-    <string name="package_name">com.hellogiftgrid.app</string>
-    <string name="custom_url_scheme">com.hellogiftgrid.app</string>
-</resources>

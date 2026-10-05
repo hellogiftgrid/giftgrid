@@ -1,22 +1,15 @@
 import Link from "next/link";
+import AdminQuoteNotifications from "@/components/admin/AdminQuoteNotifications";
 
 const sections = [
+  { heading: "Operations", links: [{href:"/admin/applications",label:"Applications"},{href:"/admin/merchants",label:"Merchants"},{href:"/admin/opportunities",label:"Opportunities"},{href:"/admin/marketplace",label:"Buyer Marketplace"},{href:"/admin/community",label:"Community moderation"}] },
   {
     heading: "Overview",
     links: [
       { href: "/admin", label: "Dashboard" },
     ],
   },
-  {
-    heading: "Operations",
-    links: [
-      { href: "/admin/applications", label: "Applications" },
-      { href: "/admin/merchants", label: "Merchants" },
-      { href: "/admin/audits", label: "Store Audits" },
-      { href: "/admin/opportunities", label: "Opportunities" },
-      { href: "/admin/marketplace", label: "Buyer Marketplace" },
-    ],
-  },
+  
   {
     heading: "Communication",
     links: [
@@ -36,8 +29,8 @@ const sections = [
 
 export default function AdminSidebar() {
   return (
-    <aside className="hidden min-h-screen w-64 shrink-0 border-r border-slate-200 bg-white lg:block">
-      <div className="sticky top-0 flex h-screen flex-col">
+    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-slate-200 bg-white lg:block">
+      <div className="flex h-full flex-col">
         <div className="border-b border-slate-200 px-6 py-5">
           <Link href="/admin" className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
@@ -60,6 +53,7 @@ export default function AdminSidebar() {
         </div>
 
         <nav className="flex-1 overflow-y-auto px-4 py-5">
+          <AdminQuoteNotifications />
           {sections.map((section) => (
             <div key={section.heading} className="mb-7">
               <div className="px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">

@@ -1,40 +1,19 @@
-# GiftGrid mobile release
+# GiftGrid Android app
 
-GiftGrid is packaged with Capacitor as `com.hellogiftgrid.app`. The Android project is in `android/` and loads the deployed GiftGrid site through the Capacitor server configuration.
+GiftGrid’s Android app is a bare React Native application in `mobile-native/`. It builds as a native Android package with Gradle and React Native; it does not use Expo, Capacitor, or a website wrapper. The app connects to `https://community.degiftgrid.com` and uses the public Supabase configuration supplied by `/api/mobile/config` at runtime.
 
-## Native capabilities
+## Build a signed Android APK
 
-The app includes Capacitor support for push notifications, camera photos, GPS location, and Bluetooth Low Energy on Android and iPhone. Camera, location, and Bluetooth permissions are requested only when the related action is used. Push permission and registration are initialized when the native app starts; the registration token is emitted as the `giftgrid:push-token` browser event for the authenticated device-registration flow.
+Install Android Studio’s Android SDK (API 36, Build Tools 36.0.0, and NDK 27.1.12297006), Java 21, and Node.js 22.11 or later. Install JavaScript dependencies from `mobile-native/` with `npm ci`.
 
-Bluetooth support covers Bluetooth Low Energy devices. It does not cover Bluetooth Classic or act as a Bluetooth peripheral.
+The production signing key and `release.properties` must be supplied securely at `.giftgrid-signing/`. The Gradle release build reads the key and passwords from that private directory; do not commit or upload it. From `mobile-native/android/`, run `gradlew assembleRelease` on Windows or `./gradlew assembleRelease` on macOS/Linux. The signed APK is written to `mobile-native/android/app/build/outputs/apk/release/app-release.apk`.
 
-Push delivery still requires production credentials and server support: Firebase Cloud Messaging for Android, Apple Push Notification service for iPhone, and an authenticated API that stores device tokens and sends notifications.
+Before distributing, verify the APK with `node scripts/verify-apk.mjs <apk-path>`. It checks the APK v2 signature, file contents, and application ID (`com.hellogiftgrid.app`). Install and launch it on a physical Android device before a public release. Keep the signing key for future upgrades and increment `versionCode` for each release.
 
-## Build
+## Website download
 
-Use Java 21 (Java 17 is also supported by the Android toolchain), sync Capacitor, and build the debug APK:
+Copy the verified APK to `public/downloads/giftgrid-android.apk` and set `public/downloads/giftgrid-android.json` to `{"version":"1.0.1"}` (use the actual version in the APK). Deploy the website to make the download available at `/app`. The download page remains disabled if the APK is absent. The app is distributed as a direct Android APK; a Google Play listing requires a separate Play Console release.
 
-```bash
-JAVA_HOME=/path/to/java-21 npx cap sync android
-cd android
-JAVA_HOME=/path/to/java-21 ./gradlew assembleDebug
-```
+## iOS
 
-The debug artifact is written to `android/app/build/outputs/apk/debug/app-debug.apk`. Debug builds are for testing. A public release must use a protected release keystore and a stable signing identity.
-
-## Distribution links
-
-- Palm Store / Transsion developer portal: https://dev.dlightek.com/services/app
-- F-Droid submission guidance: https://f-droid.org/docs/Submitting_to_F-Droid_Quick_Start_Guide/
-- F-Droid metadata repository: https://gitlab.com/fdroid/fdroiddata
-- Google Play Console: https://play.google.com/console/signup
-- Samsung Galaxy Store Seller Portal: https://seller.samsungapps.com/
-- Huawei AppGallery: https://developer.huawei.com/consumer/en/appgallery
-- Xiaomi GetApps developer console: https://global.developer.mi.com/
-- Direct APK hosting: https://www.degiftgrid.com/download
-
-## F-Droid readiness
-
-The repository now has an MIT license and includes the Android source project. F-Droid maintainers still need to review the complete dependency graph, remote-service behavior, analytics, privacy policy, reproducible build, and app metadata. F-Droid requires a public source repository, a FOSS license, and buildable source; proprietary dependencies can prevent inclusion in the main repository. See the [F-Droid developer FAQ](https://f-droid.org/docs/FAQ_-_App_Developers/) and [inclusion policy](https://f-droid.org/docs/Inclusion_Policy/).
-
-Before submitting, prepare screenshots, a privacy policy URL, a changelog, a version code, and a public Git repository. Do not submit the debug APK as a production release.
+The same React Native interface is present, but a signed iOS app requires macOS with Xcode and an Apple Developer account. No iOS release is claimed until it is built, signed, and tested there.

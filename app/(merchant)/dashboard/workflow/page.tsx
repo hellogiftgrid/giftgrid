@@ -1,37 +1,21 @@
 "use client";
-
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
-
-const supabase = createClient();
-type WorkItem = { id: string; title: string; detail: string; status: string; href: string };
-
-export default function TeamWorkflowPage() {
-  const [items, setItems] = useState<WorkItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const load = useCallback(async () => {
-    const { data: auth } = await supabase.auth.getUser();
-    if (!auth.user) return setLoading(false);
-    const { data: merchant } = await supabase.from("merchant_profiles").select("id").eq("profile_id", auth.user.id).single();
-    if (!merchant) return setLoading(false);
-    const [{ data: listings }, { data: inquiries }, { data: submissions }] = await Promise.all([
-      supabase.from("merchant_listings").select("id, title, status").eq("merchant_id", merchant.id),
-      supabase.from("buyer_inquiries").select("id, subject, status").eq("merchant_id", merchant.id),
-      supabase.from("opportunity_submissions").select("id, status, opportunities(company_name)").eq("merchant_id", merchant.id),
-    ]);
-    const next: WorkItem[] = [
-      ...(listings || []).map((row) => ({ id: "l" + row.id, title: row.title, detail: "Marketplace listing", status: row.status, href: "/dashboard/listings" })),
-      ...(inquiries || []).map((row) => ({ id: "i" + row.id, title: row.subject, detail: "Corporate buyer inquiry", status: row.status, href: "/dashboard/connections" })),
-      ...(submissions || []).map((row: any) => ({ id: "s" + row.id, title: (Array.isArray(row.opportunities) ? row.opportunities[0]?.company_name : row.opportunities?.company_name) || "Opportunity", detail: "Opportunity submission", status: row.status, href: "/dashboard/opportunities" })),
-    ];
-    setItems(next);
-    setLoading(false);
-  }, []);
-  useEffect(() => { void load(); }, [load]);
-
-  const columns = [["To do", ["draft", "sent", "ready"]], ["In progress", ["pending_review", "viewed", "researching", "under_review", "waiting"]], ["Complete", ["published", "accepted", "submitted", "closed"]]] as const;
-  return <div className="mx-auto max-w-7xl"><p className="text-xs font-bold uppercase tracking-[0.16em] text-indigo-600">Team-ready workflow</p><h1 className="mt-2 text-3xl font-bold text-slate-950">Coordinate every opportunity</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Listings, buyer requests, and submissions in one shared view.</p>
-    <div className="mt-8 grid gap-5 lg:grid-cols-3">{columns.map(([label, statuses]) => { const filtered = items.filter((item) => (statuses as readonly string[]).includes(item.status)); return <section key={label} className="rounded-2xl bg-slate-100 p-4"><div className="flex items-center justify-between px-1"><h2 className="text-sm font-bold text-slate-700">{label}</h2><span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-slate-500">{filtered.length}</span></div><div className="mt-4 space-y-3">{filtered.map((item) => <Link key={item.id} href={item.href} className="block rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-200"><p className="font-bold text-slate-950">{item.title}</p><p className="mt-2 text-xs text-slate-500">{item.detail}</p><span className="mt-3 inline-flex rounded-full bg-indigo-50 px-2.5 py-1 text-[10px] font-bold uppercase text-indigo-700">{item.status.replace("_", " ")}</span></Link>)}{!loading && !filtered.length && <p className="rounded-xl border border-dashed border-slate-300 p-5 text-center text-xs text-slate-400">No items</p>}</div></section>; })}</div>
-  </div>;
+type Task = { id: string; title: string; detail: string; status: string; href: string };
+const columns = [["todo", "To do"], ["in_progress", "In progress"], ["done", "Complete"]] as const;
+export default function WorkflowPage() {
+ const [tasks, setTasks] = useState<Task[]>([]), [enabled, setEnabled] = useState(true), [loading, setLoading] = useState(true), [busy, setBusy] = useState(false), [error, setError] = useState("");
+ const load = useCallback(async () => {
+  try { const response = await fetch("/api/merchant/workflow", { cache: "no-store" }); const data = await response.json(); if (!response.ok) throw new Error(data.error); setTasks(data.tasks); setEnabled(data.enabled); setError(""); }
+  catch (error) { setError(error instanceof Error ? error.message : "Unable to load workflow."); }
+  finally { setLoading(false); }
+ }, []);
+ useEffect(() => { const first = setTimeout(() => { void load(); }, 0); const timer = setInterval(load, 30000); return () => { clearTimeout(first); clearInterval(timer); }; }, [load]);
+ async function update(input: Record<string, unknown>) {
+  setBusy(true); setError("");
+  try { const response = await fetch("/api/merchant/workflow", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input) }); const data = await response.json(); if (!response.ok) throw new Error(data.error); await load(); }
+  catch (error) { setError(error instanceof Error ? error.message : "Unable to update workflow."); }
+  finally { setBusy(false); }
+ }
+ return <div className="mx-auto max-w-7xl space-y-6"><h1 className="text-3xl font-bold">Workflow automation</h1><p className="max-w-3xl text-sm leading-7 text-slate-600">Automatically create follow-up tasks for unfinished merchant setup, products missing images or descriptions, and buyer inquiries awaiting your response. Tasks resolve when the underlying work is finished.</p><div className="flex flex-wrap items-center gap-4 rounded-xl bg-white p-4"><label className="flex items-center gap-3 font-semibold"><input type="checkbox" checked={enabled} disabled={busy || loading} onChange={event => { void update({ enabled: event.target.checked }); }} />Enable automatic follow-up tasks</label><button disabled={busy} onClick={() => { void load(); }} className="rounded-lg border border-slate-300 px-4 py-2 text-sm">Refresh</button></div>{!enabled && <p className="text-sm">Automation is paused. Existing tasks remain available.</p>}{error && <p role="alert" className="text-red-700">{error}</p>}{loading ? <p role="status">Loading workflow...</p> : <div className="grid gap-5 lg:grid-cols-3">{columns.map(([status, label]) => <section key={status} className="space-y-3 rounded-2xl bg-slate-100 p-4"><h2 className="font-bold">{label} ({tasks.filter(task => task.status === status).length})</h2>{tasks.filter(task => task.status === status).map(task => <article key={task.id} className="space-y-3 rounded-xl bg-white p-4 shadow-sm"><h3 className="font-bold">{task.title}</h3><p className="text-sm text-slate-600">{task.detail}</p><Link href={task.href} className="block text-sm font-semibold text-blue-700">Open related work</Link><label className="block text-xs font-semibold">Task status<select value={task.status} disabled={busy} onChange={event => { void update({ id: task.id, status: event.target.value }); }} className="mt-1 w-full rounded-lg border border-slate-300 p-2 text-sm">{columns.map(([value, name]) => <option key={value} value={value}>{name}</option>)}</select></label></article>)}{!tasks.some(task => task.status === status) && <p className="text-sm text-slate-500">No tasks</p>}</section>)}</div>}</div>;
 }

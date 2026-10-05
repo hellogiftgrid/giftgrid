@@ -8,7 +8,6 @@ const routes = [
   "/giftgrid",
   "/about",
   "/how-it-works",
-  "/store-review",
   "/faq",
   "/contact",
   "/blog",

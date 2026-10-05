@@ -23,28 +23,25 @@ export type PageBlock = {
   cards?: { title: string; body: string; href?: string; image?: string }[];
 };
 export type SitePages = Record<string, PageBlock[]>;
-export const pageLabels: Record<string,string> = {'/':'Home','/about':'About','/how-it-works':'How it works','/store-review':'Store review','/faq':'FAQs','/contact':'Contact','/blog':'Journal','/book':'Book a call','/buyers/apply':'Buyer application','/giftgrid':'About the platform'};
+export const pageLabels: Record<string,string> = {'/':'Home','/about':'About','/how-it-works':'How it works','/store-review':'Store review','/faq':'FAQs','/contact':'Contact','/blog':'Journal','/buyers/apply':'Buyer application','/giftgrid':'About the platform'};
 const hero=(title:string,eyebrow:string,body:string,image='merchant-studio'):PageBlock=>({id:'hero',type:'hero',visible:true,title,eyebrow,body,image:`/images/heroes/${image}.webp`,imageAlt:image==='gifting'?'Curated gift box with ceramic mug and linen notebook':image==='collaboration'?'People planning a gifting project around a studio table':'Product and packaging samples in a merchant studio',padding:96,overlay:30,align:'left'});
 export function defaultPages(design:SiteDesign=defaultSiteDesign):SitePages {const pages:SitePages = {
  '/':[
- {...hero(design.heroTitle,design.heroEyebrow,design.heroDescription,'gifting'),buttonLabel:design.merchantButton,buttonUrl:'/auth/sign-up',secondaryLabel:design.bookingButton,secondaryUrl:'/book',overlay:design.heroOverlay},
- {id:'platforms',type:'platforms',visible:true,title:'Works with leading commerce platforms',speed:34,padding:32},
- {id:'featured-picks',type:'cards',visible:true,eyebrow:'Featured picks',title:'A few places to start.',body:'Practical next steps for merchants and gifting teams exploring GiftGrid.',padding:72,cards:[{title:'A clearer storefront',body:'See what your public store communicates to a potential business buyer.',href:'/store-review',image:'/images/heroes/merchant-studio.webp'},{title:'A thoughtful gifting brief',body:'Share the audience, timing and priorities behind your next gifting project.',href:'/buyers/apply',image:'/images/heroes/gifting.webp'},{title:'A useful conversation',body:'Talk through your store, gifting plan or next commercial step with GiftGrid.',href:'/book',image:'/images/heroes/collaboration.webp'}]},
- {id:'paths',type:'cards',visible:true,eyebrow:'One connected platform',title:'Better gifting starts with the right people.',body:'A clear workspace for merchants preparing their brands and teams planning their next gifting project.',padding:80,cards:[{title:'For merchants',body:'Review your store, strengthen your profile and keep your commercial opportunities organized.',href:'/auth/sign-up'},{title:'For gifting teams',body:'Share your requirements and start a conversation about brands that fit your audience and timeline.',href:'/buyers/apply'},{title:'For growing teams',body:'Keep recommendations, documents, messages and next actions connected.',href:'/how-it-works'}]},
- {id:'steps',type:'cards',visible:true,eyebrow:'Your next chapter',title:'Prepare, position, and pursue.',padding:80,background:'#f1f5f9',cards:[{title:'01 · Review your store',body:'Understand what your public storefront communicates to a potential business buyer.',href:'/store-review'},{title:'02 · Strengthen your position',body:'Turn readiness recommendations into clear improvements and a stronger merchant profile.'},{title:'03 · Explore the right fit',body:'Prepare for relevant gifting, wholesale and other commercial conversations.'}]},
- {id:'workflow',type:'image_text',visible:true,title:'Work together without losing the thread.',eyebrow:'A clearer workflow',body:'Bring the brief, product information, documents and next steps into one shared conversation. Give your team a clear view of what needs attention.',image:'/images/heroes/collaboration.webp',imageAlt:'A team discussing product samples and a gifting plan',buttonLabel:'Explore how GiftGrid works',buttonUrl:'/how-it-works',padding:80},
- {id:'trust',type:'cards',visible:true,title:'Real reviews. Clear next actions.',eyebrow:'Why GiftGrid',padding:80,cards:[{title:'Human context',body:'Store reviews help you identify practical next steps, with room for questions and clarification.'},{title:'Organized information',body:'Keep your brand profile, commercial documents and opportunity conversations together.'},{title:'A considered fit',body:'Focus on opportunities that match what your business can realistically deliver.'}]},
- {id:'cta',type:'cta',visible:true,title:'Make room for your next opportunity.',body:'Start your merchant application or tell us about the gifts you are planning.',buttonLabel:'Apply as a merchant',buttonUrl:'/auth/sign-up',secondaryLabel:'Start a gifting request',secondaryUrl:'/buyers/apply',padding:80}
+ {...hero(design.heroTitle,design.heroEyebrow,design.heroDescription,'collaboration'),buttonLabel:'Explore the community',buttonUrl:'/community',secondaryLabel:'For gifting buyers',secondaryUrl:'/buyers/apply',overlay:design.heroOverlay},
+ {id:'community-activities',type:'cards',visible:true,eyebrow:'What happens here',title:'One community. Better gifting conversations.',body:'GiftGrid brings the people behind gifting together to discover products, share real needs, and find a practical next step.',padding:76,cards:[{title:'Buyers share the brief',body:'Gifting teams explain who they are buying for, what they need, and when they need it.',href:'/buyers/apply',image:'/images/heroes/gifting.webp'},{title:'Brands share what they make',body:'Independent brands present their products, capabilities, and ideas to the people looking for them.',href:'/market',image:'/images/heroes/merchant-studio.webp'},{title:'Members move ideas forward',body:'Explore conversations, meet people across the gifting ecosystem, and turn a good idea into a useful connection.',href:'/community',image:'/images/heroes/collaboration.webp'}]},
+ {id:'what-giftgrid-does',type:'image_text',visible:true,eyebrow:'What we do',title:'We make it easier to find the right people and products.',body:'GiftGrid is a working community for corporate gifting buyers, independent brands, and the partners who help them deliver. Members share sourcing needs, discover products, introduce their work, and continue the conversation in one place.',image:'/images/heroes/collaboration.webp',imageAlt:'Gifting buyers and independent brands sharing product ideas',buttonLabel:'See the community',buttonUrl:'/community',padding:80},
+ {id:'member-paths',type:'cards',visible:true,eyebrow:'A place for every side of gifting',title:'Bring what you know. Find what you need.',body:'The community works best when buyers, brands, and partners take part together.',padding:76,background:'#f1f5f9',cards:[{title:'Gifting buyers',body:'Share a brief, browse products, and hear from eligible brands that can meet your requirements.',href:'/buyers/apply'},{title:'Independent brands',body:'Show your products, tell your story, and respond to buyer needs with clear offers.',href:'/auth/join'},{title:'Partners and operators',body:'Exchange practical knowledge and build relationships across the gifting ecosystem.',href:'/community'}]},
+ {id:'community-in-action',type:'text',visible:true,eyebrow:'How GiftGrid works',title:'A useful conversation starts with context.',body:'Buyers share what they are trying to accomplish. Brands bring products and delivery details. GiftGrid gives both sides a shared place to discover one another, ask questions, and move toward a considered decision.',padding:80},
+ {id:'community-cta',type:'cta',visible:true,title:'Come see what the community is building.',body:'Meet gifting buyers, independent brands, and partners who are sharing ideas and making better connections.',buttonLabel:'Join GiftGrid',buttonUrl:'/auth/join',secondaryLabel:'Browse the community',secondaryUrl:'/community',padding:80}
  ],
- '/about':[hero('Good products deserve a clearer path forward.','About GiftGrid','We help independent brands prepare for commercial opportunities and make it easier for gifting teams to start useful conversations.','collaboration')],
- '/how-it-works':[hero('From store review to your next step.','How GiftGrid works','Review your storefront, understand the recommendations and prepare for commercial conversations with a clearer plan.')],
+ '/about':[hero('A community for the people behind better gifting.','What we do','GiftGrid brings gifting buyers, independent brands, and partners together to share products, sourcing needs, practical knowledge, and opportunities.','collaboration')],
+ '/how-it-works':[hero('Meet, share, discover, and move forward.','How the community works','Buyers share what they need. Brands present products and capabilities. Members connect around real gifting projects and keep the next steps clear.','collaboration')],
  '/store-review':[hero('See your store through a buyer’s eyes.','Store readiness','A practical look at your public storefront, product presentation and the information buyers need to feel confident.')],
  '/faq':[hero('A little clarity goes a long way.','Your questions, answered','Understand the review process, merchant applications and what to expect when working with GiftGrid.','collaboration')],
  '/contact':[hero('Let’s talk about what comes next.','Contact GiftGrid','Tell us about your brand, your gifting plans or the question you need help answering.','collaboration')],
  '/blog':[hero('Ideas for your next chapter.','The GiftGrid Journal','Practical guides to stronger stores, thoughtful gifts and clearer commercial conversations.')],
- '/book':[hero('A useful conversation starts here.','Meet GiftGrid','Choose a time to discuss your store, your next steps or a gifting project.','collaboration')],
  '/buyers/apply':[hero('One thoughtful brief. Better conversations.','For gifting teams','Tell us who you are gifting, what matters to them and when you need everything ready.','gifting')],
- '/giftgrid':[hero('Meet the platform behind better gifting.','GiftGrid','A place for merchants to prepare, teams to collaborate and gifting conversations to move forward.','gifting')]
+ '/giftgrid':[hero('Meet the community behind better gifting.','GiftGrid','A shared space where buyers, independent brands, and partners exchange products, ideas, and sourcing needs.','collaboration')]
 }; return Object.fromEntries(Object.entries(pages).map(([path,blocks])=>[path,[...blocks,...(pageBodyBlocks[path]||[])]])); }
 const types=['hero','platforms','cards','image_text','text','cta','spacer','faq'];
 const cleanText=(v:unknown,max=8000)=>typeof v==='string'?v.slice(0,max):'';
@@ -53,6 +50,7 @@ export const safeImage=(v:unknown)=>typeof v==='string'&&(/^(\/(?!\/)|https:\/\/
 const color=(v:unknown,fallback:string)=>typeof v==='string'&&/^#[0-9a-f]{6}$/i.test(v)?v:fallback;
 const number=(v:unknown,fallback:number,min:number,max:number)=>typeof v==='number'&&Number.isFinite(v)?Math.min(max,Math.max(min,v)):fallback;
 export function normalizePages(input:unknown,design?:SiteDesign,legacySections?:unknown):SitePages {
+ if (input && typeof input === 'object') input = JSON.parse(JSON.stringify(input, (_key, value) => typeof value === 'string' ? value.replace(/book a call/gi, 'Contact GiftGrid').replace(/^(https:\/\/(www\.)?degiftgrid\.com)?\/book(?:\/.*)?$/, '/contact') : value));
  const defaults=defaultPages(design);
  if((!input||typeof input!=='object')&&Array.isArray(legacySections)){
   const migrated=legacySections.filter(s=>s&&typeof s==='object'&&['text','image_text','gallery','spacer'].includes(s.type)).map(s=>({id:`legacy-${s.id}`,type:s.type==='gallery'?'cards':s.type,visible:s.visible!==false,title:s.title||'',eyebrow:s.eyebrow,body:s.body,image:s.imageUrl,buttonLabel:s.buttonLabel,buttonUrl:s.buttonUrl,padding:s.padding,height:s.height,align:s.align,background:s.background,color:s.color,cards:s.type==='gallery'?(s.items||[]).map((image:string)=>({title:'',body:'',image})):undefined}));
@@ -68,80 +66,12 @@ export function normalizePages(input:unknown,design?:SiteDesign,legacySections?:
 
 const pageBodyBlocks:Record<string,PageBlock[]> = {
   "/about": [
-    {
-      "id": "principles",
-      "type": "cards",
-      "visible": true,
-      "eyebrow": "What we believe",
-      "title": "How we work",
-      "padding": 80,
-      "cards": [
-        {
-          "title": "Merchant-first review",
-          "body": "Before GiftGrid submits a store anywhere, it's actually reviewed — technically, structurally, and on product presentation. We don't forward stores that aren't ready."
-        },
-        {
-          "title": "One application, many paths",
-          "body": "Instead of applying separately to every gifting platform, wholesaler, or corporate buyer, merchants go through one process. GiftGrid handles the routing."
-        },
-        {
-          "title": "A trusted developer network",
-          "body": "When a store needs work before it's ready, GiftGrid can introduce merchants to individual developers we know and trust — not a faceless marketplace."
-        }
-      ]
-    },
-    {
-      "id": "about-next",
-      "type": "cta",
-      "visible": true,
-      "title": "Start with a conversation.",
-      "body": "Tell us what your brand is working toward, or what you need for your next gifting project.",
-      "buttonLabel": "Talk to GiftGrid",
-      "buttonUrl": "/contact",
-      "padding": 80
-    }
+    {id:"about-community",type:"cards",visible:true,eyebrow:"What we do",title:"We bring the gifting ecosystem into one conversation.",body:"GiftGrid helps buyers and brands discover one another, share useful context, and take practical next steps.",padding:80,cards:[{title:"Make needs visible",body:"Buyers can describe the products, quantities, budgets, and timelines behind a gifting project."},{title:"Help brands be discovered",body:"Independent brands can show what they make and how they can fulfill a project."},{title:"Keep the conversation useful",body:"Members can connect around real requirements, compare options, and follow up with clarity."}]},
+    {id:"about-next",type:"cta",visible:true,title:"A better gifting project starts with the right people.",body:"Explore the community and see what buyers, brands, and partners are sharing.",buttonLabel:"Explore the community",buttonUrl:"/community",padding:80}
   ],
   "/how-it-works": [
-    {
-      "id": "process",
-      "type": "cards",
-      "visible": true,
-      "title": "A practical path forward",
-      "padding": 80,
-      "cards": [
-        {
-          "title": "01 · Apply or start your store review",
-          "body": "Create your merchant account or start with a store review. GiftGrid gathers the information needed to understand your ecommerce business."
-        },
-        {
-          "title": "02 · GiftGrid audits your store",
-          "body": "GiftGrid evaluates important areas of your store, including buyer readiness, presentation, trust, commercial readiness and other factors visible from your public storefront."
-        },
-        {
-          "title": "03 · Get recommendations",
-          "body": "Your dashboard turns the findings into practical recommendations so you know what to improve and what to prioritize."
-        },
-        {
-          "title": "04 · Prepare for commercial opportunities",
-          "body": "GiftGrid helps merchants become more prepared for corporate gifting, wholesale enquiries and other commercial opportunities."
-        },
-        {
-          "title": "05 · Speak with a GiftGrid expert",
-          "body": "Need help implementing the recommendations? Book a call and GiftGrid connects you with an available team member."
-        }
-      ]
-    },
-    {
-      "id": "how-next",
-      "type": "cta",
-      "visible": true,
-      "title": "Take your next step with a clearer plan.",
-      "buttonLabel": "Apply as a merchant",
-      "buttonUrl": "/auth/sign-up",
-      "secondaryLabel": "Book a call",
-      "secondaryUrl": "/book",
-      "padding": 80
-    }
+    {id:"community-steps",type:"cards",visible:true,eyebrow:"How GiftGrid works",title:"A shared path from first idea to next step.",body:"GiftGrid gives buyers, brands, and partners a practical place to find one another and work through real gifting needs.",padding:80,cards:[{title:"01 | Find your place",body:"Join as a buyer, independent brand, or partner and get to know the people in the community."},{title:"02 | Share what matters",body:"Buyers explain their project. Brands present the products and capabilities that fit."},{title:"03 | Discover options",body:"Browse products and community conversations to find ideas that match your audience and plans."},{title:"04 | Respond with clarity",body:"Eligible merchants can respond to buyer briefs with a product, price, minimum order, and lead time."},{title:"05 | Keep moving together",body:"Compare options, ask questions, discuss samples, and agree on the next step directly in GiftGrid."}]},
+    {id:"how-next",type:"cta",visible:true,title:"The next useful connection starts here.",buttonLabel:"Explore the community",buttonUrl:"/community",secondaryLabel:"For gifting buyers",secondaryUrl:"/buyers/apply",padding:80}
   ],
   "/store-review": [
     {

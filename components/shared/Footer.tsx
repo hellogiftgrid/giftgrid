@@ -2,14 +2,7 @@ import Link from "next/link";
 import { siteConfig } from "@/config/branding";
 
 const columns = [
-  {
-    title: "Platform",
-    links: [
-      { href: "/how-it-works", label: "How It Works" },
-      { href: "/store-review", label: "Store Review" },
-      { href: "/#network", label: "Opportunity Network" },
-    ],
-  },
+  
   {
     title: "Company",
     links: [

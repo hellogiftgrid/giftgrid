@@ -1,7 +1,7 @@
 const cards = [
   {
-    title: "Human-Reviewed Audits",
-    body: "Every audit is checked by our team before it reaches you. No automated scores presented as final.",
+    title: "Merchant Community",
+    body: "Build a merchant profile, share products and connect with gifting teams.",
     icon: <path d="M9 12l2 2 4-4" />,
     iconExtra: <circle cx="12" cy="12" r="9" />,
   },
@@ -26,7 +26,7 @@ export default function TrustSection() {
         <div className="mb-14 max-w-[600px]">
           <span className="font-mono text-[12px] uppercase tracking-[0.14em] text-accent">Why Merchants Trust GiftGrid</span>
           <h2 className="mt-3.5 font-display text-[clamp(26px,3vw,36px)] font-semibold tracking-tight">
-            Built on real reviews, not fabricated scores.
+            Built for brands and gifting teams.
           </h2>
           <p className="mt-4 text-[15px] leading-relaxed text-textSecondary">
             GiftGrid is early — we&apos;d rather tell you that plainly than manufacture numbers to look established.

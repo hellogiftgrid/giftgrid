@@ -1,16 +1,18 @@
 "use client";
 
+import AuthControls from "@/components/shared/AuthControls";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const navLinks = [
-  { href: "/how-it-works", label: "How It Works" },
-  { href: "/about", label: "About" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/blog", label: "Blog" },
   { href: "/community", label: "Community" },
-  { href: "/console", label: "Console" },
+  { href: "/sourcing", label: "Open Requests" },
+  { href: "/about", label: "What We Do" },
+  { href: "/how-it-works", label: "How It Works" },
+  { href: "/buyers/apply", label: "For Buyers" },
+  { href: "/market", label: "Market" },
+  { href: "/blog", label: "Journal" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -41,17 +43,15 @@ export default function Header() {
 
         <div className="hidden items-center gap-4 md:flex">
           <Link href="/buyers/apply" className="text-[14.5px] font-semibold text-indigo-700 hover:text-indigo-900">
-            Gifting Teams
+            For Buyers
           </Link>
-          <Link href="/auth/sign-in" className="text-[14.5px] text-textSecondary hover:text-textPrimary">
-            Sign In
-          </Link>
+          <AuthControls />
           <Link
-            href="/auth/sign-up"
+            href="/auth/join"
             className="rounded-full px-5 py-2.5 text-[14px] font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5"
             style={{ background: "#1D4ED8" }}
           >
-            Apply as Merchant
+            Join GiftGrid
           </Link>
         </div>
 
@@ -80,11 +80,9 @@ export default function Header() {
           </ul>
           <div className="mt-6 flex flex-col gap-3">
             <Link href="/buyers/apply" className="text-[15px] font-semibold text-indigo-700">
-              Gifting Teams
+              For Buyers
             </Link>
-            <Link href="/auth/sign-in" className="text-[15px] text-textSecondary">
-              Sign In
-            </Link>
+            <AuthControls />
             <Link
               href="/auth/sign-up"
               className="rounded-full px-5 py-3 text-center text-[14px] font-semibold text-white"

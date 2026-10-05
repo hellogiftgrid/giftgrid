@@ -15,6 +15,11 @@ Usage:
   npm run giftgrid -- <resource> <action> [options]
 
 Resources and actions:
+  status
+  shop list [--category <category>] [--page <number>]
+  community list
+  community draft --brief <source material>
+  community publish --body <text> --idempotency-key <unique key> [--topic <topic>]
   apps list
   apps create --name <name> [--description <text>]
   keys create --app-id <id> --scopes <scope,...> [--expires <ISO date>]
@@ -42,15 +47,17 @@ function requireKey() {
   if (!API_KEY) throw new Error("Set GIFTGRID_API_KEY before running this command.");
 }
 
-async function request(path, method = "GET", body) {
-  requireKey();
+async function request(path, method = "GET", body, protectedRequest = true, extraHeaders = {}) {
+  if (protectedRequest) requireKey();
   const response = await fetch(`${API_URL}${path}`, {
     method,
-    headers: { accept: "application/json", authorization: `Bearer ${API_KEY}`, ...(body ? { "content-type": "application/json" } : {}) },
+    headers: { accept: "application/json", ...(protectedRequest ? {authorization: `Bearer ${API_KEY}`} : {}), ...(body ? { "content-type": "application/json" } : {}), ...extraHeaders },
+    redirect: "error",
+    signal: AbortSignal.timeout(35000),
     body: body ? JSON.stringify(body) : undefined,
   });
   const payload = await response.json().catch(() => null);
-  if (!response.ok) throw new Error(`${response.status}: ${payload?.message || "GiftGrid API request failed"}`);
+  if (!response.ok) throw new Error(`${response.status}: ${payload?.error || payload?.message || "GiftGrid API request failed"}`);
   return payload;
 }
 
@@ -63,7 +70,18 @@ async function main() {
   if (!resource || resource === "--help" || resource === "-h") return help();
   const opts = options(rest);
   let result;
-  if (resource === "apps" && action === "list") result = await request("/developer/apps");
+  if (resource === "status") result = await request("/health","GET",undefined,false);
+  else if (resource === "shop" && action === "list") result = await request("/shop?" + new URLSearchParams({category:String(opts.category || ""),page:String(opts.page || "1")}),"GET",undefined,false);
+  else if (resource === "community" && action === "list") result = await request("/community/posts","GET",undefined,false);
+  else if (resource === "community" && action === "draft") {
+    if (typeof opts.brief !== "string") throw new Error("community draft requires --brief");
+    result = await request("/developer/community/drafts", "POST", { brief: opts.brief });
+  }
+  else if (resource === "community" && action === "publish") {
+    if (typeof opts.body !== "string" || typeof opts["idempotency-key"] !== "string") throw new Error("community publish requires --body and --idempotency-key");
+    result = await request("/developer/community/posts", "POST", { body: opts.body, topic: opts.topic || "General" }, true, { "Idempotency-Key": opts["idempotency-key"] });
+  }
+  else if (resource === "apps" && action === "list") result = await request("/developer/apps");
   else if (resource === "apps" && action === "create") {
     if (!opts.name) throw new Error("apps create requires --name");
     result = await request("/developer/apps", "POST", { name: opts.name, description: opts.description || undefined });

@@ -41,8 +41,8 @@ export async function GET() {
 
   const [
     users,
-    bookingAdmins,
-    bookings,
+    
+    
     activity,
   ] = await Promise.all([
     admin.auth.admin.listUsers({
@@ -50,24 +50,9 @@ export async function GET() {
       perPage: 1000,
     }),
 
-    admin
-      .from("booking_admins")
-      .select(
-        "id, profile_id, slug, display_name, active, accepting_bookings, google_calendar_email, calendly_user_uri, calendly_scheduling_url"
-      )
-      .order("created_at", {
-        ascending: true,
-      }),
+    
 
-    admin
-      .from("bookings")
-      .select(
-        "id, guest_name, guest_email, start_at, end_at, status, meeting_type, meeting_url, calendly_status"
-      )
-      .order("start_at", {
-        ascending: false,
-      })
-      .limit(20),
+    
 
     admin
       .from("activity_logs")
@@ -89,12 +74,10 @@ export async function GET() {
     },
     auth_users: users.data?.users || [],
     auth_error: users.error?.message || null,
-    booking_admins: bookingAdmins.data || [],
-    booking_admin_error:
-      bookingAdmins.error?.message || null,
-    recent_bookings: bookings.data || [],
-    booking_error:
-      bookings.error?.message || null,
+    
+    
+    
+    
     recent_activity: activity.data || [],
     activity_error:
       activity.error?.message || null,

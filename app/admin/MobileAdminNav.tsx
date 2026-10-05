@@ -8,9 +8,10 @@ export default function MobileAdminNav() {
           ["/admin", "Dashboard"],
           ["/admin/applications", "Applications"],
           ["/admin/merchants", "Merchants"],
-          ["/admin/audits", "Audits"],
+          
           ["/admin/opportunities", "Opportunities"],
           ["/admin/marketplace", "Marketplace"],
+          ["/admin/community", "Community"],
           ["/admin/messages", "Messages"],
           ["/admin/support", "Support"],
           ["/admin/content", "Content"],

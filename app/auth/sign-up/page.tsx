@@ -59,6 +59,7 @@ export default function SignUpPage() {
           password,
           options: {
             data: {
+              account_type: "merchant",
               full_name: fullName,
               business_name: businessName,
             },
@@ -84,7 +85,7 @@ export default function SignUpPage() {
        */
 
       if (data.session) {
-        router.replace("/dashboard");
+        router.replace("/merchant/setup");
         router.refresh();
         return;
       }
@@ -94,7 +95,7 @@ export default function SignUpPage() {
       );
 
       router.replace(
-        `/auth/verify?email=${encodeURIComponent(email)}`
+        `/auth/verify?email=${encodeURIComponent(email)}&next=/merchant/setup`
       );
     } catch (err) {
       console.error("GiftGrid signup error:", err);
@@ -112,7 +113,7 @@ export default function SignUpPage() {
   return (
     <AuthShell
       title="Apply as a merchant"
-      subtitle="Create your GiftGrid merchant account."
+      subtitle="Create your brand workspace, complete your profile, and start submitting product listings for review."
       footer={
         <>
           Already have an account?{" "}
@@ -129,6 +130,7 @@ export default function SignUpPage() {
         onSubmit={handleSubmit}
         className="space-y-5"
       >
+        <p className="text-sm text-slate-600">Merchant / supplier account. <Link href="/buyers/apply" className="text-blue-700 underline">Buying or sourcing gifts? Create a buyer account.</Link></p>
         <AuthField
           label="Full Name"
           name="fullName"

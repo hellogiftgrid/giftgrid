@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { siteConfig } from "@/config/branding";
-import ChatWidget from "@/components/shared/ChatWidget";
+import PwaRegistrar from "@/components/app/PwaRegistrar";
 import OrganizationJsonLd from "@/components/seo/OrganizationJsonLd";
 import WebSiteJsonLd from "@/components/seo/WebSiteJsonLd";
 import { createClient } from "@/lib/supabase/server";
@@ -12,16 +12,17 @@ import { normalizePages } from "@/lib/content/site-pages";
 import type { CSSProperties } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import NativeAppBootstrap from "@/components/mobile/NativeAppBootstrap";
+
 
 export const metadata: Metadata = {
+  manifest: "/manifest.webmanifest",
   metadataBase: new URL("https://www.degiftgrid.com"),
   title: {
-    default: "GiftGrid | E-commerce Merchant Platform for Corporate Gifting",
+    default: "GiftGrid | The Community for Better Gifting",
     template: "%s | GiftGrid",
   },
   description:
-    "GiftGrid connects brands, gifting teams, and partners through a practical community and shared workspace.",
+    "Meet gifting buyers, independent brands, and partners. Share products, sourcing needs, and ideas in the GiftGrid community.",
   alternates: {
     canonical: "https://www.degiftgrid.com/",
   },
@@ -33,9 +34,9 @@ export const metadata: Metadata = {
     apple: "/apple-icon.png",
   },
   openGraph: {
-    title: "GiftGrid | E-commerce Merchant Platform for Corporate Gifting",
+    title: "GiftGrid | The Community for Better Gifting",
     description:
-      "GiftGrid connects brands, gifting teams, and partners through a practical community and shared workspace.",
+      "Meet gifting buyers, independent brands, and partners. Share products, sourcing needs, and ideas in the GiftGrid community.",
     url: "https://www.degiftgrid.com/",
     siteName: "GiftGrid",
     images: [
@@ -48,9 +49,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "GiftGrid | E-commerce Merchant Platform for Corporate Gifting",
+    title: "GiftGrid | The Community for Better Gifting",
     description:
-      "GiftGrid connects brands, gifting teams, and partners through a practical community and shared workspace.",
+      "Meet gifting buyers, independent brands, and partners. Share products, sourcing needs, and ideas in the GiftGrid community.",
     images: ["/images/logo-horizontal.png"],
   },
 };
@@ -91,8 +92,6 @@ export default async function RootLayout({
   return (
     <html lang="en" data-scroll-behavior="smooth">
   <head>
-    <link rel="preconnect" href="https://cal.com" />
-    <link rel="preconnect" href="https://app.cal.com" crossOrigin="anonymous" />
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-4F8TJ70RR7"></script>
     <script
       dangerouslySetInnerHTML={{
@@ -125,8 +124,8 @@ export default async function RootLayout({
         <OrganizationJsonLd />
         <WebSiteJsonLd />
         <SitePagesProvider initial={pages}><DesignPreviewBridge />{children}</SitePagesProvider>
-        <ChatWidget />
-        <NativeAppBootstrap />
+        <PwaRegistrar />
+
         <Analytics />
         <SpeedInsights />
 </body>

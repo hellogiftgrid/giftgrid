@@ -1,0 +1,62 @@
+{
+  "slug": "getting-started-your-first-visit",
+  "intro": "Welcome to GiftGrid’s Getting Started guide. This document walks you through your first visit to the community, explains how to explore content, interact with members, and understand the platform’s rules around listings and profiles. By the end you’ll know how to navigate the site, what actions require authentication, and how to handle common hiccups without losing progress.",
+  "sections": [
+    {
+      "heading": "1. Landing on the Community Home",
+      "paragraphs": [
+        "When you first open https://community.degiftgrid.com, the Home page presents a curated feed of public posts. Each post shows the author’s public profile, a brief excerpt, and engagement counts. The layout is responsive, so whether you’re on a phone or a desktop you’ll see the same content hierarchy: headline, snippet, author card, and engagement icons. The top navigation bar offers links to Home, Connect, and Docs. No sign‑in is required to view posts, but you’ll be limited to reading only until you authenticate. The Home page also displays a prominent banner that invites you to sign up or log in if you wish to participate further.",
+        "If you scroll to the bottom of the page, you’ll find pagination controls. Clicking “Next” loads the next batch of posts via a GET request to /api/community/posts. The API returns a JSON array of post objects, each containing an id, title, body, authorId, and timestamps. The client automatically updates the UI without a full page reload. This seamless experience lets you skim through community discussions before deciding to engage."
+      ]
+    },
+    {
+      "heading": "2. Browsing Members on Connect",
+      "paragraphs": [
+        "The Connect page lists active community members. Each member card displays the user’s name, avatar, and a link to their public profile at /members/{id}. The list is paginated and can be filtered by role using the sidebar. Even members with incomplete business profiles or no deck appear here, so you can discover potential collaborators early. The Connect page loads data through a GET request to /api/developer/apps, which returns a lightweight summary of each member.",
+        "You can click a member’s avatar or name to open their profile. The profile page shows public information: name, role (buyer or merchant), and any uploaded deck URL if present. The deck is a PDF up to 4 MB, hosted at /dashboard/profile. If a merchant’s deck is missing, the profile still displays the basic info, but the merchant’s listings may be hidden after the 72‑hour grace period. This transparency helps you gauge a merchant’s readiness without needing to sign in."
+      ]
+    },
+    {
+      "heading": "3. Signing In to Unlock Interactions",
+      "paragraphs": [
+        "To like, comment, follow, or message, you must authenticate. The sign‑in flow starts at /auth/sign‑in, where you choose between buyer and merchant options. The choice card is remembered in a cookie, so subsequent sign‑ins default to your last role. After entering credentials, the server issues a session cookie and a bearer token for API calls. The token is stored in localStorage under GIFTGRID_API_KEY and used for protected endpoints such as /api/developer/apps and /messages.",
+        "If you forget your password, the /auth/forgot-password route triggers a reset email. The email contains a time‑limited link that redirects back to /auth/sign‑in with a token prefilled. This flow ensures that only the account owner can reset the password. After resetting, you can immediately sign in and resume browsing. The sign‑in process is stateless; no server‑side session persistence beyond the cookie, so you can close the browser and return later without losing your place."
+      ]
+    },
+    {
+      "heading": "4. Interacting with Posts and Comments",
+      "paragraphs": [
+        "Once authenticated, you can write new posts up to 2000 characters. The editor enforces this limit client‑side, and the server validates it before accepting the payload. Each post is assigned a unique id and stored in the community database. You can edit or delete your own posts within a 24‑hour window; after that, the post becomes immutable to preserve discussion integrity.",
+        "Commenting follows a similar pattern. Each comment is capped at 1500 characters and attached to a post via its id. The API endpoint /api/community/posts/{postId}/comments accepts POST requests with the comment body. The UI shows real‑time updates using websockets, so you see new comments appear instantly. Likes are toggled by clicking the heart icon; the client sends a POST to /api/community/posts/{postId}/likes. Only one like per member per post is allowed, and the server enforces this rule by checking the memberId and postId combination."
+      ]
+    },
+    {
+      "heading": "5. Following and Messaging Members",
+      "paragraphs": [
+        "Following a member adds them to your Following list, which you can view via the sidebar filter. The action is a POST to /api/developer/apps/{id}/follow. Unfollowing reverses the process. The Following list is stored server‑side and retrieved on login, ensuring you always see the latest state across devices.",
+        "Direct messages are accessed through the member card or the /messages endpoint. Each message thread is a conversation between two authenticated members. The UI provides a simple text box and a send button. Messages are stored in a separate collection and can be retrieved via GET /api/developer/apps/{id}/messages. The system does not guarantee delivery timing; network latency may cause delays, but the client retries failed sends up to three times before showing an error."
+      ]
+    },
+    {
+      "heading": "6. Understanding Listings and Deck Rules",
+      "paragraphs": [
+        "Merchants create listings under /dashboard/listings. Each listing is enquiry‑based; it does not reserve stock or initiate an order. The listing includes product details, price, and a link to an external supplier such as AliExpress or Faire. External entries older than seven days or marked out‑of‑stock are hidden automatically. If a listing lacks a merchant deck after 72 hours, the listing becomes invisible to the public, though the merchant can still edit it. This grace period allows merchants to prepare a deck without losing visibility.",
+        "The deck itself is a public PDF uploaded at /dashboard/profile. It can be up to 4 MB and is linked from the merchant’s profile. The deck is not required for account creation; merchants can start listing immediately. However, without a deck, their listings will be hidden after the grace period. Buyers do not need a deck to browse or purchase, and their accounts can be created without any business documentation."
+      ]
+    },
+    {
+      "heading": "7. Working Offline and Managing State",
+      "paragraphs": [
+        "While the platform is web‑centric, you can prepare content offline using a text editor. Draft posts, comments, or deck PDFs locally, then copy‑paste into the editor when you’re online. The client validates character limits before submission, so you’ll know if you need to trim content. For merchants, you can use a spreadsheet to track product details and external links, then paste them into the listing form. This approach reduces errors and speeds up bulk uploads.",
+        "If you encounter a network failure while submitting a listing or comment, the client queues the request locally. Once connectivity is restored, the queued request is retried automatically. If the retry fails, the UI shows a persistent error banner and offers a manual retry button. This mechanism ensures that transient network issues do not permanently lose your work."
+      ]
+    },
+    {
+      "heading": "8. Troubleshooting Common Issues and Verification",
+      "paragraphs": [
+        "A frequent hiccup is the 72‑hour deck gating. If a merchant’s listing disappears, verify the deck upload time and ensure the PDF is under 4 MB. If the deck is present but the listing is hidden, check that the external supplier link is active and not older than seven days. For authentication problems, clear the browser cache and cookies, then re‑authenticate. If the API key is missing from localStorage, the client will prompt you to sign in again.",
+        "Verification of your actions is straightforward. After posting, you can refresh the page or navigate to /api/community/posts to confirm the new entry appears. For messages, open the conversation thread and look for the timestamped entry. If a like or follow does not persist after a page reload, clear localStorage and retry. These steps provide a reliable way to confirm that your interactions have been recorded by the system."
+      ]
+    }
+  ]
+}

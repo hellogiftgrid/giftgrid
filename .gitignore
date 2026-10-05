@@ -11,5 +11,12 @@ node_modules
 
 # GiftGrid local work / backups
 .giftgrid-*/
+.giftgrid-*
 middleware.ts.backup-*
 public/_unused-assets-*/
+
+mobile/.expo/
+mobile/dist/
+mobile/android/
+mobile/ios/
+android/.kotlin/
