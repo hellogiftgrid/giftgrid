@@ -228,10 +228,6 @@ export default function ProfilePage() {
             Your GiftGrid profile
           </h1>
 
-          <p className="mt-2 text-sm text-slate-500">
-            Manage the business information GiftGrid uses for your profile and
-            opportunity matching.
-          </p>
         </div>
 
         {message && (
@@ -289,7 +285,7 @@ export default function ProfilePage() {
           <div className="mt-6 grid gap-5 md:grid-cols-2">
             <label>
               <span className="mb-2 block text-sm font-semibold text-slate-700">
-                Business name (required)
+                Business name
               </span>
               <input
                 value={form.businessName}
@@ -312,7 +308,7 @@ export default function ProfilePage() {
 
             <label>
               <span className="mb-2 block text-sm font-semibold text-slate-700">
-                Phone (optional)
+                Phone
               </span>
               <input
                 value={form.phone}
@@ -338,7 +334,7 @@ export default function ProfilePage() {
           <div className="mt-6 space-y-5">
             <label>
               <span className="mb-2 block text-sm font-semibold text-slate-700">
-                Store URL (optional)
+                Store URL
               </span>
               <input
                 type="url"
@@ -352,7 +348,7 @@ export default function ProfilePage() {
             <div className="grid gap-5 md:grid-cols-2">
               <label>
                 <span className="mb-2 block text-sm font-semibold text-slate-700">
-                  Business category (required)
+                  Business category
                 </span>
                 <input
                   value={form.businessCategory}
@@ -395,7 +391,6 @@ export default function ProfilePage() {
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-bold text-slate-900">Trade deck</h2>
-          <p className="mt-1 text-sm text-slate-500">Upload a PDF or document that introduces your products and capabilities. Merchants opening a shop on GiftGrid are expected to supply one — upload it here from your profile.</p>
           <div className="mt-4">
             <label className="cursor-pointer rounded-xl border border-dashed border-indigo-300 px-4 py-3 text-sm font-semibold text-indigo-700 inline-block">
               {deckUploading ? "Uploading…" : "Upload trade deck"}
