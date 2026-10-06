@@ -46,9 +46,13 @@ create table if not exists public.listing_reviews (
   unique (listing_id, profile_id)
 );
 alter table public.listing_reviews enable row level security;
+drop policy if exists "listing_reviews_read" on public.listing_reviews;
 create policy "listing_reviews_read" on public.listing_reviews for select using (true);
+drop policy if exists "listing_reviews_insert" on public.listing_reviews;
 create policy "listing_reviews_insert" on public.listing_reviews for insert to authenticated with check (profile_id = auth.uid());
+drop policy if exists "listing_reviews_update" on public.listing_reviews;
 create policy "listing_reviews_update" on public.listing_reviews for update to authenticated using (profile_id = auth.uid()) with check (profile_id = auth.uid());
+drop policy if exists "listing_reviews_delete" on public.listing_reviews;
 create policy "listing_reviews_delete" on public.listing_reviews for delete to authenticated using (profile_id = auth.uid());
 
 -- AI rating blends review average with engagement (clicks per impression).
@@ -113,6 +117,7 @@ create table if not exists public.campaigns (
   created_at timestamptz not null default now()
 );
 alter table public.campaigns enable row level security;
+drop policy if exists "campaigns_admin" on public.campaigns;
 create policy "campaigns_admin" on public.campaigns for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
@@ -155,6 +160,7 @@ create table if not exists public.support_outreach (
 );
 create index if not exists support_outreach_profile_idx on public.support_outreach(profile_id, created_at desc);
 alter table public.support_outreach enable row level security;
+drop policy if exists "support_outreach_self_read" on public.support_outreach;
 create policy "support_outreach_self_read" on public.support_outreach for select to authenticated using (profile_id = auth.uid());
 
 -- Trade deck is optional (per product decision): visibility gating stays off.
@@ -174,8 +180,11 @@ create table if not exists public.listing_likes (
   primary key (listing_id, profile_id)
 );
 alter table public.listing_likes enable row level security;
+drop policy if exists "listing_likes_read" on public.listing_likes;
 create policy "listing_likes_read" on public.listing_likes for select using (true);
+drop policy if exists "listing_likes_insert" on public.listing_likes;
 create policy "listing_likes_insert" on public.listing_likes for insert to authenticated with check (profile_id = auth.uid());
+drop policy if exists "listing_likes_delete" on public.listing_likes;
 create policy "listing_likes_delete" on public.listing_likes for delete to authenticated using (profile_id = auth.uid());
 
 alter table public.merchant_listings add column if not exists like_count integer not null default 0;
