@@ -200,3 +200,13 @@ html[data-theme="dark"] .admin-shell .theme-logo { filter: brightness(0) invert(
 
 .site-themed .page-block > .max-w-7xl, .site-themed .page-hero > .max-w-7xl { max-width: var(--site-container, 1280px); padding-inline: var(--site-padding-mobile, 20px); }
 @media (min-width:640px) { .site-themed .page-block > .max-w-7xl, .site-themed .page-hero > .max-w-7xl { padding-inline: var(--site-padding-desktop, 40px); } }
+
+/* GiftGrid polish layer */
+html { scroll-behavior: smooth; }
+body { background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); }
+.community-shell { background: linear-gradient(180deg, #eef2ff 0%, #f0f2f5 220px); }
+a, button { transition: all .18s ease; }
+button:hover, a:hover { transform: translateY(-1px); }
+[class*="rounded-2xl"], [class*="rounded-3xl"] { box-shadow: 0 1px 2px rgba(15,23,42,.04), 0 8px 24px -12px rgba(15,23,42,.12); }
+img { transition: transform .3s ease; }
+a:hover img { transform: scale(1.02); }
