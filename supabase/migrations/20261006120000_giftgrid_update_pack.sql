@@ -122,13 +122,18 @@ language plpgsql security definer set search_path = public as $$
 declare
   v_recipient uuid;
 begin
-  select case when requester_id = new.sender_id then recipient_id else requester_id end
-    into v_recipient
-    from public.community_connections where id = new.connection_id;
-  insert into public.activity_email_events (event_type, owner_profile_id, actor_name, summary, href)
-  select 'message', v_recipient, p.full_name, 'Sent you a new message', '/messages'
-    from public.profiles p where p.id = new.sender_id;
-  insert into public.notifications (profile_id, title, body) values (v_recipient, 'New message', left(new.body, 200));
+  begin
+    select case when requester_id = new.sender_id then recipient_id else requester_id end
+      into v_recipient
+      from public.community_connections where id = new.connection_id;
+    insert into public.activity_email_events (event_type, owner_profile_id, actor_name, summary, href)
+    select 'message', v_recipient, p.full_name, 'Sent you a new message', '/messages'
+      from public.profiles p where p.id = new.sender_id;
+    insert into public.notifications (profile_id, title, body) values (v_recipient, 'New message', left(new.body, 200));
+  exception when others then
+    -- Notification side-effects must never block the message itself.
+    null;
+  end;
   return new;
 end $$;
 
@@ -186,11 +191,15 @@ language plpgsql security definer set search_path = public as $$
 declare
   official uuid := public.giftgrid_official_profile();
 begin
-  if official is not null and new.id <> official then
-    insert into public.community_follows(follower_id, followed_id)
-    values (new.id, official)
-    on conflict (follower_id, followed_id) do nothing;
-  end if;
+  begin
+    if official is not null and new.id <> official then
+      insert into public.community_follows(follower_id, followed_id)
+      values (new.id, official)
+      on conflict (follower_id, followed_id) do nothing;
+    end if;
+  exception when others then
+    null;
+  end;
   return new;
 end $$;
 
