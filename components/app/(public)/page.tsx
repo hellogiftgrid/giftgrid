@@ -36,7 +36,7 @@ export default function HomePage() {
               <Link
                 href="/auth/sign-up"
                 className="rounded-full px-7 py-3.5 text-[14.5px] font-semibold text-white shadow-md transition-transform hover:-translate-y-0.5"
-                style={{ background: "linear-gradient(90deg, #4F46E5, #F97316)" }}
+                style={{ background: "linear-gradient(90deg, #0F766E, #F97316)" }}
               >
                 Apply as a Merchant
               </Link>

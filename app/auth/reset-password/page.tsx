@@ -251,7 +251,7 @@ export default function ResetPasswordPage() {
             password.length < 6 ||
             confirmPassword.length < 6
           }
-          className="w-full rounded-xl bg-[#4F46E5] px-6 py-3.5 text-sm font-bold text-white hover:bg-[#4338CA] disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-xl bg-[#0F766E] px-6 py-3.5 text-sm font-bold text-white hover:bg-[#115E59] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading
             ? "Updating password..."

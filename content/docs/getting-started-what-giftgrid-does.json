@@ -6,7 +6,7 @@
       "heading": "Getting Started with Your Account",
       "paragraphs": [
         "The first step is to create an account on community.degiftgrid.com. You can sign up via the /auth/join page, choosing whether you’ll be a buyer or a merchant. Even if you don’t have a business deck yet, you can still create an account; the platform will allow you to browse the community and view public merchant profiles. Once you’ve signed up, you’ll receive a confirmation email and can log in through /auth/sign-in. The sign‑in page presents role cards—buyer or merchant—so that your experience is tailored to your needs. If you forget your password, use /auth/forgot-password to reset it. After logging in, you’ll see the Connect page, which lists all active community members, including those with incomplete profiles.",
-        "After you’re logged in, take a moment to review your profile. For buyers, a complete profile isn’t required to browse or comment, but adding a short bio and company name can help merchants identify you. Merchants should upload a public PDF deck (max 4 MB) to /dashboard/profile; this deck is visible to all community members and can include product details, brand story, and contact information. A trade deck is optional — a missing one never hides your listings. Listing approval is separate from deck review, so you can keep listing even while your deck is pending review."
+        "After you’re logged in, take a moment to review your profile. For buyers, a complete profile isn’t required to browse or comment, but adding a short bio and company name can help merchants identify you. Merchants should upload a public PDF deck (max 4 MB) to /dashboard/profile; this deck is visible to all community members and can include product details, brand story, and contact information. A trade deck is required for merchants selling on GiftGrid. Listing approval is separate from deck review, so you can keep listing even while your deck is pending review."
       ]
     },
     {
@@ -34,7 +34,7 @@
       "heading": "Understanding Merchant Decks",
       "paragraphs": [
         "Merchant decks are public PDFs uploaded to /dashboard/profile. They serve as a portfolio for the merchant, showcasing product ranges, brand values, and contact information. The deck is limited to 4 MB, so include only essential visuals and concise text. Once uploaded, the deck becomes visible to all community members, and it can be downloaded from the merchant’s profile page.",
-        "A deck is not required for a listing to appear — it simply enhances credibility. Buyers can use the deck to assess the merchant’s professionalism and product quality before initiating contact."
+        "A deck is required for a merchant shop to appear fully — it builds buyer confidence. Buyers can use the deck to assess the merchant’s professionalism and product quality before initiating contact."
       ]
     },
     {

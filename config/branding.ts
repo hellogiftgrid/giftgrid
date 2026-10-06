@@ -15,14 +15,14 @@ export const colors = {
   borderCustom: "#CBD5E1",   
 
   // Brand accents
-  accent: "#4F46E5",         
-  accentAlt: "#2563EB",      
-  accentDim: "#3730A3",      
+  accent: "#0F766E",         
+  accentAlt: "#D97706",      
+  accentDim: "#115E59",      
 
   // Status
-  success: "#2563EB",
-  warning: "#3B82F6",
-  danger: "#1E40AF",
+  success: "#0F766E",
+  warning: "#D97706",
+  danger: "#B91C1C",
 
   // Footer
   footerBg: "#0F172A",

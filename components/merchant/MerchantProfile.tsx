@@ -220,7 +220,7 @@ export default function ProfilePage() {
     <div className="min-h-full bg-[#F7F9FC] p-4 lg:p-6">
       <div className="mx-auto max-w-5xl space-y-7">
         <div>
-          <p className="text-xs font-mono font-bold uppercase tracking-[0.15em] text-[#4F46E5]">
+          <p className="text-xs font-mono font-bold uppercase tracking-[0.15em] text-[#0F766E]">
             Business profile
           </p>
 
@@ -264,7 +264,7 @@ export default function ProfilePage() {
               <input
                 value={form.fullName}
                 onChange={(e) => setField("fullName", e.target.value)}
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-indigo-100"
               />
             </label>
 
@@ -294,7 +294,7 @@ export default function ProfilePage() {
               <input
                 value={form.businessName}
                 onChange={(e) => setField("businessName", e.target.value)}
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-indigo-100"
               />
             </label>
 
@@ -306,7 +306,7 @@ export default function ProfilePage() {
                 type="email"
                 value={form.businessEmail}
                 onChange={(e) => setField("businessEmail", e.target.value)}
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-indigo-100"
               />
             </label>
 
@@ -317,7 +317,7 @@ export default function ProfilePage() {
               <input
                 value={form.phone}
                 onChange={(e) => setField("phone", e.target.value)}
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-indigo-100"
               />
             </label>
 
@@ -345,7 +345,7 @@ export default function ProfilePage() {
                 value={form.storeUrl}
                 onChange={(e) => setField("storeUrl", e.target.value)}
                 placeholder="https://yourstore.com"
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-indigo-100"
               />
             </label>
 
@@ -359,7 +359,7 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setField("businessCategory", e.target.value)
                   }
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-indigo-100"
                 />
               </label>
 
@@ -372,7 +372,7 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setField("productCategory", e.target.value)
                   }
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-indigo-100"
                 />
               </label>
             </div>
@@ -387,15 +387,15 @@ export default function ProfilePage() {
                 onChange={(e) =>
                   setField("businessDescription", e.target.value)
                 }
-                className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
+                className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-indigo-100"
               />
             </label>
           </div>
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-slate-900">Trade deck (optional)</h2>
-          <p className="mt-1 text-sm text-slate-500">Share a PDF or document that introduces your products and capabilities. You can skip this — it is not required and will not affect your account or listings.</p>
+          <h2 className="text-lg font-bold text-slate-900">Trade deck</h2>
+          <p className="mt-1 text-sm text-slate-500">Upload a PDF or document that introduces your products and capabilities. Merchants opening a shop on GiftGrid are expected to supply one — upload it here from your profile.</p>
           <div className="mt-4">
             <label className="cursor-pointer rounded-xl border border-dashed border-indigo-300 px-4 py-3 text-sm font-semibold text-indigo-700 inline-block">
               {deckUploading ? "Uploading…" : "Upload trade deck"}
@@ -420,7 +420,7 @@ export default function ProfilePage() {
             type="button"
             onClick={saveProfile}
             disabled={saving}
-            className="min-w-[170px] rounded-xl bg-[#4F46E5] px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#4338CA] disabled:opacity-60"
+            className="min-w-[170px] rounded-xl bg-[#0F766E] px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#115E59] disabled:opacity-60"
           >
             {saving ? "Saving…" : "Save profile"}
           </button>

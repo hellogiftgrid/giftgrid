@@ -98,7 +98,7 @@ export default async function MessagesPage() {
       <div className="mx-auto max-w-6xl space-y-7">
 
         <div>
-          <p className="text-xs font-mono font-bold uppercase tracking-[0.15em] text-[#4F46E5]">
+          <p className="text-xs font-mono font-bold uppercase tracking-[0.15em] text-[#0F766E]">
             Messages
           </p>
 
@@ -172,7 +172,7 @@ export default async function MessagesPage() {
           </div>
 
           <section className="h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <p className="text-xs font-mono font-bold uppercase tracking-wider text-[#4F46E5]">
+            <p className="text-xs font-mono font-bold uppercase tracking-wider text-[#0F766E]">
               New conversation
             </p>
 
@@ -185,7 +185,7 @@ export default async function MessagesPage() {
                 name="subject"
                 required
                 placeholder="Subject"
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-indigo-100"
               />
 
               <textarea
@@ -193,12 +193,12 @@ export default async function MessagesPage() {
                 required
                 rows={7}
                 placeholder="How can we help?"
-                className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
+                className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-indigo-100"
               />
 
               <button
                 type="submit"
-                className="w-full rounded-xl bg-[#4F46E5] px-5 py-3 text-sm font-bold text-white hover:bg-[#4338CA]"
+                className="w-full rounded-xl bg-[#0F766E] px-5 py-3 text-sm font-bold text-white hover:bg-[#115E59]"
               >
                 Send message
               </button>

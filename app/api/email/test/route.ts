@@ -11,7 +11,7 @@ export async function POST() {
         <html>
           <body style="margin:0;padding:40px;font-family:Arial,sans-serif;background:#f7f9fc">
             <div style="max-width:600px;margin:auto;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:32px">
-              <h1 style="margin:0 0 16px;color:#4F46E5">GiftGrid</h1>
+              <h1 style="margin:0 0 16px;color:#0F766E">GiftGrid</h1>
 
               <h2 style="margin:0 0 12px;color:#111827">
                 Email delivery test

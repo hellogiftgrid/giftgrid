@@ -24,13 +24,13 @@
   /* Soft colorful blob background for the hero — replaces the v1 dark grid */
   .hero-blob-bg {
     background:
-      radial-gradient(ellipse 55% 50% at 12% 20%, rgba(79, 70, 229, 0.14), transparent 60%),
-      radial-gradient(ellipse 50% 45% at 88% 15%, rgba(249, 115, 22, 0.12), transparent 60%),
-      radial-gradient(ellipse 60% 55% at 50% 100%, rgba(79, 70, 229, 0.08), transparent 65%);
+      radial-gradient(ellipse 55% 50% at 12% 20%, rgba(15, 118, 110, 0.14), transparent 60%),
+      radial-gradient(ellipse 50% 45% at 88% 15%, rgba(217, 119, 6, 0.10), transparent 60%),
+      radial-gradient(ellipse 60% 55% at 50% 100%, rgba(15, 118, 110, 0.08), transparent 65%);
   }
 
   .text-gradient {
-    background: linear-gradient(90deg, #4F46E5, #F97316);
+    background: linear-gradient(90deg, #0F766E, #F97316);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;

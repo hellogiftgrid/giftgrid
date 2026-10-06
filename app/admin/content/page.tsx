@@ -24,7 +24,7 @@ export default async function AdminContentPage() {
   return (
     <div className="mx-auto max-w-7xl">
       <div className="mb-7">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#4F46E5]">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0F766E]">
           Content
         </p>
 

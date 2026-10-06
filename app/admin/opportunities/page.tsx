@@ -42,7 +42,7 @@ export default async function AdminOpportunitiesPage() {
   return (
     <div className="mx-auto max-w-7xl">
       <div className="mb-7">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#4F46E5]">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0F766E]">
           Opportunity Network
         </p>
 
@@ -72,7 +72,7 @@ export default async function AdminOpportunitiesPage() {
                     {item.company_name}
                   </h2>
 
-                  <p className="mt-1 text-xs font-semibold text-[#4F46E5]">
+                  <p className="mt-1 text-xs font-semibold text-[#0F766E]">
                     {item.category}
                   </p>
                 </div>
@@ -137,7 +137,7 @@ export default async function AdminOpportunitiesPage() {
                     type="submit"
                     className={`rounded-xl px-4 py-2 text-xs font-bold ${
                       item.public_display
-                        ? "bg-[#4F46E5] text-white"
+                        ? "bg-[#0F766E] text-white"
                         : "border border-slate-200 text-slate-600 hover:bg-slate-50"
                     }`}
                   >

@@ -45,7 +45,7 @@ export default function AdminSidebar() {
               <div className="font-bold text-slate-950">
                 GiftGrid
               </div>
-              <div className="text-xs font-semibold text-[#4F46E5]">
+              <div className="text-xs font-semibold text-[#0F766E]">
                 Admin
               </div>
             </div>
@@ -65,7 +65,7 @@ export default function AdminSidebar() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="block rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-indigo-50 hover:text-[#4F46E5]"
+                    className="block rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-indigo-50 hover:text-[#0F766E]"
                   >
                     {link.label}
                   </Link>

@@ -52,7 +52,7 @@ export default async function AdminApplicationsPage() {
   return (
     <div className="mx-auto max-w-7xl">
       <div className="mb-7">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#4F46E5]">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0F766E]">
           Applications
         </p>
         <h1 className="mt-2 text-3xl font-bold text-slate-950">
@@ -115,7 +115,7 @@ export default async function AdminApplicationsPage() {
                       type="submit"
                       className={`rounded-xl px-4 py-2 text-xs font-bold transition ${
                         item.status === status
-                          ? "bg-[#4F46E5] text-white"
+                          ? "bg-[#0F766E] text-white"
                           : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                       }`}
                     >

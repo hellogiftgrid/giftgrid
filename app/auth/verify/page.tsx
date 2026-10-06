@@ -150,7 +150,7 @@ function VerifyForm() {
               setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
             }
             placeholder="000000"
-            className="w-full rounded-xl border border-slate-200 px-4 py-4 text-center text-2xl font-bold tracking-[0.4em] text-slate-900 outline-none focus:border-[#4F46E5] focus:ring-4 focus:ring-indigo-100"
+            className="w-full rounded-xl border border-slate-200 px-4 py-4 text-center text-2xl font-bold tracking-[0.4em] text-slate-900 outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-indigo-100"
           />
         </div>
 
@@ -169,7 +169,7 @@ function VerifyForm() {
         <button
           type="submit"
           disabled={loading || code.length !== 6}
-          className="w-full rounded-xl bg-[#4F46E5] px-6 py-3.5 text-sm font-bold text-white hover:bg-[#4338CA] disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-xl bg-[#0F766E] px-6 py-3.5 text-sm font-bold text-white hover:bg-[#115E59] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? "Verifying…" : "Verify email"}
         </button>

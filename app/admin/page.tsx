@@ -71,7 +71,7 @@ function StatCard({
   detail?: string;
 }) {
   const classes = {
-    indigo: "bg-indigo-50 text-[#4F46E5]",
+    indigo: "bg-indigo-50 text-[#0F766E]",
     green: "bg-emerald-50 text-emerald-700",
     amber: "bg-amber-50 text-amber-700",
     red: "bg-red-50 text-red-700",
@@ -284,7 +284,7 @@ export default async function AdminDashboard() {
       {/* HEADER */}
       <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#4F46E5]">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0F766E]">
             Overview
           </p>
 
@@ -379,7 +379,7 @@ export default async function AdminDashboard() {
 
             <Link
               href="/admin/applications"
-              className="text-xs font-bold text-[#4F46E5] hover:underline"
+              className="text-xs font-bold text-[#0F766E] hover:underline"
             >
               View all →
             </Link>
@@ -443,7 +443,7 @@ export default async function AdminDashboard() {
 
             <Link
               href="/admin/merchants"
-              className="text-xs font-bold text-[#4F46E5] hover:underline"
+              className="text-xs font-bold text-[#0F766E] hover:underline"
             >
               All merchants →
             </Link>
@@ -497,7 +497,7 @@ export default async function AdminDashboard() {
 
           <Link
             href="/admin/support"
-            className="text-xs font-bold text-[#4F46E5] hover:underline"
+            className="text-xs font-bold text-[#0F766E] hover:underline"
           >
             Open support →
           </Link>
@@ -556,7 +556,7 @@ export default async function AdminDashboard() {
             <Link
               key={href}
               href={href}
-              className="rounded-xl border border-slate-200 px-4 py-4 text-sm font-bold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-[#4F46E5]"
+              className="rounded-xl border border-slate-200 px-4 py-4 text-sm font-bold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-[#0F766E]"
             >
               {label}
               <span className="ml-2">→</span>

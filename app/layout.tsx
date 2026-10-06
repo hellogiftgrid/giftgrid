@@ -103,22 +103,6 @@ export default async function RootLayout({
         `,
       }}
     />
-    <script
-      dangerouslySetInnerHTML={{
-        __html: `
-          (function(){
-            try {
-              var saved = localStorage.getItem('giftgrid-theme');
-              var mode = saved === 'dark' || saved === 'light' || saved === 'auto' ? saved : 'auto';
-              var hour = new Date().getHours();
-              var theme = mode === 'auto' ? (hour >= 7 && hour < 19 ? 'light' : 'dark') : mode;
-              document.documentElement.dataset.theme = theme;
-              document.documentElement.style.colorScheme = theme;
-            } catch (e) {}
-          })();
-        `,
-      }}
-    />
   </head>
   <body style={theme}>
         <OrganizationJsonLd />

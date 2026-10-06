@@ -12,7 +12,7 @@ export default function NotFound() {
           />
         </div>
 
-        <p className="mt-8 text-sm font-bold uppercase tracking-[0.2em] text-[#4F46E5]">
+        <p className="mt-8 text-sm font-bold uppercase tracking-[0.2em] text-[#0F766E]">
           Error 404
         </p>
 
@@ -28,7 +28,7 @@ export default function NotFound() {
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
             href="/"
-            className="rounded-xl bg-[#4F46E5] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#4338CA]"
+            className="rounded-xl bg-[#0F766E] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#115E59]"
           >
             Back to GiftGrid
           </Link>

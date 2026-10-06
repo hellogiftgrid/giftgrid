@@ -157,16 +157,16 @@ export default function MerchantSidebar() {
               href={item.href}
               className={`mb-1 flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-all ${
                 active
-                  ? 'bg-blue-50 text-[#4F46E5] shadow-sm ring-1 ring-blue-100'
+                  ? 'bg-blue-50 text-[#0F766E] shadow-sm ring-1 ring-blue-100'
                   : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
-              <span className={active ? 'text-[#4F46E5]' : 'text-slate-400'}>
+              <span className={active ? 'text-[#0F766E]' : 'text-slate-400'}>
                 <Icon type={item.icon} />
               </span>
               {item.label}
               {active && (
-                <span className="ml-auto h-2 w-2 rounded-full bg-[#4F46E5]" />
+                <span className="ml-auto h-2 w-2 rounded-full bg-[#0F766E]" />
               )}
             </Link>
           )

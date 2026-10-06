@@ -3,7 +3,7 @@ export default function Logo({ size = 28 }: { size?: number }) {
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="ggGrad" x1="4" y1="4" x2="36" y2="36" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#4F46E5" />
+          <stop offset="0%" stopColor="#0F766E" />
           <stop offset="100%" stopColor="#60A5FA" />
         </linearGradient>
       </defs>

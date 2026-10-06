@@ -16,9 +16,9 @@ export const colors = {
   borderCustom: "#E2E8F0",
 
   // Brand accents — gradient duo used across CTAs, icons, the logomark
-  accent: "#4F46E5",         // indigo — primary accent
+  accent: "#0F766E",         // indigo — primary accent
   accentAlt: "#F97316",      // orange — secondary accent, used sparingly
-  accentDim: "#4338CA",
+  accentDim: "#115E59",
 
   // Status
   success: "#16A34A",

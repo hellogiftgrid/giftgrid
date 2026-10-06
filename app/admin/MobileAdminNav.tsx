@@ -21,7 +21,7 @@ export default function MobileAdminNav() {
           <Link
             key={href}
             href={href}
-            className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-600 whitespace-nowrap hover:border-indigo-200 hover:text-[#4F46E5]"
+            className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-600 whitespace-nowrap hover:border-indigo-200 hover:text-[#0F766E]"
           >
             {label}
           </Link>

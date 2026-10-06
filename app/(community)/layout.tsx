@@ -1,6 +1,5 @@
 import AuthControls from "@/components/shared/AuthControls";
 import Link from "next/link";
-import ThemeToggle from "@/components/shared/ThemeToggle";
 import CommunityNav from "@/components/community/CommunityNav";
 import { communityUrl } from "@/config/community";
 
@@ -12,7 +11,6 @@ export default function CommunityLayout({ children }: { children: React.ReactNod
         <div className="flex flex-wrap items-center gap-1 text-sm font-semibold text-slate-700">
           <Link href="/docs" className="rounded-lg px-3 py-3 text-blue-700">Docs</Link>
           <CommunityNav />
-          <ThemeToggle />
           <AuthControls />
         </div>
       </nav>

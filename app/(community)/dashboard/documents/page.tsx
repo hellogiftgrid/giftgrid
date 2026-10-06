@@ -40,7 +40,7 @@ export default async function DocumentsPage() {
       <div className="mx-auto max-w-5xl space-y-7">
 
         <div>
-          <p className="text-xs font-mono font-bold uppercase tracking-[0.15em] text-[#4F46E5]">
+          <p className="text-xs font-mono font-bold uppercase tracking-[0.15em] text-[#0F766E]">
             Documents
           </p>
 
@@ -55,7 +55,7 @@ export default async function DocumentsPage() {
 
         {!documents?.length ? (
           <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-[#4F46E5]">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-[#0F766E]">
               ▣
             </div>
 
@@ -75,7 +75,7 @@ export default async function DocumentsPage() {
                 className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between"
               >
                 <div className="flex items-center gap-4">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-xs font-bold text-[#4F46E5]">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-xs font-bold text-[#0F766E]">
                     {document.file_type?.toUpperCase() || 'FILE'}
                   </div>
 
@@ -94,7 +94,7 @@ export default async function DocumentsPage() {
                   href={document.file_url}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-xl bg-[#4F46E5] px-4 py-3 text-center text-xs font-bold text-white hover:bg-[#4338CA]"
+                  className="rounded-xl bg-[#0F766E] px-4 py-3 text-center text-xs font-bold text-white hover:bg-[#115E59]"
                 >
                   Open document ↗
                 </a>

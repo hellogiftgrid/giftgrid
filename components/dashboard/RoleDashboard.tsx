@@ -56,7 +56,7 @@ export default function RoleDashboard({
       <div className="rounded-3xl bg-white border border-slate-200 p-7 shadow-sm">
         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#4F46E5]">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0F766E]">
               GiftGrid Workspace
             </p>
 

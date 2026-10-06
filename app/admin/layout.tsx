@@ -3,7 +3,6 @@ import AdminSidebar from "./AdminSidebar";
 import MobileAdminNav from "./MobileAdminNav";
 import { requireAdmin } from "@/lib/admin/auth";
 import Link from "next/link";
-import ThemeToggle from "@/components/shared/ThemeToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -32,7 +31,6 @@ export default async function AdminLayout({
               </div>
 
               <div className="flex items-center gap-4">
-                <ThemeToggle />
                 <div className="hidden text-right sm:block">
                   <div className="text-sm font-semibold text-slate-700">
                     {admin.fullName}

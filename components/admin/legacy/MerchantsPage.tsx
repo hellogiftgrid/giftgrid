@@ -18,7 +18,7 @@ export default async function AdminMerchantsPage() {
   return (
     <div className="mx-auto max-w-7xl">
       <div className="mb-7">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#4F46E5]">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0F766E]">
           Merchants
         </p>
         <h1 className="mt-2 text-3xl font-bold text-slate-950">
@@ -83,7 +83,7 @@ export default async function AdminMerchantsPage() {
                     </td>
 
                     <td className="px-5 py-4">
-                      <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold capitalize text-[#4F46E5]">
+                      <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold capitalize text-[#0F766E]">
                         {merchant.profile?.role ?? "merchant"}
                       </span>
                     </td>
