@@ -13,10 +13,10 @@ const items=[
 ];
 export default function CommunityNav() {
   const pathname=usePathname();
-  return <nav aria-label="Community navigation" className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white px-2 pb-[env(safe-area-inset-bottom)] shadow-lg lg:sticky lg:top-24 lg:inset-x-auto lg:bottom-auto lg:h-fit lg:rounded-2xl lg:border lg:p-3 lg:shadow-sm">
-    <ul className="flex lg:flex-col lg:gap-1">{items.map(item=>{
+  return <nav aria-label="Community navigation" className="sticky top-[60px] z-40 border-b border-slate-200 bg-white/95 px-2 py-1.5 shadow-sm backdrop-blur lg:rounded-2xl lg:border lg:p-2 lg:shadow-sm">
+    <ul className="flex flex-row gap-1 overflow-x-auto">{items.map(item=>{
       const active=item.path==="/" ? ["/","/community","/giftgrid"].includes(pathname) : pathname.startsWith(item.path);
-      return <li key={item.name} className="min-w-0 flex-1"><Link href={communityUrl(item.path)} aria-current={active ? "page" : undefined} className={`flex min-h-16 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-semibold transition lg:min-h-12 lg:flex-row lg:justify-start lg:gap-3 lg:px-3 lg:text-sm ${active ? "bg-blue-50 text-blue-600" : "text-slate-600 hover:bg-slate-50"}`}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="size-6 shrink-0"><path d={item.icon} strokeLinecap="round" strokeLinejoin="round" /></svg><span>{item.name}</span></Link></li>;
+      return <li key={item.name} className="min-w-0 flex-1"><Link href={communityUrl(item.path)} aria-current={active ? "page" : undefined} className={`flex min-h-10 flex-row items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition lg:min-h-10 lg:gap-2 lg:px-4 lg:text-sm ${active ? "bg-blue-50 text-blue-600" : "text-slate-600 hover:bg-slate-50"}`}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="size-6 shrink-0"><path d={item.icon} strokeLinecap="round" strokeLinejoin="round" /></svg><span>{item.name}</span></Link></li>;
     })}</ul>
   </nav>;
 }

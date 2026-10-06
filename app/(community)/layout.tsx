@@ -17,7 +17,7 @@ export default function CommunityLayout({ children }: { children: React.ReactNod
         </div>
       </nav>
     </header>
-    <div className="mx-auto grid max-w-[1440px] items-start gap-6 pb-24 lg:grid-cols-[208px_minmax(0,1fr)] lg:px-6 lg:py-6 lg:pb-8">
+    <div className="mx-auto grid max-w-[1440px] items-start gap-6 pb-24 lg:grid-cols-1 lg:px-6 lg:py-6 lg:pb-8">
       <CommunityNav />
       <div className="min-w-0">{children}</div>
     </div>
