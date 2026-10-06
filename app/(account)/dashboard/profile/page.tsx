@@ -12,6 +12,6 @@ export default async function ProfilePage() {
   if (error || !profile) throw new Error("Unable to load your account profile.");
   if (profile.is_active === false) redirect("/auth/sign-in");
   return <DashboardShell role={profile.role as DashboardRole} fullName={profile.full_name || "GiftGrid member"} email={user.email || ""} avatarUrl={isGiftGridAdmin(profile.role) ? GIFTGRID_ADMIN_AVATAR : undefined}>
-    <div className="space-y-8">{profile.role === "merchant" && <MerchantProfile />}<section className="mx-auto max-w-2xl"><h1 className="mb-2 text-2xl font-bold">Account and community profile</h1><p className="mb-5 text-sm text-slate-500">Manage your name, photo, introduction, country and visibility in Connect.</p><CommunityProfile /></section></div>
+    <section className="mx-auto max-w-3xl space-y-6"><h1 className="text-2xl font-bold">Your GiftGrid profile</h1><p className="text-sm text-slate-500">One profile for your account, your business, and the community.</p>{profile.role === "merchant" && <MerchantProfile />}<CommunityProfile /></section>
   </DashboardShell>;
 }

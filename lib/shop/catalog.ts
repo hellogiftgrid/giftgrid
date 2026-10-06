@@ -13,10 +13,10 @@ function supplierProduct(product: SupplierProduct): ShopProduct {
     supplier: { source: product.source === "faire" ? "Faire" : "AliExpress", name: product.supplier_name, url: product.source_url, checked_at: product.checked_at, availability: product.availability },
   };
 }
-const fields = "id,title,short_description,description,category,hero_image_url,minimum_order_quantity,price_range,lead_time,customization_available,merchant_profiles(business_name,avatar_url)";
+const fields = "id,title,short_description,description,category,hero_image_url,minimum_order_quantity,price_range,lead_time,customization_available,merchant_profiles(business_name,avatar_url,user_id),merchant_id,like_count,average_rating,review_count,ai_rating";
 export async function getShopCatalog(category = "", page = 1) {
   const admin = createAdminClient();
-  let query = admin.from("shop_visible_listings").select(fields, { count: "exact" }).eq("status", "published").order("created_at", { ascending: false });
+  let query = admin.from("shop_visible_listings").select(fields, { count: "exact" }).eq("status", "published").order("average_rating", { ascending: false }).order("like_count", { ascending: false }).order("created_at", { ascending: false });
   if (category) query = query.eq("category", category);
   const offset = (page - 1) * 24;
   const [products, categories] = await Promise.all([query.range(offset, offset + 23), admin.rpc("shop_categories")]);
