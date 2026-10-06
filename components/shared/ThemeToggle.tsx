@@ -58,9 +58,11 @@ export default function ThemeToggle() {
       onClick={toggleTheme}
       aria-label={`Theme mode: ${mode}. Click to switch.`}
       title="Click to cycle Light, Dark, and Auto"
-      className="theme-toggle inline-flex h-10 min-w-[76px] items-center justify-center rounded-full border border-slate-200 bg-white/90 px-3 text-[11px] font-bold uppercase tracking-[0.08em] text-slate-700 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:bg-white"
+      className="theme-toggle inline-flex h-10 min-w-0 items-center justify-center rounded-full border border-slate-200 bg-white/90 px-3 text-[11px] font-bold uppercase tracking-[0.08em] text-slate-700 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:bg-white"
     >
-      {mode === "auto" ? `Auto (${theme})` : mode}
+      {mode === "light" && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="size-5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32 1.41-1.41"/></svg>}
+      {mode === "dark" && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="size-5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>}
+      {mode === "auto" && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="size-5"><circle cx="12" cy="12" r="9"/><path d="M12 3v18" fill="currentColor" opacity=".35"/></svg>}
     </button>
   );
 }

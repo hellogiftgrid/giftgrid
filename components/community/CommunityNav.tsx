@@ -16,7 +16,7 @@ export default function CommunityNav() {
   return <nav aria-label="Community navigation" className="lg:min-w-0">
     <ul className="flex flex-row gap-1 overflow-x-auto">{items.map(item=>{
       const active=item.path==="/" ? ["/","/community","/giftgrid"].includes(pathname) : pathname.startsWith(item.path);
-      return <li key={item.name} className="min-w-0 flex-1"><Link href={communityUrl(item.path)} aria-current={active ? "page" : undefined} className={`flex min-h-10 flex-row items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition lg:min-h-10 lg:gap-2 lg:px-4 lg:text-sm ${active ? "bg-blue-50 text-blue-600" : "text-slate-600 hover:bg-slate-50"}`}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="size-6 shrink-0"><path d={item.icon} strokeLinecap="round" strokeLinejoin="round" /></svg><span>{item.name}</span></Link></li>;
+      return <li key={item.name} className="min-w-0 flex-1"><Link href={communityUrl(item.path)} aria-current={active ? "page" : undefined} className={`flex min-h-10 flex-row items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition lg:min-h-10 lg:gap-2 lg:px-4 lg:text-sm ${active ? "bg-blue-50 text-blue-600" : "text-slate-600 hover:bg-slate-50"}`}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="size-6 shrink-0"><path d={item.icon} strokeLinecap="round" strokeLinejoin="round" /></svg><span className="pointer-events-none absolute -bottom-8 left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-xs text-white group-hover:block lg:-bottom-9">{item.name}</span></Link></li>;
     })}</ul>
   </nav>;
 }

@@ -28,6 +28,8 @@ export async function memberDirectory() {
     const details = new Map((members.data || []).map(member => [member.profile_id,member]));
     const businesses = new Map((merchants.data || []).map(merchant => [merchant.user_id,merchant]));
     const merchantIds = (merchants.data || []).map(merchant => merchant.id);
+    const { data: ranking } = await admin.from("merchant_ranking").select("merchant_id,rank");
+    const rankByMerchant = new Map((ranking || []).map((row: { merchant_id: string; rank: number }) => [row.merchant_id, row.rank]));
     const { data: products, error: productsError } = merchantIds.length
       ? await admin.from("merchant_listings").select("merchant_id,title,short_description,hero_image_url,price_range,minimum_order_quantity").in("merchant_id", merchantIds).eq("status", "published").order("created_at", { ascending: false }).limit(1000)
       : { data: [], error: null };
@@ -38,11 +40,11 @@ export async function memberDirectory() {
       const member = details.get(account.id), business = account.role === "merchant" ? businesses.get(account.id) : undefined;
       const name = member?.display_name || account.full_name || business?.business_name || "GiftGrid member";
       const storeUrl = safeStoreUrl(business?.store_url);
-      result.push({profile_id:account.id,display_name:name.includes("@") ? "GiftGrid member" : name,kind:isGiftGridAdmin(account.role) ? "admin" : account.role === "merchant" ? "merchant" : "buyer",bio:member?.bio || business?.business_description || null,country:member?.country || business?.country || null,avatar_url:isGiftGridAdmin(account.role) ? GIFTGRID_ADMIN_AVATAR : member?.avatar_url || business?.avatar_url || null,store_url:storeUrl,product:business ? featuredProducts.get(business.id) || null : null});
+      result.push({profile_id:account.id,display_name:name.includes("@") ? "GiftGrid member" : name,kind:isGiftGridAdmin(account.role) ? "admin" : account.role === "merchant" ? "merchant" : "buyer",bio:member?.bio || business?.business_description || null,country:member?.country || business?.country || null,avatar_url:isGiftGridAdmin(account.role) ? GIFTGRID_ADMIN_AVATAR : member?.avatar_url || business?.avatar_url || null,store_url:storeUrl,product:business ? featuredProducts.get(business.id) || null : null,merchant_id: business?.id || null,rank: business ? rankByMerchant.get(business.id) ?? null : null} as never);
     }
     if (accounts.data.length < 1000) break;
   }
-  return result.sort((a,b) => a.display_name.localeCompare(b.display_name));
+  return result.sort((a, b) => { const ra = (a as { rank?: number | null }).rank ?? 1e9; const rb = (b as { rank?: number | null }).rank ?? 1e9; return ra - rb || a.display_name.localeCompare(b.display_name); });
 }
 
 function safeStoreUrl(value: string | null | undefined) {
