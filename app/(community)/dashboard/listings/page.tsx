@@ -50,13 +50,13 @@ export default function MerchantListingsPage() {
       lead_time: String(form.get("leadTime") || ""),
       ships_internationally: form.get("international") === "on",
       customization_available: form.get("customization") === "on",
-      status: "pending_review",
+      status: "published",
     };
     const query = supabase.from("merchant_listings");
     const { error } = editing ? await query.update(values).eq("id", editing.id).eq("merchant_id", merchantId) : await query.insert(values);
     if (error) return setNotice(error.message);
     void fetch("/api/activity/flush", { method: "POST" });
-    setNotice("Listing submitted for admin review.");
+    setNotice("Listing is live.");
     setShowForm(false);
     setImageUrl("");
     setEditing(null);

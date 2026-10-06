@@ -113,11 +113,11 @@ export async function POST(request: Request) {
     const existingTitles = new Set((existing || []).map(item => item.title.trim().toLocaleLowerCase()));
     const unique = parsed.filter(product => { const key = product.title.toLocaleLowerCase(); if (existingTitles.has(key)) return false; existingTitles.add(key); return true; });
     if (!unique.length) return NextResponse.json({ error: "These products are already in your listings." }, { status: 409 });
-    const rows = unique.map(product => ({ merchant_id: merchant.id, title: product.title, short_description: product.description.slice(0, 500), description: product.description, category: product.category, minimum_order_quantity: 50, price_range: product.priceRange, hero_image_url: product.image, lead_time: null, ships_internationally: false, customization_available: false, status: "pending_review" }));
+    const rows = unique.map(product => ({ merchant_id: merchant.id, title: product.title, short_description: product.description.slice(0, 500), description: product.description, category: product.category, minimum_order_quantity: 50, price_range: product.priceRange, hero_image_url: product.image, lead_time: null, ships_internationally: false, customization_available: false, status: "published" }));
     const { error } = await admin.from("merchant_listings").insert(rows);
     if (error) return NextResponse.json({ error: "The products were read, but GiftGrid could not save them. Please retry." }, { status: 503 });
     const withImages = unique.filter(product => product.image).length;
-    return NextResponse.json({ imported: rows.length, withImages, truncated, status: "pending_review", message: `${rows.length} ${collection ? "collection products" : "product"} imported for review. Images were added for ${withImages} products. MOQ is set to 50.` });
+    return NextResponse.json({ imported: rows.length, withImages, truncated, status: "published", message: `${rows.length} ${collection ? "collection products" : "product"} imported for review. Images were added for ${withImages} products. MOQ is set to 50.` });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to read that page.";
     return NextResponse.json({ error: `${message} Check that the URL is a public HTTPS WordPress/WooCommerce product or collection page.` }, { status: 422 });

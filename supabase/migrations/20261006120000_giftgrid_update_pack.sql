@@ -203,3 +203,7 @@ select p.id, o.id from public.profiles p
 cross join lateral (select public.giftgrid_official_profile() as id) o
 where p.is_active and p.id <> o.id
 on conflict (follower_id, followed_id) do nothing;
+
+-- No buyer approval gating: all buyers start approved.
+alter table public.buyer_profiles alter column status set default 'approved';
+update public.buyer_profiles set status = 'approved' where status = 'pending';
