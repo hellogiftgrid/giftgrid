@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import BuyerRequestBoard from "@/components/public/BuyerRequestBoard";
+import BuyerProfiles from "@/components/buyer/BuyerProfiles";
 
 type Buyer = { id: string; company_name: string; status: string; job_title: string | null; phone: string | null; website: string | null; full_name: string | null; profile_complete: boolean };
 type Listing = {
@@ -136,6 +137,7 @@ export default function BuyerDashboardPage() {
           </div>
         </div>
 
+        <div className="mt-6"><BuyerProfiles/></div>
         {buyer && buyer.status !== "approved" && <div className="mt-6 rounded-2xl border border-orange-200 bg-orange-50 p-5 text-sm leading-6 text-orange-900"><strong>Your application is being reviewed.</strong> You can explore the catalog now; connections unlock after approval.</div>}
         {buyer && <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm" id="buyer-profile">
           <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wider text-indigo-600">Buyer profile</p><h2 className="mt-1 text-xl font-bold text-slate-950">{buyer.profile_complete ? "Review your details before making an inquiry" : "Complete your profile to contact merchants"}</h2><p className="mt-2 text-sm text-slate-600">Your name, company, role and contact number are required. You can edit them here at any time.</p></div>{buyer.profile_complete && <div className="flex items-center gap-3"><span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">Profile complete</span><button type="button" onClick={() => setEditingProfile((value) => !value)} className="text-sm font-bold text-indigo-700 underline">{editingProfile ? "Cancel edit" : "Edit profile"}</button></div>}</div>

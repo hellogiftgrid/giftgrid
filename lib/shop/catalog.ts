@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getSupplierProducts } from "./suppliers";
 import { supplierPage, type SupplierProduct } from "./supplier-schema";
 
-export type ShopProduct = { id: string; title: string; short_description: string; description: string | null; category: string; hero_image_url: string | null; minimum_order_quantity: number | null; price_range: string | null; lead_time: string | null; customization_available: boolean; merchant_profiles: { business_name: string; avatar_url: string | null } | null; supplier?: { source: string; name: string; url: string; checked_at: string; availability: string } };
+export type ShopProduct = { id: string; title: string; short_description: string; description: string | null; category: string; hero_image_url: string | null; minimum_order_quantity: number | null; price_range: string | null; lead_time: string | null; customization_available: boolean; merchant_profiles: { business_name: string; avatar_url: string | null; user_id?: string | null } | null; merchant_id?: string | null; like_count?: number; average_rating?: number; review_count?: number; ai_rating?: number; supplier?: { source: string; name: string; url: string; checked_at: string; availability: string } };
 function supplierProduct(product: SupplierProduct): ShopProduct {
   return {
     id: product.id, title: product.title, short_description: product.description.slice(0, 300), description: product.description,

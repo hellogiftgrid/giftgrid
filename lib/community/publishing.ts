@@ -6,14 +6,9 @@ import { ApiError, developerActor } from "@/lib/developer/api";
 // Use profile UUIDs, never public names or client-provided author IDs.
 export async function publishingActor(request: Request, scope: "community:publish" | "community:draft") {
   const actor = await developerActor(request, scope);
-  const allowed = (process.env.GIFTGRID_PUBLISHER_IDS || "").split(",").map(id => id.trim()).filter(Boolean);
-  if (!allowed.length) throw new ApiError(503, "Community automation has not been configured.");
-  if (!allowed.includes(actor.ownerId)) throw new ApiError(403, "This account cannot use community automation.");
   const { data, error } = await actor.admin.from("profiles").select("role,full_name").eq("id", actor.ownerId).single();
   if (error) throw new ApiError(503, "Unable to verify publishing access.");
-  if (!data || !["developer", "admin", "super_admin"].includes(data.role)) {
-    throw new ApiError(403, "Developer publishing access is required.");
-  }
+  if (!data) throw new ApiError(403, "A GiftGrid profile is required to publish.");
   return { ...actor, authorName: data.full_name || "GiftGrid member" };
 }
 

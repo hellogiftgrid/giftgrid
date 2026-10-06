@@ -1,4 +1,6 @@
 import Link from "next/link";
+import ListingReviews from "@/components/market/ListingReviews";
+import ProductActions from "@/components/market/ProductActions";
 import { notFound } from "next/navigation";
 import { getShopProduct, productImage } from "@/lib/shop/catalog";
 export const dynamic = "force-dynamic";
@@ -18,6 +20,13 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         {product.supplier && <p className="mt-2 text-sm font-semibold text-amber-800">External supplier · {product.supplier.source}</p>}
         <p className="mt-5 break-words whitespace-pre-wrap text-sm leading-7 text-slate-600">{product.description || product.short_description}</p>
         <p className="mt-6 font-bold text-slate-900">{product.price_range || (product.supplier ? "Check supplier pricing" : "Contact the merchant for pricing")}</p>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+          {(product.average_rating ?? 0) >= 4.5 && (product.review_count ?? 0) > 0 && <span className="rounded-full bg-emerald-50 px-3 py-1 font-bold text-emerald-700">Top rated</span>}
+          {(product.review_count ?? 0) > 0 && <span className="text-amber-600 font-semibold">{"★".repeat(Math.round(product.average_rating || 0))} {product.average_rating?.toFixed?.(1)} ({product.review_count} reviews)</span>}
+          {(product.like_count ?? 0) > 0 && <span className="text-slate-500">♥ {product.like_count}</span>}
+          {(product.ai_rating ?? 0) > 0 && <span className="text-slate-500">AI rating {product.ai_rating?.toFixed?.(1)}</span>}
+        </div>
+        {!product.supplier && <ProductActions listingId={id} merchantUserId={product.merchant_profiles?.user_id} />}
         {product.minimum_order_quantity !== null && <p className="mt-2 text-sm text-slate-600">Minimum order: {product.minimum_order_quantity}</p>}
         {product.lead_time && <p className="mt-2 text-sm text-slate-600">Lead time: {product.lead_time}</p>}
         {product.customization_available && <p className="mt-2 text-sm text-slate-600">Customization available</p>}
@@ -28,5 +37,6 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         </> : <Link href={`/dashboard?listing=${id}`} className="mt-6 inline-flex rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white">Request a quote</Link>}
       </div>
     </article>
+    <ListingReviews listingId={id} />
   </main>;
 }

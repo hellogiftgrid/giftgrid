@@ -20,6 +20,7 @@ Resources and actions:
   community list
   community draft --brief <source material>
   community publish --body <text> --idempotency-key <unique key> [--topic <topic>]
+  community autopost --brief <source material> [--topic <topic>]
   apps list
   apps create --name <name> [--description <text>]
   keys create --app-id <id> --scopes <scope,...> [--expires <ISO date>]
@@ -76,6 +77,14 @@ async function main() {
   else if (resource === "community" && action === "draft") {
     if (typeof opts.brief !== "string") throw new Error("community draft requires --brief");
     result = await request("/developer/community/drafts", "POST", { brief: opts.brief });
+  }
+  else if (resource === "community" && action === "autopost") {
+    if (typeof opts.brief !== "string") throw new Error("community autopost requires --brief");
+    const draftResult = await request("/developer/community/drafts", "POST", { brief: opts.brief });
+    const body = draftResult?.draft?.body;
+    if (!body) throw new Error("Autopost could not draft a post from that brief.");
+    const key = opts["idempotency-key"] || `autopost-${Date.now()}`;
+    result = await request("/developer/community/posts", "POST", { body, topic: opts.topic || "General" }, true, { "Idempotency-Key": String(key) });
   }
   else if (resource === "community" && action === "publish") {
     if (typeof opts.body !== "string" || typeof opts["idempotency-key"] !== "string") throw new Error("community publish requires --body and --idempotency-key");

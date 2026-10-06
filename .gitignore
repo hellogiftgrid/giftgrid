@@ -20,3 +20,7 @@ mobile/dist/
 mobile/android/
 mobile/ios/
 android/.kotlin/
+.aider*
+
+# Local Netlify folder
+.netlify
