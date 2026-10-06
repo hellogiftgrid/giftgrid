@@ -16,7 +16,7 @@ function supplierProduct(product: SupplierProduct): ShopProduct {
 const fields = "id,title,short_description,description,category,hero_image_url,minimum_order_quantity,price_range,lead_time,customization_available,merchant_profiles(business_name,avatar_url,user_id),merchant_id,like_count,average_rating,review_count,ai_rating";
 export async function getShopCatalog(category = "", page = 1) {
   const admin = createAdminClient();
-  let query = admin.from("shop_visible_listings").select(fields, { count: "exact" }).eq("status", "published").order("average_rating", { ascending: false }).order("like_count", { ascending: false }).order("created_at", { ascending: false });
+  let query = admin.from("merchant_listings").select(fields, { count: "exact" }).eq("status", "published").order("average_rating", { ascending: false }).order("like_count", { ascending: false }).order("created_at", { ascending: false });
   if (category) query = query.eq("category", category);
   const offset = (page - 1) * 24;
   const [products, categories] = await Promise.all([query.range(offset, offset + 23), admin.rpc("shop_categories")]);
@@ -38,7 +38,7 @@ export async function getShopProduct(id: string) {
     return product ? supplierProduct(product) : null;
   }
   if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
-  const { data, error } = await createAdminClient().from("shop_visible_listings").select(fields).eq("id", id).eq("status", "published").maybeSingle();
+  const { data, error } = await createAdminClient().from("merchant_listings").select(fields).eq("id", id).eq("status", "published").maybeSingle();
   if (error) throw new Error("Unable to load this product.");
   return data as unknown as ShopProduct | null;
 }
