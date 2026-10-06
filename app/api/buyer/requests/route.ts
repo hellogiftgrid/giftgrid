@@ -57,7 +57,28 @@ export async function GET() {
     if (error) throw new ApiError(503, 'Unable to load buyer requests.');
     const open = (posts || []).filter(p => typeof p.system_key === 'string' && /^buyer-request:[0-9a-f-]{36}$/i.test(p.system_key));
     const teasers = open.map(p => ({ id: p.system_key.slice(14), title: 'Open gifting request', created_at: p.created_at, teaser: publicTeaser }));
-    if (!user) return NextResponse.json({ requests: teasers, verified: false, canRespond: false, approved: false, canPost: false, role: null }, { headers: { 'Cache-Control': 'no-store' } });
+    const buildOpen = async () => {
+      const ids = open.map(p => p.system_key.slice(14));
+      if (!ids.length) return [];
+      const [privatePosts, oldInquiries] = await Promise.all([
+        admin.from('community_posts').select('system_key,body,created_at').eq('status', 'hidden').in('system_key', ids.map(privateKey)),
+        admin.from('buyer_inquiries').select('id,buyer_id,merchant_id,subject,message,quantity,target_date,budget,status,created_at').in('status', ['sent', 'viewed', 'accepted']).like('subject', '[GGREQ:%').order('created_at', { ascending: false }).limit(5000),
+      ]);
+      const openIds = new Set(ids), briefs = new Map<string, Record<string, unknown>>();
+      for (const row of privatePosts.data || []) {
+        const id = typeof row.system_key === 'string' ? row.system_key.slice('buyer-request-private:'.length) : '';
+        const fields = parseObject(row.body);
+        if (openIds.has(id) && fields) briefs.set(id, { ...fields, id, created_at: row.created_at });
+      }
+      for (const row of oldInquiries.data || []) {
+        const id = requestIdFromSubject(row.subject);
+        if (!id || !openIds.has(id) || briefs.has(id)) continue;
+        const item = briefFromInquiry(id, row);
+        if (item) briefs.set(id, item);
+      }
+      return ids.flatMap(id => (briefs.has(id) ? [briefs.get(id)] : []));
+    };
+    if (!user) return NextResponse.json({ requests: await buildOpen(), verified: false, canRespond: false, approved: false, canPost: false, role: null }, { headers: { 'Cache-Control': 'no-store' } });
 
     const merchant = await merchantAccess(admin, user.id);
     if (merchant) {
@@ -92,8 +113,8 @@ export async function GET() {
     if (profile.error) throw new ApiError(503, 'Unable to verify your account.');
     const buyer = await admin.from('buyer_profiles').select('id,status').eq('profile_id', user.id).maybeSingle();
     if (buyer.error) throw new ApiError(503, 'Unable to load buyer requests.');
-    if (profile.data?.role !== 'corporate_buyer' || profile.data.is_active === false || !buyer.data) return NextResponse.json({ requests: teasers, verified: false, canRespond: false, approved: false, canPost: false, role: profile.data?.role || null }, { headers: { 'Cache-Control': 'private, no-store' } });
-    if (buyer.data.status !== 'approved') return NextResponse.json({ requests: teasers, verified: false, canRespond: false, approved: false, canPost: false, role: 'corporate_buyer' }, { headers: { 'Cache-Control': 'private, no-store' } });
+    if (profile.data?.role !== 'corporate_buyer' || profile.data.is_active === false || !buyer.data) return NextResponse.json({ requests: await buildOpen(), verified: false, canRespond: false, approved: false, canPost: false, role: profile.data?.role || null }, { headers: { 'Cache-Control': 'private, no-store' } });
+    if (buyer.data.status !== 'approved') return NextResponse.json({ requests: await buildOpen(), verified: false, canRespond: false, approved: false, canPost: false, role: 'corporate_buyer' }, { headers: { 'Cache-Control': 'private, no-store' } });
 
     const [inquiries, privateRows] = await Promise.all([
       admin.from('buyer_inquiries').select('id,buyer_id,subject,message,quantity,target_date,budget,status,created_at,merchant_profiles(business_name)').eq('buyer_id', buyer.data.id).like('subject', '[GGREQ:%').order('created_at', { ascending: false }).limit(2000),
