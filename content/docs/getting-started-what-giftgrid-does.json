@@ -6,7 +6,7 @@
       "heading": "Getting Started with Your Account",
       "paragraphs": [
         "The first step is to create an account on community.degiftgrid.com. You can sign up via the /auth/join page, choosing whether you’ll be a buyer or a merchant. Even if you don’t have a business deck yet, you can still create an account; the platform will allow you to browse the community and view public merchant profiles. Once you’ve signed up, you’ll receive a confirmation email and can log in through /auth/sign-in. The sign‑in page presents role cards—buyer or merchant—so that your experience is tailored to your needs. If you forget your password, use /auth/forgot-password to reset it. After logging in, you’ll see the Connect page, which lists all active community members, including those with incomplete profiles.",
-        "After you’re logged in, take a moment to review your profile. For buyers, a complete profile isn’t required to browse or comment, but adding a short bio and company name can help merchants identify you. Merchants should upload a public PDF deck (max 4 MB) to /dashboard/profile; this deck is visible to all community members and can include product details, brand story, and contact information. Remember that a single 72‑hour grace period starts on the first listing; after that, listings without a deck will be hidden. Listing approval is separate from deck qualification, so you can still list products even if your deck is pending, but they may not appear to buyers until the deck is uploaded."
+        "After you’re logged in, take a moment to review your profile. For buyers, a complete profile isn’t required to browse or comment, but adding a short bio and company name can help merchants identify you. Merchants should upload a public PDF deck (max 4 MB) to /dashboard/profile; this deck is visible to all community members and can include product details, brand story, and contact information. A trade deck is optional — a missing one never hides your listings. Listing approval is separate from deck review, so you can keep listing even while your deck is pending review."
       ]
     },
     {
@@ -34,7 +34,7 @@
       "heading": "Understanding Merchant Decks",
       "paragraphs": [
         "Merchant decks are public PDFs uploaded to /dashboard/profile. They serve as a portfolio for the merchant, showcasing product ranges, brand values, and contact information. The deck is limited to 4 MB, so include only essential visuals and concise text. Once uploaded, the deck becomes visible to all community members, and it can be downloaded from the merchant’s profile page.",
-        "A deck is not required for a listing to appear, but it enhances credibility. If a merchant’s deck is missing, their products may still be listed during the initial 72‑hour grace period. After that, listings without a deck are hidden, so it’s in the merchant’s best interest to upload a deck promptly. Buyers can use the deck to assess the merchant’s professionalism and product quality before initiating contact."
+        "A deck is not required for a listing to appear — it simply enhances credibility. Buyers can use the deck to assess the merchant’s professionalism and product quality before initiating contact."
       ]
     },
     {
@@ -54,7 +54,7 @@
     {
       "heading": "Common Failure Scenarios and Recovery",
       "paragraphs": [
-        "A frequent issue is encountering a product with an unknown price or stock status. In this case, the best practice is to contact the merchant directly to confirm details before proceeding. If the merchant does not respond, look for alternative listings or suppliers. Another common failure is a missing deck for a merchant’s product after the 72‑hour grace period. Merchants should upload a deck promptly to avoid their listings being hidden. Buyers can report the issue by leaving a comment on the product page, prompting the merchant to update their deck.",
+        "A frequent issue is encountering a product with an unknown price or stock status. In this case, the best practice is to contact the merchant directly to confirm details before proceeding. If the merchant does not respond, look for alternative listings or suppliers. Another common failure is a missing or outdated deck. Merchants can upload or refresh their deck at any time from their profile. Buyers can report the issue by leaving a comment on the product page, prompting the merchant to update their deck.",
         "If you experience authentication problems, verify that your GIFTGRID_API_KEY is correctly set in your environment and that you’re using the correct scopes. If the console shows an error when registering a webhook, double‑check the webhook URL and ensure it is reachable. For messaging issues, confirm that you are logged in and that the recipient’s profile is public. If problems persist, use the /contact page to reach support, acknowledging that response times are not guaranteed."
       ]
     },

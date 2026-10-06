@@ -36,7 +36,7 @@ begin
  perform 1 from public.merchant_profiles where id=target_merchant for update;
  update public.merchant_workflow_tasks set resolved=true,updated_at=now() where merchant_id=target_merchant and not resolved;
  insert into public.merchant_workflow_tasks(merchant_id,source_type,source_id,title,detail,href)
- select m.id,'profile',m.id,'Complete your merchant profile','Add your business details and trade deck to finish merchant setup.','/dashboard/profile'
+ select m.id,'profile',m.id,'Complete your merchant profile','Add your business details to finish merchant setup. A trade deck is optional and can be added anytime from your profile.','/dashboard/profile'
  from public.merchant_profiles m where m.id=target_merchant and m.onboarding_required and m.onboarding_completed_at is null
  on conflict(merchant_id,source_type,source_id) do update set resolved=false,updated_at=now();
  insert into public.merchant_workflow_tasks(merchant_id,source_type,source_id,title,detail,href)

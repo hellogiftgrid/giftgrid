@@ -40,6 +40,8 @@ export default function ProfilePage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [decks, setDecks] = useState<{ id: string; title: string; file_type: string; review_status: string; created_at: string }[]>([]);
+  const [deckUploading, setDeckUploading] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -145,6 +147,27 @@ export default function ProfilePage() {
     if (!response.ok) setError(result.error || "Image upload failed.");
     else setField("avatarUrl", result.url);
     setUploading(false);
+  }
+
+  async function loadDecks() {
+    try {
+      const response = await fetch("/api/merchant/trade-deck", { cache: "no-store" });
+      const result = await response.json();
+      if (response.ok) setDecks(result.documents || []);
+    } catch { /* ignore */ }
+  }
+
+  useEffect(() => { void loadDecks(); }, []);
+
+  async function uploadTradeDeck(file?: File) {
+    if (!file) return;
+    setDeckUploading(true); setError("");
+    const payload = new FormData(); payload.set("file", file);
+    const response = await fetch("/api/merchant/trade-deck", { method: "POST", body: payload });
+    const result = await response.json();
+    if (!response.ok) setError(result.error || "Trade deck upload failed.");
+    else { setMessage("Trade deck uploaded. It will be reviewed before it appears on your profile."); await loadDecks(); }
+    setDeckUploading(false);
   }
 
   async function saveProfile() {
@@ -368,6 +391,28 @@ export default function ProfilePage() {
               />
             </label>
           </div>
+        </section>
+
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-bold text-slate-900">Trade deck (optional)</h2>
+          <p className="mt-1 text-sm text-slate-500">Share a PDF or document that introduces your products and capabilities. You can skip this — it is not required and will not affect your account or listings.</p>
+          <div className="mt-4">
+            <label className="cursor-pointer rounded-xl border border-dashed border-indigo-300 px-4 py-3 text-sm font-semibold text-indigo-700 inline-block">
+              {deckUploading ? "Uploading…" : "Upload trade deck"}
+              <input type="file" accept="application/pdf,image/jpeg,image/png,.pptx,.ppt,.docx,.doc" disabled={deckUploading} className="sr-only" onChange={(e) => { uploadTradeDeck(e.target.files?.[0]); e.currentTarget.value = ""; }} />
+            </label>
+            <span className="ml-3 text-xs text-slate-400">PDF, image, or Office document, up to 10 MB.</span>
+          </div>
+          {decks.length > 0 && (
+            <ul className="mt-4 space-y-2">
+              {decks.map((deck) => (
+                <li key={deck.id} className="flex items-center justify-between rounded-xl border border-slate-100 px-4 py-2 text-sm">
+                  <span className="font-semibold text-slate-700">{deck.title}</span>
+                  <span className="text-xs text-slate-400">{deck.review_status.replace("_", " ")} · {new Date(deck.created_at).toLocaleDateString()}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <div className="flex justify-end">

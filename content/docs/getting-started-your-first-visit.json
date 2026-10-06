@@ -13,7 +13,7 @@
       "heading": "2. Browsing Members on Connect",
       "paragraphs": [
         "The Connect page lists active community members. Each member card displays the user’s name, avatar, and a link to their public profile at /members/{id}. The list is paginated and can be filtered by role using the sidebar. Even members with incomplete business profiles or no deck appear here, so you can discover potential collaborators early. The Connect page loads data through a GET request to /api/developer/apps, which returns a lightweight summary of each member.",
-        "You can click a member’s avatar or name to open their profile. The profile page shows public information: name, role (buyer or merchant), and any uploaded deck URL if present. The deck is a PDF up to 4 MB, hosted at /dashboard/profile. If a merchant’s deck is missing, the profile still displays the basic info, but the merchant’s listings may be hidden after the 72‑hour grace period. This transparency helps you gauge a merchant’s readiness without needing to sign in."
+        "You can click a member’s avatar or name to open their profile. The profile page shows public information: name, role (buyer or merchant), and any uploaded deck URL if present. The deck is a PDF up to 4 MB, hosted at /dashboard/profile. If a merchant’s deck is missing, the profile still displays the basic info — no listings are hidden. This transparency helps you gauge a merchant’s readiness without needing to sign in."
       ]
     },
     {
@@ -40,8 +40,8 @@
     {
       "heading": "6. Understanding Listings and Deck Rules",
       "paragraphs": [
-        "Merchants create listings under /dashboard/listings. Each listing is enquiry‑based; it does not reserve stock or initiate an order. The listing includes product details, price, and a link to an external supplier such as AliExpress or Faire. External entries older than seven days or marked out‑of‑stock are hidden automatically. If a listing lacks a merchant deck after 72 hours, the listing becomes invisible to the public, though the merchant can still edit it. This grace period allows merchants to prepare a deck without losing visibility.",
-        "The deck itself is a public PDF uploaded at /dashboard/profile. It can be up to 4 MB and is linked from the merchant’s profile. The deck is not required for account creation; merchants can start listing immediately. However, without a deck, their listings will be hidden after the grace period. Buyers do not need a deck to browse or purchase, and their accounts can be created without any business documentation."
+        "Merchants create listings under /dashboard/listings. Each listing is enquiry‑based; it does not reserve stock or initiate an order. The listing includes product details, price, and a link to an external supplier such as AliExpress or Faire. External entries older than seven days or marked out‑of‑stock are hidden automatically. A listing does not depend on a deck — merchants can publish and edit freely, and adding a deck is optional.",
+        "The deck itself is a public PDF uploaded at /dashboard/profile. It can be up to 4 MB and is linked from the merchant’s profile. The deck is not required for account creation; merchants can start listing immediately, with or without a deck. Buyers do not need a deck to browse or purchase, and their accounts can be created without any business documentation."
       ]
     },
     {
@@ -54,7 +54,7 @@
     {
       "heading": "8. Troubleshooting Common Issues and Verification",
       "paragraphs": [
-        "A frequent hiccup is the 72‑hour deck gating. If a merchant’s listing disappears, verify the deck upload time and ensure the PDF is under 4 MB. If the deck is present but the listing is hidden, check that the external supplier link is active and not older than seven days. For authentication problems, clear the browser cache and cookies, then re‑authenticate. If the API key is missing from localStorage, the client will prompt you to sign in again.",
+        "A frequent hiccup is a hidden listing or missing deck. Verify the deck upload time and ensure the PDF is under 4 MB. If the deck is present but the listing is hidden, check that the external supplier link is active and not older than seven days. For authentication problems, clear the browser cache and cookies, then re‑authenticate. If the API key is missing from localStorage, the client will prompt you to sign in again.",
         "Verification of your actions is straightforward. After posting, you can refresh the page or navigate to /api/community/posts to confirm the new entry appears. For messages, open the conversation thread and look for the timestamped entry. If a like or follow does not persist after a page reload, clear localStorage and retry. These steps provide a reliable way to confirm that your interactions have been recorded by the system."
       ]
     }
